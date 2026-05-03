@@ -3,7 +3,13 @@
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
-from functools import lru_cache
+
+
+def _flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """yfinance returns MultiIndex columns for single tickers — flatten them."""
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.get_level_values(0)
+    return df
 
 
 def get_price_history(ticker: str, trade_date: str, window_days: int = 90) -> pd.DataFrame:
@@ -12,6 +18,7 @@ def get_price_history(ticker: str, trade_date: str, window_days: int = 90) -> pd
     df = yf.download(ticker, start=start.strftime("%Y-%m-%d"), end=end.strftime("%Y-%m-%d"), progress=False)
     if df.empty:
         return df
+    df = _flatten_columns(df)
     df.index = pd.to_datetime(df.index)
     return df
 
@@ -22,6 +29,7 @@ def get_price_on_date(ticker: str, date: str) -> float | None:
                      end=(dt + timedelta(days=1)).strftime("%Y-%m-%d"), progress=False)
     if df.empty:
         return None
+    df = _flatten_columns(df)
     return float(df["Close"].iloc[-1])
 
 

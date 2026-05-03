@@ -4,10 +4,36 @@ import argparse
 import os
 import sys
 
-from anthropic import Anthropic
 from src.data.trades import load_trades, triage
 from src.agent.autopsy import analyze_trade
 from src.report.generate import save_results
+
+BEDROCK_MODELS = {
+    "opus": "global.anthropic.claude-opus-4-6-v1",
+    "sonnet": "global.anthropic.claude-sonnet-4-6-v1",
+    "haiku": "global.anthropic.claude-haiku-4-5-v1",
+}
+
+DIRECT_MODELS = {
+    "opus": "claude-opus-4-6-20250514",
+    "sonnet": "claude-sonnet-4-6-20250514",
+    "haiku": "claude-haiku-4-5-20251001",
+}
+
+
+def create_client():
+    """Create Anthropic client — Bedrock if AWS creds available, else direct API."""
+    if os.environ.get("AWS_BEARER_TOKEN_BEDROCK") or os.environ.get("AWS_ACCESS_KEY_ID"):
+        from anthropic import AnthropicBedrock
+        return AnthropicBedrock(), "bedrock"
+    elif os.environ.get("ANTHROPIC_API_KEY"):
+        from anthropic import Anthropic
+        return Anthropic(), "direct"
+    else:
+        print("Error: Set ANTHROPIC_API_KEY or AWS credentials for Bedrock.")
+        print("  Direct API: export ANTHROPIC_API_KEY=sk-...")
+        print("  Bedrock:    export AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... AWS_SESSION_TOKEN=...")
+        sys.exit(1)
 
 
 def main():
@@ -16,16 +42,13 @@ def main():
     parser.add_argument("--limit", type=int, default=None, help="Max number of trades to analyze")
     parser.add_argument("--politician", default=None, help="Filter to a specific politician")
     parser.add_argument("--ticker", default=None, help="Filter to a specific ticker")
-    parser.add_argument("--model", default="claude-sonnet-4-6-20250514", help="Anthropic model to use")
+    parser.add_argument("--model", default="sonnet", choices=["opus", "sonnet", "haiku"], help="Model to use (default: sonnet)")
     parser.add_argument("--output", default="outputs", help="Output directory")
     args = parser.parse_args()
 
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        print("Error: ANTHROPIC_API_KEY environment variable not set.")
-        sys.exit(1)
-
-    client = Anthropic(api_key=api_key)
+    client, backend = create_client()
+    model_id = BEDROCK_MODELS[args.model] if backend == "bedrock" else DIRECT_MODELS[args.model]
+    print(f"Using {args.model} via {backend} ({model_id})")
 
     print("Loading trades...")
     trades = load_trades(args.data)
@@ -55,7 +78,7 @@ def main():
     for i, trade in enumerate(trades):
         print(f"[{i+1}/{len(trades)}] {trade.politician} — {trade.trade_type} {trade.ticker} ({trade.trade_date})")
         try:
-            result = analyze_trade(trade, client, model=args.model)
+            result = analyze_trade(trade, client, model=model_id)
             grade = result.get("grade", "?")
             suspicion = result.get("suspicion_score", "?")
             print(f"         Grade: {grade} | Suspicion: {suspicion}/5")

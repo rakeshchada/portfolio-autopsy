@@ -1,7 +1,6 @@
 """Core autopsy agent — analyzes trades using LLM + tools."""
 
 import json
-from anthropic import Anthropic
 from src.data.trades import Trade
 from src.agent.tools import TOOL_DEFINITIONS, execute_tool
 
@@ -43,7 +42,7 @@ After gathering evidence, provide:
 Be precise. Use actual numbers from the tools. Don't speculate without evidence."""
 
 
-def analyze_trade(trade: Trade, client: Anthropic, model: str = "claude-sonnet-4-6-20250514") -> dict:
+def analyze_trade(trade: Trade, client, model: str = "claude-sonnet-4-6-20250514") -> dict:
     trade_description = (
         f"Politician: {trade.politician} ({trade.party}, {trade.chamber})\n"
         f"Trade: {trade.trade_type} {trade.ticker}\n"
@@ -92,7 +91,11 @@ def analyze_trade(trade: Trade, client: Anthropic, model: str = "claude-sonnet-4
 def parse_verdict(text: str, trade: Trade) -> dict:
     import re
 
-    grade_match = re.search(r'\b([A-F][+-]?)\b', text)
+    grade_match = re.search(r'\*\*Letter Grade\*\*[^*]*\*\*([A-F][+-]?)\*\*', text)
+    if not grade_match:
+        grade_match = re.search(r'(?:Grade|Rating)[:\s]*\*?\*?([A-F][+-]?)\*?\*?', text, re.IGNORECASE)
+    if not grade_match:
+        grade_match = re.search(r'\b([A-F][+-])\b', text)
     grade = grade_match.group(1) if grade_match else "?"
 
     suspicion_match = re.search(r'suspicion[:\s]*score[:\s]*(\d)', text, re.IGNORECASE)
