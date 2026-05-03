@@ -17,6 +17,8 @@ from src.data.market import (
     get_alternative_instruments,
     get_correlation_to_market,
 )
+from src.agent.sandbox import execute_python
+from src.agent.websearch import web_search
 
 TOOL_DEFINITIONS = [
     {
@@ -164,6 +166,34 @@ TOOL_DEFINITIONS = [
             "required": ["ticker", "trade_date"],
         },
     },
+    {
+        "name": "run_python",
+        "description": "Execute arbitrary Python code for custom analysis. The sandbox has numpy, pandas, scipy, and yfinance pre-imported. A helper `get_prices(ticker, start, end)` returns a DataFrame with OHLCV columns. Use this for any analysis that the other tools don't cover: option pricing, factor decomposition, statistical tests, Monte Carlo simulations, rolling metrics, custom visualizations, Sharpe/Sortino ratios, correlation matrices, etc. Print your results — only stdout is returned.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "description": "Python code to execute. Results must be printed to stdout.",
+                },
+            },
+            "required": ["code"],
+        },
+    },
+    {
+        "name": "web_search",
+        "description": "Search the web for market news, analyst opinions, company events, or any other context around a trade. Use this to understand WHY a stock moved — earnings surprises, FDA approvals, lawsuits, macro events, analyst upgrades/downgrades, etc. Returns titles, URLs, and snippets.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Search query — be specific, include ticker and date range for best results.",
+                },
+            },
+            "required": ["query"],
+        },
+    },
 ]
 
 
@@ -241,5 +271,11 @@ def execute_tool(name: str, args: dict) -> str:
             ],
         }
         return _to_json(summary)
+
+    elif name == "run_python":
+        return execute_python(args["code"])
+
+    elif name == "web_search":
+        return web_search(args["query"])
 
     return _to_json({"error": f"Unknown tool: {name}"})
