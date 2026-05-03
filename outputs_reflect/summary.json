@@ -1,0 +1,45 @@
+{
+  "trader": "Ms. Nancy Pelosi",
+  "iterations": 2,
+  "model": "opus",
+  "score_history": [
+    {
+      "iteration": 1,
+      "trust_score": 90,
+      "grade": "A",
+      "components": {
+        "Tool Data Accuracy": 100,
+        "Claim Tag Accuracy": 100,
+        "Claim Grounding Rate": 55,
+        "Python Execution Clean": 94,
+        "Data Coverage": 100
+      },
+      "tool_calls": 113,
+      "report_length": 17059,
+      "claim_tags": 41,
+      "claim_accuracy": "100%",
+      "grounding_rate": "28%",
+      "accepted": true
+    },
+    {
+      "iteration": 2,
+      "trust_score": 93,
+      "grade": "A",
+      "components": {
+        "Tool Data Accuracy": 100,
+        "Claim Tag Accuracy": 100,
+        "Claim Grounding Rate": 67,
+        "Python Execution Clean": 96,
+        "Data Coverage": 100
+      },
+      "tool_calls": 133,
+      "report_length": 22219,
+      "claim_tags": 89,
+      "claim_accuracy": "100%",
+      "grounding_rate": "33%",
+      "accepted": true
+    }
+  ],
+  "delta": 3,
+  "timestamp": "2026-05-03T03:43:10.762888"
+}
