@@ -210,3 +210,119 @@ def get_drawdown_from_high(ticker: str, trade_date: str, lookback_days: int = 25
         "drawdown_from_high": round(drawdown, 4),
         "interpretation": "near_high" if drawdown > -0.05 else "moderate_pullback" if drawdown > -0.15 else "significant_decline" if drawdown > -0.30 else "deep_drawdown",
     }
+
+
+def get_counterfactual_entries(ticker: str, trade_date: str, window_days: int = 30) -> dict:
+    """What if you had entered at a different time in the surrounding window?"""
+    td = pd.to_datetime(trade_date)
+    start = (td - timedelta(days=window_days)).strftime("%Y-%m-%d")
+    end_fetch = (td + timedelta(days=window_days)).strftime("%Y-%m-%d")
+    eval_end = (td + timedelta(days=90)).strftime("%Y-%m-%d")
+
+    df = yf.download(ticker, start=start, end=end_fetch, progress=False)
+    if df.empty:
+        return {"error": "No data"}
+    df = _flatten_columns(df)
+
+    end_price = get_price_on_date(ticker, eval_end)
+    if end_price is None:
+        return {"error": "No end price data"}
+
+    actual_entry = float(df.loc[df.index <= td, "Close"].iloc[-1])
+    actual_return = (end_price - actual_entry) / actual_entry
+
+    entries_before = df[df.index <= td]
+    best_entry_date = entries_before["Close"].idxmin()
+    best_entry_price = float(entries_before["Close"].min())
+    worst_entry_date = entries_before["Close"].idxmax()
+    worst_entry_price = float(entries_before["Close"].max())
+
+    return {
+        "ticker": ticker,
+        "trade_date": trade_date,
+        "eval_date": eval_end,
+        "actual_entry_price": round(actual_entry, 2),
+        "actual_90d_return": round(actual_return * 100, 2),
+        "best_entry_in_window": {
+            "date": best_entry_date.strftime("%Y-%m-%d"),
+            "price": round(best_entry_price, 2),
+            "would_have_returned": round((end_price - best_entry_price) / best_entry_price * 100, 2),
+        },
+        "worst_entry_in_window": {
+            "date": worst_entry_date.strftime("%Y-%m-%d"),
+            "price": round(worst_entry_price, 2),
+            "would_have_returned": round((end_price - worst_entry_price) / worst_entry_price * 100, 2),
+        },
+        "missed_gain_vs_best": round((actual_entry - best_entry_price) / best_entry_price * 100, 2),
+    }
+
+
+def get_alternative_instruments(ticker: str, trade_date: str, trade_type: str) -> dict:
+    """Compare what would have happened with alternative strategies: sector ETF, inverse,
+    short, or a different instrument entirely."""
+    td = pd.to_datetime(trade_date)
+    horizons = {"30d": 30, "60d": 60, "90d": 90}
+    peers = get_sector_peers(ticker)
+
+    alternatives = {}
+    for label, days in horizons.items():
+        end = (td + timedelta(days=days)).strftime("%Y-%m-%d")
+        stock_ret = get_return(ticker, trade_date, end)
+        alternatives[label] = {"stock": round(stock_ret * 100, 2) if stock_ret is not None else None}
+
+        for peer in peers:
+            peer_ret = get_return(peer, trade_date, end)
+            alternatives[label][peer] = round(peer_ret * 100, 2) if peer_ret is not None else None
+
+        inverse_ret = get_return("SH", trade_date, end)
+        alternatives[label]["inverse_SPY_(SH)"] = round(inverse_ret * 100, 2) if inverse_ret is not None else None
+
+    if trade_type.lower() == "buy":
+        stock_ret_90 = get_return(ticker, trade_date, (td + timedelta(days=90)).strftime("%Y-%m-%d"))
+        short_return = round(-stock_ret_90 * 100, 2) if stock_ret_90 is not None else None
+    else:
+        short_return = None
+
+    return {
+        "ticker": ticker,
+        "trade_date": trade_date,
+        "trade_type": trade_type,
+        "alternatives": alternatives,
+        "if_shorted_instead_90d": short_return,
+        "note": "Positive = gain, negative = loss. Compare stock return to alternatives to assess opportunity cost.",
+    }
+
+
+def get_correlation_to_market(ticker: str, trade_date: str, lookback_days: int = 120) -> dict:
+    """How correlated is this stock to SPY? High correlation = no diversification value."""
+    td = pd.to_datetime(trade_date)
+    start = (td - timedelta(days=lookback_days)).strftime("%Y-%m-%d")
+    end = (td + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    stock_df = yf.download(ticker, start=start, end=end, progress=False)
+    spy_df = yf.download("SPY", start=start, end=end, progress=False)
+
+    if stock_df.empty or spy_df.empty:
+        return {"error": "Insufficient data"}
+
+    stock_df = _flatten_columns(stock_df)
+    spy_df = _flatten_columns(spy_df)
+
+    merged = pd.DataFrame({
+        "stock": stock_df["Close"].pct_change(),
+        "spy": spy_df["Close"].pct_change(),
+    }).dropna()
+
+    if len(merged) < 20:
+        return {"error": "Insufficient overlapping data"}
+
+    corr = float(merged["stock"].corr(merged["spy"]))
+    stock_beta = float(merged["stock"].std() / merged["spy"].std() * corr)
+
+    return {
+        "ticker": ticker,
+        "trade_date": trade_date,
+        "correlation_to_SPY": round(corr, 3),
+        "estimated_beta": round(stock_beta, 2),
+        "interpretation": "highly_correlated" if corr > 0.7 else "moderately_correlated" if corr > 0.4 else "low_correlation" if corr > 0 else "inverse_correlation",
+    }

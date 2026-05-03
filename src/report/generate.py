@@ -13,7 +13,7 @@ GRADE_ORDER = {
 }
 
 
-def save_results(results: list[dict], output_dir: str = "outputs") -> str:
+def save_results(results: list[dict], output_dir: str = "outputs", pattern_analysis: str | None = None) -> str:
     out = Path(output_dir)
     out.mkdir(exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -66,6 +66,18 @@ def save_results(results: list[dict], output_dir: str = "outputs") -> str:
         for r in results:
             f.write(f"| {r.get('politician', '?')} | {r['trade_type']} | {r['ticker']} "
                     f"| {r['trade_date']} | {r.get('amount_range', '?')} | {r['grade']} |\n")
+
+    if pattern_analysis:
+        pattern_path = out / f"patterns_{timestamp}.md"
+        with open(pattern_path, "w") as f:
+            f.write("# Portfolio Autopsy — Pattern Analysis\n\n")
+            f.write(pattern_analysis)
+            f.write("\n")
+
+        with open(summary_path, "a") as f:
+            f.write("\n---\n\n")
+            f.write("## Portfolio Pattern Analysis\n\n")
+            f.write(f"See [full pattern analysis](patterns_{timestamp}.md) for details.\n")
 
     json_path = out / f"results_{timestamp}.json"
     with open(json_path, "w") as f:

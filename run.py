@@ -6,6 +6,7 @@ import sys
 
 from src.data.trades import load_trades, triage
 from src.agent.autopsy import analyze_trade
+from src.agent.patterns import analyze_patterns
 from src.report.generate import save_results
 
 BEDROCK_MODELS = {
@@ -44,6 +45,7 @@ def main():
     parser.add_argument("--ticker", default=None, help="Filter to a specific ticker")
     parser.add_argument("--model", default="sonnet", choices=["opus", "sonnet", "haiku"], help="Model to use (default: sonnet)")
     parser.add_argument("--output", default="outputs", help="Output directory")
+    parser.add_argument("--skip-patterns", action="store_true", help="Skip portfolio-level pattern analysis")
     args = parser.parse_args()
 
     client, backend = create_client()
@@ -73,7 +75,7 @@ def main():
         print("No trades to analyze.")
         sys.exit(0)
 
-    print(f"\nAnalyzing {len(trades)} trades...\n")
+    print(f"\n=== Phase 1: Individual Trade Analysis ({len(trades)} trades) ===\n")
     results = []
     for i, trade in enumerate(trades):
         print(f"[{i+1}/{len(trades)}] {trade.politician} — {trade.trade_type} {trade.ticker} ({trade.trade_date})")
@@ -94,7 +96,16 @@ def main():
                 "full_analysis": f"Analysis failed: {e}",
             })
 
-    summary_path = save_results(results, args.output)
+    pattern_analysis = None
+    if not args.skip_patterns and len(results) >= 3:
+        print(f"\n=== Phase 2: Portfolio Pattern Analysis ===\n")
+        try:
+            pattern_analysis = analyze_patterns(results, client, model=model_id)
+            print("  Pattern analysis complete.")
+        except Exception as e:
+            print(f"  Pattern analysis failed: {e}")
+
+    summary_path = save_results(results, args.output, pattern_analysis=pattern_analysis)
     print(f"\nDone! Summary written to {summary_path}")
     print(f"Individual reports in {args.output}/")
 

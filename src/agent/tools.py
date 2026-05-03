@@ -13,6 +13,9 @@ from src.data.market import (
     get_volatility_analysis,
     get_vix_on_date,
     get_drawdown_from_high,
+    get_counterfactual_entries,
+    get_alternative_instruments,
+    get_correlation_to_market,
 )
 
 TOOL_DEFINITIONS = [
@@ -112,6 +115,43 @@ TOOL_DEFINITIONS = [
         },
     },
     {
+        "name": "get_counterfactual_entries",
+        "description": "What if the trader had entered at a different time? Shows the best and worst possible entry points in a 30-day window around the trade, and what the 90-day return would have been for each. Quantifies how good or bad the timing actually was relative to what was available.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "ticker": {"type": "string", "description": "Stock ticker symbol"},
+                "trade_date": {"type": "string", "description": "Trade date YYYY-MM-DD"},
+            },
+            "required": ["ticker", "trade_date"],
+        },
+    },
+    {
+        "name": "get_alternative_instruments",
+        "description": "What if the trader had bought something else instead? Compares the stock's return to sector ETF, SPY, and inverse SPY (SH) at 30/60/90 day horizons. Also shows what shorting would have returned. Use this to evaluate opportunity cost and whether a different instrument or direction would have been smarter.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "ticker": {"type": "string", "description": "Stock ticker symbol"},
+                "trade_date": {"type": "string", "description": "Trade date YYYY-MM-DD"},
+                "trade_type": {"type": "string", "description": "Buy or Sell"},
+            },
+            "required": ["ticker", "trade_date", "trade_type"],
+        },
+    },
+    {
+        "name": "get_correlation_to_market",
+        "description": "How correlated is this stock to SPY over the prior 120 trading days? Returns correlation coefficient and estimated beta. High correlation means the trade adds no diversification. Low correlation or negative correlation suggests a differentiated bet.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "ticker": {"type": "string", "description": "Stock ticker symbol"},
+                "trade_date": {"type": "string", "description": "Trade date YYYY-MM-DD"},
+            },
+            "required": ["ticker", "trade_date"],
+        },
+    },
+    {
         "name": "get_price_history",
         "description": "Get daily OHLCV price history for a stock in a window around a date. Use for detailed price action analysis, trend identification, or computing custom metrics.",
         "input_schema": {
@@ -176,6 +216,15 @@ def execute_tool(name: str, args: dict) -> str:
 
     elif name == "get_drawdown_from_high":
         return _to_json(get_drawdown_from_high(args["ticker"], args["trade_date"]))
+
+    elif name == "get_counterfactual_entries":
+        return _to_json(get_counterfactual_entries(args["ticker"], args["trade_date"]))
+
+    elif name == "get_alternative_instruments":
+        return _to_json(get_alternative_instruments(args["ticker"], args["trade_date"], args["trade_type"]))
+
+    elif name == "get_correlation_to_market":
+        return _to_json(get_correlation_to_market(args["ticker"], args["trade_date"]))
 
     elif name == "get_price_history":
         df = get_price_history(args["ticker"], args["trade_date"], args.get("window_days", 90))
