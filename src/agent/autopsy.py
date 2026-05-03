@@ -1,60 +1,68 @@
 """Core autopsy agent — analyzes trades using LLM + tools."""
 
 import json
+import re
 from src.data.trades import Trade
 from src.agent.tools import TOOL_DEFINITIONS, execute_tool
 
 
-SYSTEM_PROMPT = """You are a trading analyst performing a structured post-mortem ("autopsy") on a
-stock trade made by a US Congressional member. Your job is to evaluate the trade with rigorous,
-evidence-based analysis.
+SYSTEM_PROMPT = """You are a trading analyst performing a rigorous post-mortem on a stock trade.
+Your job: figure out whether this was a good trade, why or why not, and what the trader should
+have done differently.
 
-You have access to market data tools. Use them to gather evidence before forming your assessment.
+You have market data tools available. USE THEM to gather real evidence before forming opinions.
+Do not guess or assume — look up the actual data.
 
-For each trade, analyze these dimensions:
+Your toolkit:
+- Stock fundamentals (profile, sector, P/E, beta)
+- Price and returns (any ticker, any date range, including ETFs)
+- Benchmark comparison (vs sector ETF and SPY)
+- Earnings calendar (was the trade near an earnings event? what was the surprise?)
+- Volatility analysis (vol regime, max drawdown/runup, position relative to highs/lows)
+- VIX level (market fear at time of trade)
+- Drawdown from 52-week high (contrarian buy or chasing?)
 
-1. **Timing Analysis**: How did the stock perform after the trade? Did the politician buy before
-   a drop or sell before a run-up? Compare price at trade date vs 5, 20, and 60 days later.
+Think like an investigator. Ask yourself:
+- What made this trade interesting? What's the story here?
+- What data would confirm or refute my initial hypothesis?
+- What would a skilled trader have done differently?
+- Are there angles specific to THIS trade that generic analysis would miss?
 
-2. **Benchmark Comparison**: How did the trade perform relative to the sector ETF and SPY?
-   A stock dropping 5% when the whole sector dropped 10% is actually a relative win.
+Don't follow a fixed checklist. Different trades demand different analysis — a pre-earnings
+options bet needs different scrutiny than a slow accumulation of an index fund. Focus your
+investigation on what matters most for THIS specific trade.
 
-3. **Alternative Analysis**: Would holding the sector ETF have been better? What about SPY?
-   Quantify the opportunity cost or gain.
+After your investigation, end your report with exactly this format:
 
-4. **Disclosure Lag**: How many days between the trade and its public disclosure? Longer lags
-   can indicate strategic delay.
+## Final Assessment
+**Grade:** [A/B/C/D/F with optional +/-]
+**Verdict:** [One paragraph with specific numbers from your analysis]
 
-5. **Pattern Context**: Consider the description provided about this trade. Does it suggest
-   potential information asymmetry or suspicious timing relative to policy/regulatory events?
+Grade rubric:
+- A: Excellent trade with clear edge — strong returns AND beat relevant benchmarks
+- B: Good trade, solid returns or smart risk management
+- C: Mediocre — roughly matched what you'd get from SPY
+- D: Poor trade, underperformed benchmarks or bad timing
+- F: Terrible — significant losses, especially if avoidable
 
-After gathering evidence, provide:
-- A **letter grade** (A through F) where:
-  A = excellent trade, strong evidence of good judgment
-  B = decent trade, beat benchmarks
-  C = neutral, roughly matched the market
-  D = poor trade, underperformed benchmarks
-  F = terrible trade, or strong signals of suspicious timing
-- A **one-paragraph verdict** explaining the grade with specific numbers
-- A **suspicion score** (1-5) for potential information asymmetry, where 1 = normal trading,
-  5 = highly suspicious timing
-
-Be precise. Use actual numbers from the tools. Don't speculate without evidence."""
+Be precise. Every claim must be backed by a number you looked up. No hand-waving."""
 
 
 def analyze_trade(trade: Trade, client, model: str = "claude-sonnet-4-6-20250514") -> dict:
     trade_description = (
-        f"Politician: {trade.politician} ({trade.party}, {trade.chamber})\n"
         f"Trade: {trade.trade_type} {trade.ticker}\n"
         f"Date: {trade.trade_date}\n"
-        f"Disclosed: {trade.disclosure_date} ({trade.disclosure_lag_days} days later)\n"
         f"Amount: ${trade.amount_low:,} - ${trade.amount_high:,}\n"
         f"Context: {trade.description}"
     )
+    if trade.disclosure_date:
+        trade_description += f"\nDisclosed: {trade.disclosure_date} ({trade.disclosure_lag_days} days after trade)"
+    if trade.politician:
+        trade_description += f"\nTrader: {trade.politician}"
 
-    messages = [{"role": "user", "content": f"Analyze this Congressional stock trade:\n\n{trade_description}"}]
+    messages = [{"role": "user", "content": f"Perform a post-mortem on this trade:\n\n{trade_description}"}]
 
-    max_turns = 10
+    max_turns = 15
     for _ in range(max_turns):
         response = client.messages.create(
             model=model,
@@ -89,19 +97,12 @@ def analyze_trade(trade: Trade, client, model: str = "claude-sonnet-4-6-20250514
 
 
 def parse_verdict(text: str, trade: Trade) -> dict:
-    import re
-
-    grade_match = re.search(r'\*\*Letter Grade\*\*[^*]*\*\*([A-F][+-]?)\*\*', text)
+    grade_match = re.search(r'\*\*Grade:\*\*\s*\*?\*?([A-Fa-f][+-]?)', text)
     if not grade_match:
-        grade_match = re.search(r'(?:Grade|Rating)[:\s]*\*?\*?([A-F][+-]?)\*?\*?', text, re.IGNORECASE)
+        grade_match = re.search(r'(?:Grade|Rating)[:\s]*\*?\*?([A-Fa-f][+-]?)\*?\*?', text, re.IGNORECASE)
     if not grade_match:
-        grade_match = re.search(r'\b([A-F][+-])\b', text)
-    grade = grade_match.group(1) if grade_match else "?"
-
-    suspicion_match = re.search(r'suspicion[:\s]*score[:\s]*(\d)', text, re.IGNORECASE)
-    if not suspicion_match:
-        suspicion_match = re.search(r'(\d)\s*/\s*5', text)
-    suspicion = int(suspicion_match.group(1)) if suspicion_match else None
+        grade_match = re.search(r'\b([A-Fa-f][+-])\b', text)
+    grade = grade_match.group(1).upper() if grade_match else "?"
 
     return {
         "politician": trade.politician,
@@ -110,6 +111,5 @@ def parse_verdict(text: str, trade: Trade) -> dict:
         "trade_date": trade.trade_date,
         "amount_range": f"${trade.amount_low:,}-${trade.amount_high:,}",
         "grade": grade,
-        "suspicion_score": suspicion,
         "full_analysis": text,
     }

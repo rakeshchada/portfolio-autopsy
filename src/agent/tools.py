@@ -1,22 +1,39 @@
 """Tool definitions for the autopsy agent."""
 
 import json
+import numpy as np
 from src.data.market import (
     get_price_history,
     get_price_on_date,
     get_return,
     get_benchmark_comparison,
     get_sector_peers,
+    get_stock_profile,
+    get_earnings_dates,
+    get_volatility_analysis,
+    get_vix_on_date,
+    get_drawdown_from_high,
 )
 
 TOOL_DEFINITIONS = [
     {
-        "name": "get_price_on_date",
-        "description": "Get the closing price of a stock on a specific date. Returns the closest available trading day price.",
+        "name": "get_stock_profile",
+        "description": "Get fundamental info about a stock: name, sector, industry, market cap, P/E ratio, beta, 52-week range, dividend yield.",
         "input_schema": {
             "type": "object",
             "properties": {
-                "ticker": {"type": "string", "description": "Stock ticker symbol (e.g., NVDA)"},
+                "ticker": {"type": "string", "description": "Stock ticker symbol"},
+            },
+            "required": ["ticker"],
+        },
+    },
+    {
+        "name": "get_price_on_date",
+        "description": "Get the closing price of a stock on a specific date.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "ticker": {"type": "string", "description": "Stock ticker symbol"},
                 "date": {"type": "string", "description": "Date in YYYY-MM-DD format"},
             },
             "required": ["ticker", "date"],
@@ -24,7 +41,7 @@ TOOL_DEFINITIONS = [
     },
     {
         "name": "get_return",
-        "description": "Get the percentage return of a stock between two dates.",
+        "description": "Get the percentage return of a stock between two dates. Works for any ticker including ETFs (SPY, XLK, etc).",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -48,25 +65,61 @@ TOOL_DEFINITIONS = [
         },
     },
     {
-        "name": "get_sector_peers",
-        "description": "Get the sector ETF and SPY as benchmark peers for a given stock.",
+        "name": "get_earnings_dates",
+        "description": "Get earnings dates within 90 days before and after the trade date, including EPS estimates, actuals, and surprise percentage. Use this to check if a trade was suspiciously close to an earnings event.",
         "input_schema": {
             "type": "object",
             "properties": {
                 "ticker": {"type": "string", "description": "Stock ticker symbol"},
+                "trade_date": {"type": "string", "description": "Trade date YYYY-MM-DD"},
             },
-            "required": ["ticker"],
+            "required": ["ticker", "trade_date"],
+        },
+    },
+    {
+        "name": "get_volatility_analysis",
+        "description": "Get volatility profile around the trade: annualized vol before/after, max drawdown and max runup after entry, and where the price sits relative to the window's high/low. Useful for assessing risk taken and whether they bought the dip or chased the top.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "ticker": {"type": "string", "description": "Stock ticker symbol"},
+                "trade_date": {"type": "string", "description": "Trade date YYYY-MM-DD"},
+            },
+            "required": ["ticker", "trade_date"],
+        },
+    },
+    {
+        "name": "get_vix_on_date",
+        "description": "Get the VIX (fear index) level on a specific date. Returns the value and a regime label (low/normal/elevated/high_fear). Use this to understand the broader market mood when the trade was made.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "date": {"type": "string", "description": "Date in YYYY-MM-DD format"},
+            },
+            "required": ["date"],
+        },
+    },
+    {
+        "name": "get_drawdown_from_high",
+        "description": "How far the stock has fallen from its 52-week high at the time of the trade. Useful for determining if this was a contrarian buy (during a big dip) or momentum/chasing (near all-time highs).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "ticker": {"type": "string", "description": "Stock ticker symbol"},
+                "trade_date": {"type": "string", "description": "Trade date YYYY-MM-DD"},
+            },
+            "required": ["ticker", "trade_date"],
         },
     },
     {
         "name": "get_price_history",
-        "description": "Get daily OHLCV price history for a stock in a window around a date. Returns a table of dates with Open, High, Low, Close, Volume.",
+        "description": "Get daily OHLCV price history for a stock in a window around a date. Use for detailed price action analysis, trend identification, or computing custom metrics.",
         "input_schema": {
             "type": "object",
             "properties": {
                 "ticker": {"type": "string", "description": "Stock ticker symbol"},
                 "trade_date": {"type": "string", "description": "Center date YYYY-MM-DD"},
-                "window_days": {"type": "integer", "description": "Days before and after the trade date (default 90)"},
+                "window_days": {"type": "integer", "description": "Days before and after (default 90)"},
             },
             "required": ["ticker", "trade_date"],
         },
@@ -74,39 +127,60 @@ TOOL_DEFINITIONS = [
 ]
 
 
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (np.integer,)):
+            return int(obj)
+        if isinstance(obj, (np.floating,)):
+            return round(float(obj), 4) if not np.isnan(obj) else None
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
+
+
+def _to_json(obj: dict) -> str:
+    return json.dumps(obj, cls=NumpyEncoder)
+
+
 def execute_tool(name: str, args: dict) -> str:
-    if name == "get_price_on_date":
+    if name == "get_stock_profile":
+        return _to_json(get_stock_profile(args["ticker"]))
+
+    elif name == "get_price_on_date":
         result = get_price_on_date(args["ticker"], args["date"])
         if result is None:
-            return json.dumps({"error": f"No price data found for {args['ticker']} on {args['date']}"})
-        return json.dumps({"ticker": args["ticker"], "date": args["date"], "close_price": round(result, 2)})
+            return _to_json({"error": f"No price data for {args['ticker']} on {args['date']}"})
+        return _to_json({"ticker": args["ticker"], "date": args["date"], "close_price": round(result, 2)})
 
     elif name == "get_return":
         result = get_return(args["ticker"], args["start_date"], args["end_date"])
         if result is None:
-            return json.dumps({"error": f"Could not compute return for {args['ticker']}"})
-        return json.dumps({
-            "ticker": args["ticker"],
-            "start_date": args["start_date"],
-            "end_date": args["end_date"],
-            "return_pct": round(result * 100, 2),
-        })
+            return _to_json({"error": f"Could not compute return for {args['ticker']}"})
+        return _to_json({"ticker": args["ticker"], "start": args["start_date"], "end": args["end_date"], "return_pct": round(result * 100, 2)})
 
     elif name == "get_benchmark_comparison":
         result = get_benchmark_comparison(args["ticker"], args["trade_date"])
         serializable = {}
         for horizon, data in result.items():
             serializable[horizon] = {k: round(v * 100, 2) if v is not None else None for k, v in data.items()}
-        return json.dumps({"ticker": args["ticker"], "trade_date": args["trade_date"], "comparison": serializable})
+        return _to_json({"ticker": args["ticker"], "trade_date": args["trade_date"], "comparison": serializable})
 
-    elif name == "get_sector_peers":
-        result = get_sector_peers(args["ticker"])
-        return json.dumps({"ticker": args["ticker"], "peers": result})
+    elif name == "get_earnings_dates":
+        return _to_json(get_earnings_dates(args["ticker"], args["trade_date"]))
+
+    elif name == "get_volatility_analysis":
+        return _to_json(get_volatility_analysis(args["ticker"], args["trade_date"]))
+
+    elif name == "get_vix_on_date":
+        return _to_json(get_vix_on_date(args["date"]))
+
+    elif name == "get_drawdown_from_high":
+        return _to_json(get_drawdown_from_high(args["ticker"], args["trade_date"]))
 
     elif name == "get_price_history":
         df = get_price_history(args["ticker"], args["trade_date"], args.get("window_days", 90))
         if df.empty:
-            return json.dumps({"error": f"No price history for {args['ticker']}"})
+            return _to_json({"error": f"No price history for {args['ticker']}"})
         summary = {
             "ticker": args["ticker"],
             "rows": len(df),
@@ -117,6 +191,6 @@ def execute_tool(name: str, args: dict) -> str:
                 for idx, row in list(df.tail(10).iterrows())
             ],
         }
-        return json.dumps(summary)
+        return _to_json(summary)
 
-    return json.dumps({"error": f"Unknown tool: {name}"})
+    return _to_json({"error": f"Unknown tool: {name}"})

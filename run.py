@@ -37,10 +37,10 @@ def create_client():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Portfolio Autopsy: Agentic post-mortem on Congressional trades")
+    parser = argparse.ArgumentParser(description="Portfolio Autopsy: Agentic post-mortem on trading histories")
     parser.add_argument("--data", default=None, help="Path to trades CSV (default: data/congressional_trades.csv)")
     parser.add_argument("--limit", type=int, default=None, help="Max number of trades to analyze")
-    parser.add_argument("--politician", default=None, help="Filter to a specific politician")
+    parser.add_argument("--politician", default=None, help="Filter to a specific trader")
     parser.add_argument("--ticker", default=None, help="Filter to a specific ticker")
     parser.add_argument("--model", default="sonnet", choices=["opus", "sonnet", "haiku"], help="Model to use (default: sonnet)")
     parser.add_argument("--output", default="outputs", help="Output directory")
@@ -80,8 +80,7 @@ def main():
         try:
             result = analyze_trade(trade, client, model=model_id)
             grade = result.get("grade", "?")
-            suspicion = result.get("suspicion_score", "?")
-            print(f"         Grade: {grade} | Suspicion: {suspicion}/5")
+            print(f"         Grade: {grade}")
             results.append(result)
         except Exception as e:
             print(f"         ERROR: {e}")
@@ -92,7 +91,6 @@ def main():
                 "trade_date": trade.trade_date,
                 "amount_range": f"${trade.amount_low:,}-${trade.amount_high:,}",
                 "grade": "ERR",
-                "suspicion_score": None,
                 "full_analysis": f"Analysis failed: {e}",
             })
 
