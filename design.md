@@ -139,19 +139,62 @@ The trust score quantifies how much you should trust this specific report.
 4. **Extensibility:** New analysis dimensions emerge from the agent's reasoning +
    sandbox, not from adding hardcoded tools.
 
+## Reflection Loop (GEPA-inspired evolutionary optimization)
+
+The system implements an analyze → evaluate → reflect → re-analyze loop inspired by
+[GEPA](https://github.com/gepa-ai/gepa)'s evolutionary prompt optimization. Rather than
+gradient updates, the agent improves through structured self-reflection on its evaluation
+results.
+
+**How it works:**
+1. The advisor agent generates a portfolio report (iteration 1 = baseline, no guidelines)
+2. The grounding evaluator scores it (trust score, claim accuracy, grounding rate)
+3. A reflection agent analyzes the eval failures and produces specific guidelines
+4. The advisor re-runs with guidelines injected into its system prompt
+5. The evaluator scores again. If the score regressed, guidelines are rolled back
+   (strict improvement gating, borrowed from GEPA's `StrictImprovementAcceptance`)
+
+**Results on Pelosi portfolio (2 iterations):**
+
+| Metric | Iteration 1 (baseline) | Iteration 2 (with guidelines) |
+|--------|----------------------|------------------------------|
+| Trust Score | 90/100 | 93/100 (+3) |
+| Claim Tags | 41 | 89 (+117%) |
+| Tag Accuracy | 100% | 100% |
+| Grounding Rate | 28% | 33% (+18%) |
+| Python Clean | 94% | 96% |
+| Tildes (~) | 29 | 21 (-28%) |
+
+The reflection produced 10 specific guidelines. The most impactful: "tag ALL verifiable
+claims, not just a subset" (41→89 tags), "every price must trace to a tool call" (grounding
+improved), and "avoid ~ as a substitute for computing" (fewer approximations). Iteration 2
+also introduced new analytical depth not present in iteration 1: Monte Carlo skill tests,
+VIX regime analysis at every trade date, and tax-loss harvesting quantification.
+
+**What we borrowed from GEPA:**
+- Structured reflective dataset (curate what the reflection LLM sees, not raw dumps)
+- Strict improvement gating (reject mutations that make scores worse)
+- Cumulative guideline evolution (each reflection builds on previous guidelines)
+
+**What we didn't implement (future work):**
+- Population-based search with Pareto front over multiple strategy variants
+- Ancestry-aware crossover between strategies
+- Component-level round-robin mutation (rotating which prompt section gets updated)
+
 ## What's Next (with more time)
 
-- **Chat interface:** Interactive Q&A over a portfolio ("should I sell my NVDA?", "how
-  am I doing vs SPY this quarter?")
+- **Distillation + RL:** Generate 50-100 Opus trajectories, distill to Qwen3-32B or
+  Gemma-27B via SFT, then run GRPO with the trust score as reward. The eval framework
+  becomes the reward model. Estimated: ~2 days on A100.
 - **Real-time alerts:** Monitor portfolio positions and surface warnings (concentration
   drift, stop-loss triggers, earnings proximity)
-- **Eval-driven fine-tuning:** Use the claim verification data to fine-tune a smaller model
-  for faster, cheaper analysis with higher grounding accuracy
 - **Backtesting framework:** "What if you'd followed a systematic version of your own
   strategy?" — codify the trader's patterns into rules and backtest them
 - **Multi-modal analysis:** Ingest earnings call transcripts, SEC filings, news articles
   alongside price data
+- **Population-based reflection:** Maintain a Pareto front of strategy variants, each
+  specialized for different portfolio types (growth vs value vs options-heavy)
 
 ---
 
-*v3 — reflects the actual system as built*
+*v4 — reflects the full system including reflection loop and tool analysis*
