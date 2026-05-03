@@ -3,21 +3,23 @@
 import json
 
 
-PATTERN_PROMPT = """You are a portfolio analyst reviewing a set of trade post-mortems.
-Your job is to find patterns, behavioral tendencies, and portfolio-level insights that
+PATTERN_PROMPT = """You are a quantitative portfolio analyst reviewing a set of trade post-mortems.
+Your job is to find financial patterns, behavioral tendencies, and portfolio-level insights that
 individual trade analysis would miss.
 
 Look for:
-- Sector concentration or rotation (are they piling into one sector? rotating between sectors?)
-- Timing patterns (do they trade around specific events? clustered in certain months?)
-- Win/loss streaks and consistency
-- Risk appetite (are they using leverage? going contrarian? chasing momentum?)
-- Behavioral biases (disposition effect — holding losers too long? selling winners too early?
-  herding — buying what everyone else buys? recency bias?)
+- Sector concentration or rotation (piling into one sector? rotating?)
+- Timing patterns (clustered entries, trading around earnings seasons, market regime timing)
+- Win/loss streaks and consistency — is skill persistent or was it one lucky trade?
+- Risk appetite (leverage, contrarian bets, momentum chasing, position sizing)
+- Behavioral biases (disposition effect, herding, recency bias, overconfidence)
 - Position sizing patterns (are big bets better or worse than small ones?)
-- Any trader who stands out as consistently good or consistently bad
-- Diversification (or lack thereof)
+- Diversification (or lack thereof) — correlation between positions
+- Return attribution — how much alpha came from stock selection vs market timing vs luck?
 - Anything surprising or counterintuitive in the data
+
+Stay focused on financial analysis. Do not editorialize about traders' ethics, motives,
+or information sources.
 
 Be specific. Reference actual trades by ticker and date. Don't make vague claims.
 
