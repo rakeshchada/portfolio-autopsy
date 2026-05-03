@@ -119,8 +119,16 @@ build trust in the analysis and allow automated verification. Not every number n
 have one."""
 
 
-def analyze_portfolio(portfolio_summary: dict, client, model: str) -> dict:
-    """Run portfolio analysis. Returns dict with 'report', 'call_log', and 'metadata'."""
+def analyze_portfolio(portfolio_summary: dict, client, model: str, guidelines: str | None = None) -> dict:
+    """Run portfolio analysis. Returns dict with 'report', 'call_log', and 'metadata'.
+
+    If guidelines are provided (from reflection), they are appended to the system prompt.
+    """
+    system_prompt = SYSTEM_PROMPT
+    if guidelines:
+        system_prompt += f"\n\n## Learned guidelines from previous iterations\n\nThese are specific " \
+                         f"improvements identified by reviewing your previous reports. Follow them carefully.\n\n{guidelines}"
+
     positions_data = json.dumps(portfolio_summary['positions'], indent=2, default=str)
     timeline_data = json.dumps(portfolio_summary['timeline'], indent=2, default=str)
 
@@ -152,7 +160,7 @@ I want to understand: was this trader skilled, lucky, or just riding beta?"""
         response = client.messages.create(
             model=model,
             max_tokens=16384,
-            system=SYSTEM_PROMPT,
+            system=system_prompt,
             tools=TOOL_DEFINITIONS,
             messages=messages,
         )
