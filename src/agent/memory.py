@@ -19,7 +19,7 @@ class PortfolioMemory:
 
     def __init__(self, memory_dir: str = "memory"):
         self.dir = Path(memory_dir)
-        self.dir.mkdir(exist_ok=True)
+        self.dir.mkdir(parents=True, exist_ok=True)
         self.memories: list[dict] = []
         self._load()
 

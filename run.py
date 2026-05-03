@@ -1,13 +1,21 @@
-"""Portfolio Autopsy — entry point."""
+"""Portfolio Autopsy — entry point.
+
+Runs portfolio-level analysis with grounding evaluation.
+
+Usage:
+    python run.py --kaggle /path/to/kaggle.csv --trader "Nancy Pelosi"
+    python run.py --kaggle /path/to/kaggle.csv --trader Pelosi --skip-eval
+"""
 
 import argparse
+import json
 import os
 import sys
+from pathlib import Path
 
-from src.data.trades import load_trades, triage
-from src.agent.autopsy import analyze_trade
-from src.agent.patterns import analyze_patterns
-from src.report.generate import save_results
+from src.data.portfolio import load_kaggle_trades, build_portfolio_summary
+from src.agent.advisor import analyze_portfolio
+from src.eval.grounding import evaluate_report, format_eval_report
 
 BEDROCK_MODELS = {
     "opus": "global.anthropic.claude-opus-4-6-v1",
@@ -38,76 +46,76 @@ def create_client():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Portfolio Autopsy: Agentic post-mortem on trading histories")
-    parser.add_argument("--data", default=None, help="Path to trades CSV (default: data/congressional_trades.csv)")
-    parser.add_argument("--limit", type=int, default=None, help="Max number of trades to analyze")
-    parser.add_argument("--politician", default=None, help="Filter to a specific trader")
-    parser.add_argument("--ticker", default=None, help="Filter to a specific ticker")
-    parser.add_argument("--model", default="sonnet", choices=["opus", "sonnet", "haiku"], help="Model to use (default: sonnet)")
+    parser = argparse.ArgumentParser(description="Portfolio Autopsy: Agentic portfolio analysis with grounding evaluation")
+    parser.add_argument("--kaggle", default=None, help="Path to Kaggle trades CSV")
+    parser.add_argument("--trader", default=None, help="Filter to a specific trader name")
+    parser.add_argument("--model", default="opus", choices=["opus", "sonnet", "haiku"])
     parser.add_argument("--output", default="outputs", help="Output directory")
-    parser.add_argument("--skip-patterns", action="store_true", help="Skip portfolio-level pattern analysis")
+    parser.add_argument("--skip-eval", action="store_true", help="Skip grounding evaluation")
     args = parser.parse_args()
+
+    if not args.kaggle:
+        default_kaggle = "/tmp/congress_data/Copy of congress-trading-all (3).csv"
+        if Path(default_kaggle).exists():
+            args.kaggle = default_kaggle
+        else:
+            print("Error: Provide --kaggle path to trades CSV")
+            sys.exit(1)
 
     client, backend = create_client()
     model_id = BEDROCK_MODELS[args.model] if backend == "bedrock" else DIRECT_MODELS[args.model]
-    print(f"Using {args.model} via {backend} ({model_id})")
+    print(f"Using {args.model} via {backend}")
 
     print("Loading trades...")
-    trades = load_trades(args.data)
-    print(f"  Loaded {len(trades)} trades")
-
-    trades = triage(trades)
-    print(f"  After triage: {len(trades)} trades")
-
-    if args.politician:
-        trades = [t for t in trades if args.politician.lower() in t.politician.lower()]
-        print(f"  Filtered to {args.politician}: {len(trades)} trades")
-
-    if args.ticker:
-        trades = [t for t in trades if t.ticker == args.ticker.upper()]
-        print(f"  Filtered to {args.ticker.upper()}: {len(trades)} trades")
-
-    if args.limit:
-        trades = trades[:args.limit]
-        print(f"  Limited to {args.limit} trades")
-
+    trades = load_kaggle_trades(args.kaggle, args.trader)
     if not trades:
-        print("No trades to analyze.")
-        sys.exit(0)
+        print(f"No trades found{' for ' + args.trader if args.trader else ''}.")
+        sys.exit(1)
 
-    print(f"\n=== Phase 1: Individual Trade Analysis ({len(trades)} trades) ===\n")
-    results = []
-    for i, trade in enumerate(trades):
-        print(f"[{i+1}/{len(trades)}] {trade.politician} — {trade.trade_type} {trade.ticker} ({trade.trade_date})")
-        try:
-            result = analyze_trade(trade, client, model=model_id)
-            grade = result.get("grade", "?")
-            print(f"         Grade: {grade}")
-            results.append(result)
-        except Exception as e:
-            print(f"         ERROR: {e}")
-            results.append({
-                "politician": trade.politician,
-                "ticker": trade.ticker,
-                "trade_type": trade.trade_type,
-                "trade_date": trade.trade_date,
-                "amount_range": f"${trade.amount_low:,}-${trade.amount_high:,}",
-                "grade": "ERR",
-                "full_analysis": f"Analysis failed: {e}",
-            })
+    summary = build_portfolio_summary(trades)
+    print(f"  {summary['trader']}: {len(trades)} trades, "
+          f"{len(summary['unique_tickers'])} tickers, "
+          f"${summary['total_capital_deployed']:,.0f} deployed")
 
-    pattern_analysis = None
-    if not args.skip_patterns and len(results) >= 3:
-        print(f"\n=== Phase 2: Portfolio Pattern Analysis ===\n")
-        try:
-            pattern_analysis = analyze_patterns(results, client, model=model_id)
-            print("  Pattern analysis complete.")
-        except Exception as e:
-            print(f"  Pattern analysis failed: {e}")
+    # --- Analysis ---
+    print(f"\n=== Portfolio Analysis ===\n")
+    result = analyze_portfolio(summary, client, model=model_id)
 
-    summary_path = save_results(results, args.output, pattern_analysis=pattern_analysis)
-    print(f"\nDone! Summary written to {summary_path}")
-    print(f"Individual reports in {args.output}/")
+    report = result["report"]
+    call_log = result["call_log"]
+    meta = result["metadata"]
+    print(f"  Report: {meta['report_length']:,} chars, {meta['tool_calls']} tool calls")
+
+    # --- Save outputs ---
+    out = Path(args.output)
+    out.mkdir(exist_ok=True)
+
+    report_path = out / "portfolio_report.md"
+    report_path.write_text(report)
+    print(f"  Report saved to {report_path}")
+
+    log_path = out / "call_log.json"
+    log_path.write_text(json.dumps(
+        [{"tool": c.tool_name, "args": c.args, "result": c.result[:500]}
+         for c in call_log],
+        indent=2,
+    ))
+    print(f"  Call log saved to {log_path}")
+
+    # --- Evaluation ---
+    if not args.skip_eval:
+        print(f"\n=== Grounding Evaluation ===\n")
+        eval_results = evaluate_report(report, call_log)
+        eval_text = format_eval_report(eval_results)
+
+        eval_path = out / "eval_report.md"
+        eval_path.write_text(eval_text)
+        print(eval_text)
+        print(f"\n  Eval saved to {eval_path}")
+    else:
+        print("\n  Skipping evaluation (--skip-eval)")
+
+    print("\nDone.")
 
 
 if __name__ == "__main__":
