@@ -1,2 +1,7 @@
-# portfolio-autopsy
-An agentic system that performs counterfactual analysis on trading histories — investigating what went wrong, what alternatives existed, and learning to make better decisions through self-reflection
+# Portfolio Autopsy
+
+An agentic system that performs structured post-mortems on Congressional stock trades — investigating what went wrong, what alternatives existed, and grading each decision against market evidence.
+
+## Status
+
+Work in progress. See [design.md](design.md) for approach and architecture.
