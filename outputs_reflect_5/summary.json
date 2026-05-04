@@ -1,0 +1,99 @@
+{
+  "trader": "Ms. Nancy Pelosi",
+  "iterations": 5,
+  "model": "opus",
+  "score_history": [
+    {
+      "iteration": 1,
+      "trust_score": 89,
+      "grade": "B",
+      "components": {
+        "Tool Data Accuracy": 100,
+        "Claim Tag Accuracy": 100,
+        "Claim Grounding Rate": 54,
+        "Python Execution Clean": 88,
+        "Data Coverage": 100
+      },
+      "tool_calls": 99,
+      "report_length": 15685,
+      "claim_tags": 40,
+      "claim_accuracy": "100%",
+      "grounding_rate": "27%",
+      "accepted": true
+    },
+    {
+      "iteration": 2,
+      "trust_score": 82,
+      "grade": "B",
+      "components": {
+        "Tool Data Accuracy": 100,
+        "Claim Tag Accuracy": 100,
+        "Claim Grounding Rate": 20,
+        "Python Execution Clean": 88,
+        "Data Coverage": 100
+      },
+      "tool_calls": 143,
+      "report_length": 15700,
+      "claim_tags": 45,
+      "claim_accuracy": "100%",
+      "grounding_rate": "10%",
+      "accepted": false
+    },
+    {
+      "iteration": 3,
+      "trust_score": 88,
+      "grade": "B",
+      "components": {
+        "Tool Data Accuracy": 100,
+        "Claim Tag Accuracy": 100,
+        "Claim Grounding Rate": 50,
+        "Python Execution Clean": 90,
+        "Data Coverage": 100
+      },
+      "tool_calls": 126,
+      "report_length": 15575,
+      "claim_tags": 55,
+      "claim_accuracy": "100%",
+      "grounding_rate": "25%",
+      "accepted": false
+    },
+    {
+      "iteration": 4,
+      "trust_score": 95,
+      "grade": "A",
+      "components": {
+        "Tool Data Accuracy": 100,
+        "Claim Tag Accuracy": 100,
+        "Claim Grounding Rate": 73,
+        "Python Execution Clean": 100,
+        "Data Coverage": 100
+      },
+      "tool_calls": 143,
+      "report_length": 24900,
+      "claim_tags": 89,
+      "claim_accuracy": "100%",
+      "grounding_rate": "37%",
+      "accepted": true
+    },
+    {
+      "iteration": 5,
+      "trust_score": 92,
+      "grade": "A",
+      "components": {
+        "Tool Data Accuracy": 100,
+        "Claim Tag Accuracy": 100,
+        "Claim Grounding Rate": 63,
+        "Python Execution Clean": 93,
+        "Data Coverage": 100
+      },
+      "tool_calls": 165,
+      "report_length": 19011,
+      "claim_tags": 105,
+      "claim_accuracy": "100%",
+      "grounding_rate": "31%",
+      "accepted": false
+    }
+  ],
+  "delta": 3,
+  "timestamp": "2026-05-03T05:18:42.635770"
+}

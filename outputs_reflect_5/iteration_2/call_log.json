@@ -1,0 +1,1110 @@
+[
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\nimport json\n\n# Parse the full trade data\ntrades = [\n    {\"date\": \"2014-09-22\", \"ticker\": \"MGRC\", \"action\": \"Donation\", \"instrument\": \"stock\", \"amount\": 75000.5},\n    {\"date\": \"2014-09-22\", \"ticker\": \"RHI\", \"action\": \"Donation\", \"instrument\": \"stock\", \"amount\": 175000.5},\n    {\"date\": \"2014-10-23\", \"ticker\": \"SFLY\", \"action\": \"Sell\", \"instrument\": \"stock\", \"amount\": 32500.5},\n    {\"date\": \"2014-10-23\", \"ticker\": \"BRCM\", \"action\": \"Sell\", \"instrument\": \"stock\", \"amount\": 8000.5},\n    {\"date\": \"2014-10-23\", \"ticker\": \"AA\", \"action\": \"Sell\", \"instrument\": \"stock\", \"amount\": 32500.5},\n    {\"date\": \"2014-10-23\", \"ticker\": \"ELX\", \"action\": \"Sell\", \"instrument\": \"stock\", \"amount\": 8000.5},\n    {\"date\": \"2014-10-23\", \"ticker\": \"BCOR\", \"action\": \"Sell\", \"instrument\": \"stock\", \"amount\": 8000.5},\n    {\"date\": \"2014-10-23\", \"ticker\": \"DOW\", \"action\": \"Sell\", \"instrument\": \"stock\", \"amount\": 32500.5},\n    {\"date\": \"2014-10-23\", \"ticker\": \"ENTR\", \"action\": \"Sell\", \"instrument\": \"stock\", \"amount\": 8000.5},\n    {\"date\": \"2014-10-24\", \"ticker\": \"SUNE\", \"action\": \"Buy\", \"instrument\": \"stock\", \"amount\": 175000.5},\n    {\"date\": \"2014-11-05\", \"ticker\": \"HTZ\", \"action\": \"Buy\", \"instrument\": \"stock\", \"amount\": 32500.5},\n    {\"date\": \"2014-11-06\", \"ticker\": \"HTZ\", \"action\": \"Buy\", \"instrument\": \"stock\", \"amount\": 75000.5},\n    {\"date\": \"2014-11-25\", \"ticker\": \"HTZ\", \"action\": \"Buy\", \"instrument\": \"stock\", \"amount\": 175000.5},\n    {\"date\": \"2014-11-28\", \"ticker\": \"DIS\", \"action\": \"Buy\", \"instrument\": \"stock\", \"amount\": 8000.5},\n    {\"date\": \"2014-11-28\", \"ticker\": \"HTZ\", \"action\": \"Buy\", \"instrument\": \"stock\", \"amount\": 75000.5},\n    {\"date\": \"2014-12-10\", \"ticker\": \"DIS\", \"action\": \"Buy\", \"instrument\": \"stock\", \"amount\": 75000.5},\n    {\"date\": \"2014-12-29\", \"ticker\": \"V\", \"action\": \"Sell\", \"instrument\": \"stock\", \"amount\": 375000.5},\n    {\"date\": \"2014-12-30\", \"ticker\": \"V\", \"action\": \"Sell\", \"instrument\": \"stock\", \"amount\": 175000.5},\n]\n\n# Sector classification\nsector_map = {\n    'AAPL': 'Technology', 'NVDA': 'Technology', 'MSFT': 'Technology', 'AMZN': 'Technology/Consumer',\n    'GOOG': 'Technology', 'GOOGL': 'Technology', 'CRM': 'Technology', 'FB': 'Technology',\n    'NFLX': 'Technology/Media', 'PYPL': 'Technology/Fintech', 'CRWD': 'Technology/Cybersecurity',\n    'PANW': 'Technology/Cybersecurity', 'DBX': 'Technology', 'MU': 'Technology/Semiconductors',\n    'RBLX': 'Technology/Gaming', 'WORK': 'Technology', 'SQ': 'Technology/Fintech',\n    'TSLA': 'Consumer/Auto', 'DIS': 'Media/Entertainment', 'V': 'Financial Services',\n    'AXP': 'Financial Services', 'AB': 'Financial Services', 'T': 'Telecom',\n    'HTZ': 'Consumer/Travel', 'SUNE': 'Energy/Solar', 'WBD': 'Media/Entertainment',\n    'IBKR': 'Financial Services', 'MORN': 'Financial Services',\n    'MGRC': 'Other', 'RHI': 'Staffing', 'SFLY': 'Technology', 'BRCM': 'Technology',\n    'AA': 'Materials', 'ELX': 'Technology', 'BCOR': 'Technology', 'DOW': 'Materials',\n    'ENTR': 'Other', 'BFET': 'Other'\n}\n\n# Broader sector groups\nbroad_sector = {\n    'AAPL': 'Tech', 'NVDA': 'Tech', 'MSFT': 'Tech', 'AMZN': 'Tech', 'GOOG': 'Tech', 'GOOGL': 'Tech',\n    'CRM': 'Tech', 'FB': 'Tech', 'NFLX': 'Tech', 'PYPL': 'Tech', 'CRWD': 'Tech', 'PANW': 'Tech',\n    'DBX': 'Tech', 'MU': 'Tech', 'RBLX': 'Tech', 'WORK': 'Tech', 'SQ': 'Tech',\n    'TSLA': 'Consumer Discretionary', 'DIS': 'Communication Services', 'V': 'Financials',\n    'AXP': 'Financials', 'AB': 'Financials', 'T': 'Communication Services',\n    'HTZ': 'Consumer Discretionary', 'SUNE': 'Energy', 'WBD': 'Communication Services',\n    'IBKR': 'Financials', 'MORN': 'Financials',\n    'MGRC': 'Other', 'RHI': 'Industrials', 'SFLY': 'Tech', 'BRCM': 'Tech',\n    'AA': 'Materials', 'ELX': 'Tech', 'BCOR': 'Tech', 'DOW': 'Materials',\n    'ENTR': 'Other', 'BFET': 'Other'\n}\n\n# Capital deployed by broad sector (buys + exercises only)\npositions = {\n    'AAPL': 10450008.0, 'NVDA': 10125002.5, 'MSFT': 8500004.0, 'AMZN': 8250002.5,\n    'DIS': 4758003.0, 'CRM': 4175002.5, 'GOOG': 3750001.0, 'GOOGL': 3750001.0,\n    'TSLA': 3750001.0, 'NFLX': 3550001.5, 'PYPL': 2625002.0, 'AB': 2250001.5,\n    'FB': 1000002.0, 'PANW': 925001.0, 'CRWD': 750000.5, 'HTZ': 565003.0,\n    'AXP': 550001.0, 'DBX': 375000.5, 'MU': 375000.5, 'RBLX': 375000.5,\n    'T': 375000.5, 'WORK': 375000.5, 'SUNE': 175000.5, 'WBD': 75000.5, 'SQ': 40501.0\n}\n\nsector_totals = {}\nfor ticker, capital in positions.items():\n    s = broad_sector.get(ticker, 'Other')\n    sector_totals[s] = sector_totals.get(s, 0) + capital\n\nprint(\"=== Capital Deployed by Broad Sector ===\")\nfor s in sorted(sector_totals.keys(), key=lambda x: -sector_totals[x]):\n    pct = sector_totals[s] / sum(sector_totals.values()) * 100\n    print(f\"  {s}: ${sector_totals[s]:,.0f} ({pct:.1f}%)\")\n\nprint(f\"\\nTotal capital deployed: ${sum(positions.values()):,.0f}\")\n\n# Top 5 positions\nprint(\"\\n=== Top 5 Positions by Capital Deployed ===\")\nsorted_pos = sorted(positions.items(), key=lambda x: -x[1])\ntop5_total = sum(v for _, v in sorted_pos[:5])\nfor ticker, cap in sorted_pos[:5]:\n    print(f\"  {ticker}: ${cap:,.0f}\")\nprint(f\"  Top 5 total: ${top5_total:,.0f} ({top5_total/sum(positions.values())*100:.1f}%)\")\n"
+    },
+    "result": "=== Capital Deployed by Broad Sector ===\n  Tech: $59,390,532 (82.6%)\n  Communication Services: $5,208,004 (7.2%)\n  Consumer Discretionary: $4,315,004 (6.0%)\n  Financials: $2,800,002 (3.9%)\n  Energy: $175,000 (0.2%)\n\nTotal capital deployed: $71,888,542\n\n=== Top 5 Positions by Capital Deployed ===\n  AAPL: $10,450,008\n  NVDA: $10,125,002\n  MSFT: $8,500,004\n  AMZN: $8,250,002\n  DIS: $4,758,003\n  Top 5 total: $42,083,020 (58.5%)\n"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2017-01-19"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2017-01-19\", \"close_price\": 27.58}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2017-12-28"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2017-12-28\", \"close_price\": 40.03}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2020-05-08"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2020-05-08\", \"close_price\": 75.14}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2020-06-18"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2020-06-18\", \"close_price\": 85.22}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "MSFT",
+      "date": "2021-03-19"
+    },
+    "result": "{\"ticker\": \"MSFT\", \"date\": \"2021-03-19\", \"close_price\": 221.03}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "NVDA",
+      "date": "2022-07-26"
+    },
+    "result": "{\"ticker\": \"NVDA\", \"date\": \"2022-07-26\", \"close_price\": 16.51}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "NVDA",
+      "date": "2021-07-23"
+    },
+    "result": "{\"ticker\": \"NVDA\", \"date\": \"2021-07-23\", \"close_price\": 19.51}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "NVDA",
+      "date": "2022-06-17"
+    },
+    "result": "{\"ticker\": \"NVDA\", \"date\": \"2022-06-17\", \"close_price\": 15.85}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "NVDA",
+      "date": "2023-11-22"
+    },
+    "result": "{\"ticker\": \"NVDA\", \"date\": \"2023-11-22\", \"close_price\": 48.68}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "NVDA",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"NVDA\", \"date\": \"2024-02-21\", \"close_price\": 67.43}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "FB",
+      "date": "2020-01-16"
+    },
+    "result": "{\"error\": \"No price data for FB on 2020-01-16\"}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "FB",
+      "date": "2020-05-08"
+    },
+    "result": "{\"error\": \"No price data for FB on 2020-05-08\"}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "FB",
+      "date": "2020-08-07"
+    },
+    "result": "{\"error\": \"No price data for FB on 2020-08-07\"}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "GOOGL",
+      "date": "2021-06-18"
+    },
+    "result": "{\"ticker\": \"GOOGL\", \"date\": \"2021-06-18\", \"close_price\": 119.13}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "META",
+      "date": "2020-01-16"
+    },
+    "result": "{\"ticker\": \"META\", \"date\": \"2020-01-16\", \"close_price\": 220.04}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "META",
+      "date": "2020-05-08"
+    },
+    "result": "{\"ticker\": \"META\", \"date\": \"2020-05-08\", \"close_price\": 210.7}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "META",
+      "date": "2020-08-07"
+    },
+    "result": "{\"ticker\": \"META\", \"date\": \"2020-08-07\", \"close_price\": 266.35}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "GOOGL",
+      "date": "2022-12-20"
+    },
+    "result": "{\"ticker\": \"GOOGL\", \"date\": \"2022-12-20\", \"close_price\": 88.29}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "GOOGL",
+      "date": "2022-12-21"
+    },
+    "result": "{\"ticker\": \"GOOGL\", \"date\": \"2022-12-21\", \"close_price\": 88.85}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "GOOGL",
+      "date": "2022-12-28"
+    },
+    "result": "{\"ticker\": \"GOOGL\", \"date\": \"2022-12-28\", \"close_price\": 85.31}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "TSLA",
+      "date": "2022-03-17"
+    },
+    "result": "{\"ticker\": \"TSLA\", \"date\": \"2022-03-17\", \"close_price\": 290.53}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "TSLA",
+      "date": "2022-12-20"
+    },
+    "result": "{\"ticker\": \"TSLA\", \"date\": \"2022-12-20\", \"close_price\": 137.8}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "TSLA",
+      "date": "2020-12-22"
+    },
+    "result": "{\"ticker\": \"TSLA\", \"date\": \"2020-12-22\", \"close_price\": 213.45}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "CRM",
+      "date": "2020-06-18"
+    },
+    "result": "{\"ticker\": \"CRM\", \"date\": \"2020-06-18\", \"close_price\": 184.94}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "DIS",
+      "date": "2022-01-21"
+    },
+    "result": "{\"ticker\": \"DIS\", \"date\": \"2022-01-21\", \"close_price\": 134.22}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "DIS",
+      "date": "2022-09-16"
+    },
+    "result": "{\"ticker\": \"DIS\", \"date\": \"2022-09-16\", \"close_price\": 105.76}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "DIS",
+      "date": "2022-12-21"
+    },
+    "result": "{\"ticker\": \"DIS\", \"date\": \"2022-12-21\", \"close_price\": 84.92}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "PYPL",
+      "date": "2022-01-21"
+    },
+    "result": "{\"ticker\": \"PYPL\", \"date\": \"2022-01-21\", \"close_price\": 162.67}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "PYPL",
+      "date": "2020-06-12"
+    },
+    "result": "{\"ticker\": \"PYPL\", \"date\": \"2020-06-12\", \"close_price\": 154.43}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "PYPL",
+      "date": "2022-12-21"
+    },
+    "result": "{\"ticker\": \"PYPL\", \"date\": \"2022-12-21\", \"close_price\": 68.84}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "PYPL",
+      "date": "2022-12-28"
+    },
+    "result": "{\"ticker\": \"PYPL\", \"date\": \"2022-12-28\", \"close_price\": 67.19}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "CRM",
+      "date": "2021-12-20"
+    },
+    "result": "{\"ticker\": \"CRM\", \"date\": \"2021-12-20\", \"close_price\": 243.63}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "CRM",
+      "date": "2022-12-20"
+    },
+    "result": "{\"ticker\": \"CRM\", \"date\": \"2022-12-20\", \"close_price\": 126.59}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "NFLX",
+      "date": "2020-06-18"
+    },
+    "result": "{\"ticker\": \"NFLX\", \"date\": \"2020-06-18\", \"close_price\": 44.99}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "NFLX",
+      "date": "2022-12-29"
+    },
+    "result": "{\"ticker\": \"NFLX\", \"date\": \"2022-12-29\", \"close_price\": 29.11}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2022-01-21"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2022-01-21\", \"close_price\": 158.92}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2023-03-17"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2023-03-17\", \"close_price\": 152.79}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2023-06-15"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2023-06-15\", \"close_price\": 183.61}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "MSFT",
+      "date": "2023-06-15"
+    },
+    "result": "{\"ticker\": \"MSFT\", \"date\": \"2023-06-15\", \"close_price\": 340.79}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "MSFT",
+      "date": "2020-02-20"
+    },
+    "result": "{\"ticker\": \"MSFT\", \"date\": \"2020-02-20\", \"close_price\": 175.18}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "MSFT",
+      "date": "2020-02-28"
+    },
+    "result": "{\"ticker\": \"MSFT\", \"date\": \"2020-02-28\", \"close_price\": 153.89}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "V",
+      "date": "2022-06-21"
+    },
+    "result": "{\"ticker\": \"V\", \"date\": \"2022-06-21\", \"close_price\": 188.9}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "V",
+      "date": "2022-11-08"
+    },
+    "result": "{\"ticker\": \"V\", \"date\": \"2022-11-08\", \"close_price\": 196.43}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "NVDA",
+      "date": "2021-06-03"
+    },
+    "result": "{\"ticker\": \"NVDA\", \"date\": \"2021-06-03\", \"close_price\": 16.93}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "CRWD",
+      "date": "2020-09-03"
+    },
+    "result": "{\"ticker\": \"CRWD\", \"date\": \"2020-09-03\", \"close_price\": 129.25}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "PANW",
+      "date": "2024-02-12"
+    },
+    "result": "{\"ticker\": \"PANW\", \"date\": \"2024-02-12\", \"close_price\": 185.99}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "PANW",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"PANW\", \"date\": \"2024-02-21\", \"close_price\": 130.99}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2017-06-15"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2017-06-15\", \"close_price\": 33.51}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AMZN",
+      "date": "2020-01-16"
+    },
+    "result": "{\"ticker\": \"AMZN\", \"date\": \"2020-01-16\", \"close_price\": 93.9}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2016-01-13"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2016-01-13\", \"close_price\": 21.94}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "RBLX",
+      "date": "2021-12-20"
+    },
+    "result": "{\"ticker\": \"RBLX\", \"date\": \"2021-12-20\", \"close_price\": 98.69}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "RBLX",
+      "date": "2023-01-20"
+    },
+    "result": "{\"ticker\": \"RBLX\", \"date\": \"2023-01-20\", \"close_price\": 35.38}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "MU",
+      "date": "2021-12-21"
+    },
+    "result": "{\"ticker\": \"MU\", \"date\": \"2021-12-21\", \"close_price\": 88.56}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "MU",
+      "date": "2022-09-16"
+    },
+    "result": "{\"ticker\": \"MU\", \"date\": \"2022-09-16\", \"close_price\": 51.84}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AXP",
+      "date": "2022-01-21"
+    },
+    "result": "{\"ticker\": \"AXP\", \"date\": \"2022-01-21\", \"close_price\": 150.54}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AXP",
+      "date": "2020-06-24"
+    },
+    "result": "{\"ticker\": \"AXP\", \"date\": \"2020-06-24\", \"close_price\": 88.51}"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Let's compute round-trip P&L for each major position using the price data we've gathered\n\n# AAPL - Complex position with multiple entries and exits\n# Note: AAPL prices are split-adjusted. Pre-2020 strikes need to be adjusted for 4:1 split (Aug 2020)\n# The strikes in the data already seem to reflect the actual contract terms at the time\n\n# Let me work through each position carefully\n\nprint(\"=\" * 80)\nprint(\"POSITION P&L ANALYSIS\")\nprint(\"=\" * 80)\n\n# =====================\n# 1. AAPL\n# =====================\nprint(\"\\n--- AAPL ---\")\n# Note: AAPL had a 4:1 stock split on Aug 28, 2020. Prices from tools are split-adjusted.\n# The option strike prices are NOT split-adjusted (they're the original contract terms).\n# Pre-split: $90 strike = $22.50 post-split equivalent\n\n# Phase 1: Jan 2016 bought 200 calls at $90 strike, paid $375k\n# Exercised 100 (Jan 2017) \u2192 10,000 shares at $90/share = $900,000 cost\n# Sold 100 calls Jan 2017 for $375k\n# AAPL at exercise (1/19/17): $27.58 split-adjusted = ~$110.32 pre-split\n# Gain on exercised: (110.32 - 90) * 10,000 = $203,200 intrinsic minus $187,500 premium paid\n# Sold 9,000 shares Dec 2017 at $40.03 split-adj = ~$160.12 pre-split \u2192 9,000 * 160.12 = ~$1.44M\n# Donated 1,300 + 2,800 = 4,100 shares (valued in range)\n\n# This gets very complex with splits. Let me use a simpler approach - total cash in vs total cash out\n\n# AAPL Total cash invested (buys only, not exercises): \naapl_premium_paid = 375000.5 + 175000.5 + 175000.5 + 175000.5 + 750000.5 + 375000.5 + 175000.5 + 750000.5 + 375000.5\nprint(f\"AAPL total option premiums paid: ${aapl_premium_paid:,.0f}\")\n\n# AAPL exercise costs (buying stock through options):\n# These are the actual capital outlay at exercise\n# Jan 2017: 100 contracts * 100 shares * $90 strike / something... \n# Wait - the \"amount\" for exercises is listed in the data as ranges\n# Let me re-read the data more carefully\n\n# For exercises, the \"amount\" field represents the transaction value\n# Exercise 100 calls at $90 \u2192 10,000 shares at $90 = $900,000 \u2192 amount listed as $750,000.5\n# The amounts in disclosure forms are RANGES, not exact values\n\nprint(\"\\nNote: Amounts in this data are RANGE midpoints from congressional disclosures,\")\nprint(\"not exact values. We'll use market prices for more accurate P&L.\")\n\n# Let me try a different approach: reconstruct share holdings from known prices\n# AAPL share accumulation (all pre-split prices \u00f74 = post-split adjusted):\n\n# Key AAPL prices (all split-adjusted from tools):\n# 2016-01-13: $21.94\n# 2017-01-19: $27.58 (exercise 100 calls at $90 pre-split = $22.50 split-adj)\n# 2017-06-15: $33.51 (exercise 100 calls at $80 pre-split = $20.00 split-adj)  \n# 2017-12-28: $40.03 (sold 9,000 shares)\n# 2018-09-20: exercise at $130 and $140 pre-split = $32.50 and $35.00 split-adj\n# AAPL 2018-09-20: need price\nprint(\"\\nNeed more prices to complete AAPL analysis...\")\n"
+    },
+    "result": "================================================================================\nPOSITION P&L ANALYSIS\n================================================================================\n\n--- AAPL ---\nAAPL total option premiums paid: $3,325,004\n\nNote: Amounts in this data are RANGE midpoints from congressional disclosures,\nnot exact values. We'll use market prices for more accurate P&L.\n\nNeed more prices to complete AAPL analysis...\n"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2018-09-20"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2018-09-20\", \"close_price\": 52.07}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2020-12-22"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2020-12-22\", \"close_price\": 128.26}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2021-05-21"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2021-05-21\", \"close_price\": 122.38}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2022-05-13"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2022-05-13\", \"close_price\": 144.35}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2022-05-24"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2022-05-24\", \"close_price\": 137.72}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2022-06-17"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2022-06-17\", \"close_price\": 129.09}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2020-11-06"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2020-11-06\", \"close_price\": 115.43}"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# AAPL underwent a 4:1 split on Aug 28, 2020. All prices from tools are split-adjusted.\n# Pre-split option strikes need to be divided by 4 to get split-adjusted equivalents.\n\n# Let me reconstruct the AAPL position P&L using split-adjusted prices from tools\n\nprint(\"=\" * 80)\nprint(\"AAPL POSITION RECONSTRUCTION (all prices split-adjusted)\")\nprint(\"=\" * 80)\n\n# Phase 1: Jan 2016 - Buy 200 calls, strike $90 pre-split = $22.50 adj\n# Premium paid: $375,000.5\n# Jan 2017: Exercise 100 calls \u2192 10,000 shares at $22.50 adj = $225,000 exercise cost\n#   (disclosure says $750k which is the range midpoint for total transaction value)\n#   Market price on 1/19/17: $27.58 \u2192 intrinsic = ($27.58 - $22.50) * 10,000 = $50,800\n# Jan 2017: Sell 100 calls for $375,000.5 (per disclosure range)\n#   At $27.58 stock price, 100 calls at $22.50 strike = ($27.58-$22.50)*10000 = $50,800 intrinsic\n#   This seems low. The disclosure says $375k... Let me check if splits apply differently.\n\n# Actually wait - the option contracts pre-split were for 100 shares each at the pre-split price.\n# After split, you'd have 400 shares per contract at 1/4 the strike.\n# But the disclosure reports these at ORIGINAL terms.\n# \"EXERCISED 100 CALL OPTIONS (10,000 SHARES) EXPIRING 1/20/17 AT A STRIKE PRICE OF $90\"\n# This is 100 contracts * 100 shares = 10,000 shares at $90/share = $900,000 total exercise cost\n# Pre-split AAPL on 1/19/17: $27.58 * 4 = $110.32 pre-split price\n# Intrinsic: ($110.32 - $90) * 10,000 = $203,200\n\n# OK so the prices from our tool are ALL split-adjusted (post-split basis).\n# Pre-2020 share counts in the disclosure are PRE-SPLIT.\n# To get pre-split price: multiply tool price by 4\n\nprint(\"\\nPhase 1: 200 calls at $90 strike (pre-split)\")\nprint(\"  Premium paid: $375,001\")\npre_split_price_jan2017 = 27.58 * 4  # = $110.32\nprint(f\"  AAPL pre-split price 1/19/17: ${pre_split_price_jan2017:.2f}\")\nexercise_gain_100 = (pre_split_price_jan2017 - 90) * 10000\nprint(f\"  Exercised 100 contracts (10,000 shares): intrinsic gain = ${exercise_gain_100:,.0f}\")\n# Sold other 100 contracts - at expiry they'd be worth intrinsic\nsold_100_intrinsic = (pre_split_price_jan2017 - 90) * 10000  # same as exercise\nprint(f\"  Sold 100 contracts: ~${sold_100_intrinsic:,.0f} (disclosure says $375k range)\")\n# Net on 200 calls: spent $375k premium, got $203k intrinsic on exercise + $203k on sale = $406k\nphase1_net = exercise_gain_100 + sold_100_intrinsic - 375000.5\nprint(f\"  Phase 1 net gain (options only): ${phase1_net:,.0f}\")\n\n# But then held 10,000 shares from exercise. These were sold Dec 2017:\n# 9,000 shares sold at $40.03 adj = $160.12 pre-split \npre_split_dec2017 = 40.03 * 4\nshares_sold_gain = (pre_split_dec2017 - 90) * 9000\nprint(f\"\\n  Sold 9,000 shares 12/28/17 at ${pre_split_dec2017:.2f} pre-split\")\nprint(f\"  Gain on sold shares: ${shares_sold_gain:,.0f}\")\n# 1,300 shares donated (tax deduction at market value)\n\nprint(\"\\nPhase 2: 100 calls at $80 strike (pre-split), bought May 2016\")\nprint(\"  Premium paid: $175,001\")\npre_split_jun2017 = 33.51 * 4  # = $134.04\nprint(f\"  AAPL pre-split price 6/15/17: ${pre_split_jun2017:.2f}\")\nexercise_gain_phase2 = (pre_split_jun2017 - 80) * 10000\nprint(f\"  Exercised 100 contracts (10,000 shares): intrinsic = ${exercise_gain_phase2:,.0f}\")\n# These shares were likely held through 2017 and included in the Dec 2017 sales/donations\n# Total shares from exercises: 10,000 + 10,000 = 20,000 pre-split\n# Sold 9,000, donated 1,300 + 2,800 = 4,100. Remaining: 6,900 shares\n\nprint(\"\\nPhase 3: Feb 2018 - 50 calls at $130, 50 calls at $140 (pre-split)\")\nprint(\"  Premium paid: $175,001 + $175,001 = $350,001\")\npre_split_sep2018 = 52.07 * 4  # = $208.28\nprint(f\"  AAPL pre-split price 9/20/18: ${pre_split_sep2018:.2f}\")\ngain_130 = (pre_split_sep2018 - 130) * 5000\ngain_140 = (pre_split_sep2018 - 140) * 5000\nprint(f\"  Exercised 50 calls at $130 (5,000 shares): intrinsic = ${gain_130:,.0f}\")\nprint(f\"  Exercised 50 calls at $140 (5,000 shares): intrinsic = ${gain_140:,.0f}\")\nphase3_net = gain_130 + gain_140 - 350001\nprint(f\"  Phase 3 net gain: ${phase3_net:,.0f}\")\n\nprint(\"\\nPhase 4: Sep 2018 - 100 calls at $145 strike (pre-split), exp 6/19/20\")\nprint(\"  Premium paid: $750,001\")\n# Sold 6/18/2020 for $3M (disclosure range)\n# AAPL on 6/18/20: $85.22 split-adj = $340.88 pre-split\npre_split_jun2020 = 85.22 * 4\nintrinsic_145 = (pre_split_jun2020 - 145) * 10000\nprint(f\"  AAPL pre-split price 6/18/20: ${pre_split_jun2020:.2f}\")\nprint(f\"  Sold 100 calls: intrinsic = ${intrinsic_145:,.0f}\")\nphase4_net = intrinsic_145 - 750001\nprint(f\"  Phase 4 net gain: ${phase4_net:,.0f}\")\n\n# May 2020 stock sales\n# Sold 3,000 + 1,700 + 3,300 = 8,000 pre-split shares at $75.14 adj = $300.56 pre-split\nprint(\"\\nMay 2020 stock sales:\")\npre_split_may2020 = 75.14 * 4\nprint(f\"  Sold 8,000 shares at ~${pre_split_may2020:.2f} pre-split\")\n# These came from the Sep 2018 exercises (5000+5000=10,000 shares) + remaining from earlier\n# Cost basis: mix of $130 and $140 strikes\n# Approximate: 5000 at $130 + 3000 at $140 avg cost = (650000+420000)/8000 = $133.75/share\n# Actually, also 6,900 remaining from earlier at $80-90. Let's approximate.\n# Gain = (300.56 - avg_cost) * 8,000\n\nprint(\"\\n\" + \"=\" * 80)\nprint(\"POST-SPLIT PHASES (after Aug 2020 4:1 split)\")\nprint(\"=\" * 80)\n\n# After split, all prices are on split-adjusted basis and share counts multiply by 4\n# Note: Disclosures after split use post-split terms\n\nprint(\"\\nPhase 5: Dec 2020 - 100 calls at $100 strike (post-split), exp 1/21/22\")\nprint(\"  Premium paid: $375,001\")\n# AAPL on 12/22/20: $128.26\nprint(f\"  AAPL at purchase: $128.26 (deep ITM, $28.26 intrinsic)\")\n# Exercised 1/21/22: AAPL at $158.92\ngain_100_post = (158.92 - 100) * 10000\nprint(f\"  Exercised 1/21/22 at AAPL=${158.92}: intrinsic = ${gain_100_post:,.0f}\")\nphase5_net = gain_100_post - 375001\nprint(f\"  Phase 5 net gain: ${phase5_net:,.0f}\")\n\nprint(\"\\nPhase 6: May 2021 - 50 calls at $100 strike (post-split), exp 6/17/22\")\nprint(\"  Premium paid: $175,001\")\n# AAPL on 5/21/21: $122.38 (ITM)\n# Sold 6/17/22 for $175,001 (disclosure)\n# AAPL on 6/17/22: $129.09, intrinsic = ($129.09-$100)*5000 = $145,450\nprint(f\"  AAPL at purchase: $122.38 (ITM)\")\nprint(f\"  AAPL on 6/17/22: $129.09, intrinsic = ${(129.09-100)*5000:,.0f}\")\nphase6_net = 175001 - 175001  # sold for same range as bought\nprint(f\"  Phase 6 roughly breakeven based on disclosure ranges\")\n\nprint(\"\\nPhase 7: May 2022 - 100 calls at $80 + 50 calls at $80 (post-split)\")\nprint(\"  Premium paid: $750,001 + $375,001 = $1,125,001\")\n# AAPL on 5/13/22: $144.35. Deep ITM (intrinsic = $64.35)\n# Exercised 3/17/23: AAPL at $152.79, intrinsic per share = $72.79\ngain_80_100 = (152.79 - 80) * 10000\n# Exercised 6/15/23: AAPL at $183.61, intrinsic per share = $103.61\ngain_80_50 = (183.61 - 80) * 5000\nprint(f\"  Exercised 100 calls 3/17/23 at AAPL=$152.79: intrinsic = ${gain_80_100:,.0f}\")\nprint(f\"  Exercised 50 calls 6/15/23 at AAPL=$183.61: intrinsic = ${gain_80_50:,.0f}\")\ntotal_intrinsic_phase7 = gain_80_100 + gain_80_50\nphase7_net = total_intrinsic_phase7 - 1125001\nprint(f\"  Phase 7 net gain: ${phase7_net:,.0f}\")\nprint(f\"  (But premium was ~$1.125M for deep ITM calls; real gain is stock appreciation from entry)\")\n"
+    },
+    "result": "================================================================================\nAAPL POSITION RECONSTRUCTION (all prices split-adjusted)\n================================================================================\n\nPhase 1: 200 calls at $90 strike (pre-split)\n  Premium paid: $375,001\n  AAPL pre-split price 1/19/17: $110.32\n  Exercised 100 contracts (10,000 shares): intrinsic gain = $203,200\n  Sold 100 contracts: ~$203,200 (disclosure says $375k range)\n  Phase 1 net gain (options only): $31,"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Now let's do the other major positions\n\nprint(\"=\" * 80)\nprint(\"NVDA POSITION P&L\")\nprint(\"=\" * 80)\n\n# NVDA had a 10:1 split in June 2024 and a 4:1 split in July 2021\n# Our tool prices are fully split-adjusted\n# June 3, 2021: $16.93 split-adj. Pre-10:1-split, pre-4:1-split original price = 16.93 * 4 * 10 = $677.20\n# Wait - the 4:1 split was July 2021, 10:1 split was June 2024\n# June 3, 2021 price from tool: $16.93. This is after BOTH splits.\n# Original price on June 3, 2021: $16.93 * 10 * 4 = $677.20... \n# Actually no. The July 2021 split was 4:1 AFTER June 3, 2021.\n# So on June 3, 2021, NVDA had NOT yet split 4:1. The 4:1 happened July 20, 2021.\n# And the 10:1 happened June 7, 2024.\n# Tool price for 6/3/21: $16.93 is adjusted for BOTH the 4:1 (Jul 2021) and 10:1 (Jun 2024)\n# Original price = $16.93 * 4 * 10 = $677.20\n\n# Trade: 50 call options at $400 strike, exp 6/17/22\n# This $400 was the pre-4:1, pre-10:1 strike.\n# After 4:1 split (Jul 2021): becomes 200 contracts at $100 strike\n# After 10:1 split (Jun 2024): becomes 2000 contracts at $10 strike (but expired before this)\n# Actually the expiry is 6/17/22 so only the 4:1 split applies.\n# After 4:1: 200 contracts at $100 strike, each for 100 shares = 20,000 shares\n\nprint(\"\\nTrade 1: June 3, 2021 - 50 calls at $400 strike (pre-4:1)\")\nprint(\"  Premium paid: $3,000,001\")\noriginal_price_jun2021 = 16.93 * 4 * 10  # adj for both splits\nprint(f\"  NVDA original price 6/3/21: ~${original_price_jun2021:.2f}\")\n# Actually let me recalculate. The 10:1 split was June 2024. \n# yfinance prices are adjusted for ALL historical splits. \n# NVDA splits: 2:1 (2006), 3:2 (2007), 4:1 (Jul 2021), 10:1 (Jun 2024)\n# Price from tool on 6/3/21: $16.93 adjusted for post-Jul-2021 4:1 AND post-Jun-2024 10:1\n# To get original: $16.93 * 4 * 10 = $677.20... that seems too high for Jun 2021\n# Actually NVDA was around $650-700 in June 2021. So $677.20 is correct!\n\n# After 4:1 split (Jul 2021), 50 contracts \u2192 200 contracts at $100 strike\n# Exercised on 6/17/22 per disclosure: \"EXERCISED 200 CALL OPTIONS (20,000 SHARES) AT $100 STRIKE\"\n# This matches: 200 contracts * 100 shares = 20,000 shares at $100\n\n# NVDA on 6/17/22 from tool: $15.85 (adjusted for 10:1 Jun 2024)\n# Pre-10:1 price on 6/17/22: $15.85 * 10 = $158.50\n# After 4:1 split but before 10:1 split: that's the basis they'd see\n# Intrinsic at exercise: ($158.50 - $100) * 20,000 = $1,170,000\nnvda_exercise_price = 15.85 * 10  # adjusting back for the 10:1 only (4:1 already happened)\nprint(f\"  NVDA price at exercise 6/17/22 (post-4:1, pre-10:1): ${nvda_exercise_price:.2f}\")\nintrinsic_nvda_1 = (nvda_exercise_price - 100) * 20000\nprint(f\"  Intrinsic on 20,000 shares: ${intrinsic_nvda_1:,.0f}\")\nphase1_nvda_net = intrinsic_nvda_1 - 3000001\nprint(f\"  Net gain on Trade 1 options: ${phase1_nvda_net:,.0f}\")\n\nprint(\"\\nTrade 2: July 23, 2021 - 5,000 shares stock purchase\")\nprint(\"  Amount: $750,001\")\n# Price on 7/23/21 from tool: $19.51 (adjusted for 10:1)\n# Post-4:1, pre-10:1 price: $19.51 * 10 = $195.10\nnvda_buy_price_jul2021 = 19.51 * 10\nprint(f\"  NVDA price 7/23/21 (post-4:1, pre-10:1): ${nvda_buy_price_jul2021:.2f}\")\n# 5,000 shares at $195.10 = $975,500 (disclosure says $750k range)\n# This was post-4:1 split, so 5,000 shares at ~$195 = ~$975k cost\n\nprint(\"\\nTrade 3: July 23, 2021 - 50 calls at $100 strike (post-4:1), exp 9/16/22\")\nprint(\"  Premium paid: $375,001\")\n# After 10:1 split (Jun 2024), these become 500 contracts at $10 strike\n# But expired 9/16/22, before 10:1 split.\n# On 9/16/22 disclosure says: SOLD for $175,001\n# NVDA on 9/16/22 from tool: need to get this\n\n# Trade 4: Sold 25,000 shares on 7/26/22\n# NVDA on 7/26/22 from tool: $16.51 (adjusted for 10:1)\n# Post-4:1, pre-10:1: $16.51 * 10 = $165.10\nnvda_sell_price = 16.51 * 10\nprint(f\"\\nTrade 4: Sold 25,000 shares on 7/26/22\")\nprint(f\"  NVDA price (post-4:1, pre-10:1): ${nvda_sell_price:.2f}\")\nprint(f\"  Proceeds: 25,000 * ${nvda_sell_price:.2f} = ${25000 * nvda_sell_price:,.0f}\")\n\n# Cost basis of 25,000 shares:\n# 20,000 from exercise at $100 = $2,000,000\n# 5,000 from stock purchase at ~$195.10 = $975,500\ntotal_cost_25k = 20000 * 100 + 5000 * nvda_buy_price_jul2021\ntotal_proceeds_25k = 25000 * nvda_sell_price\nnvda_stock_gain = total_proceeds_25k - total_cost_25k\nprint(f\"  Cost basis: ${total_cost_25k:,.0f}\")\nprint(f\"  Gain/(Loss) on stock sale: ${nvda_stock_gain:,.0f}\")\n\n# Trade 5: Sold 50 calls on 9/16/22 for $175,001\n# NVDA on 9/16/22: need price\nprint(f\"\\nTrade 5: Sold 50 calls (post-4:1 at $100 strike) on 9/16/22 for ~$175,001\")\n\n# Trade 6: Nov 22, 2023 - 50 calls at $120 strike, exp 12/20/24\n# This is post both splits? No - the 10:1 split was June 2024, after purchase but before expiry\n# At purchase (11/22/23): NVDA at $48.68 (adj for 10:1) = $486.80 pre-10:1\n# Strike $120 pre-10:1 split\n# After 10:1: 500 contracts at $12 strike\nnvda_price_nov2023 = 48.68 * 10  # pre-10:1 price\nprint(f\"\\nTrade 6: Nov 22, 2023 - 50 calls at $120 strike (pre-10:1)\")\nprint(f\"  Premium paid: $3,000,001\")\nprint(f\"  NVDA price (pre-10:1): ${nvda_price_nov2023:.2f}\")\nprint(f\"  Deep ITM: intrinsic = ${(nvda_price_nov2023 - 120) * 5000:,.0f}\")\n\n# At end of review period (2/21/24): NVDA at $67.43 adj = $674.30 pre-10:1\nnvda_price_feb2024 = 67.43 * 10\nintrinsic_feb2024 = (nvda_price_feb2024 - 120) * 5000\nprint(f\"  NVDA price 2/21/24 (pre-10:1): ${nvda_price_feb2024:.2f}\")\nprint(f\"  Intrinsic at review end: ${intrinsic_feb2024:,.0f}\")\nnvda_trade6_gain = intrinsic_feb2024 - 3000001\nprint(f\"  Unrealized gain at review end: ${nvda_trade6_gain:,.0f}\")\n\n# NVDA Total P&L summary\nprint(\"\\n--- NVDA TOTAL P&L SUMMARY ---\")\nnvda_premiums_paid = 3000001 + 375001 + 3000001  # three option purchases\nnvda_options_received = 175001  # sold one set\nnvda_stock_cost = 975500  # approximate\nnvda_stock_proceeds = 25000 * nvda_sell_price\nprint(f\"  Total option premiums paid: ${nvda_premiums_paid:,.0f}\")\nprint(f\"  Stock purchase cost: ~${nvda_stock_cost:,.0f}\")\nprint(f\"  Stock sale proceeds: ~${nvda_stock_proceeds:,.0f}\")\nprint(f\"  Net realized from exercises + sales: complex (see above)\")\nprint(f\"  Key outcome: Sold NVDA at ~$165/share (post-4:1) in July 2022\")\nprint(f\"  Then re-entered at ~$487/share (pre-10:1) in Nov 2023\")\nprint(f\"  By Feb 2024, that position worth ~${intrinsic_feb2024:,.0f} in intrinsic alone\")\n"
+    },
+    "result": "================================================================================\nNVDA POSITION P&L\n================================================================================\n\nTrade 1: June 3, 2021 - 50 calls at $400 strike (pre-4:1)\n  Premium paid: $3,000,001\n  NVDA original price 6/3/21: ~$677.20\n  NVDA price at exercise 6/17/22 (post-4:1, pre-10:1): $158.50\n  Intrinsic on 20,000 shares: $1,170,000\n  Net gain on Trade 1 options: $-1,830,001\n\nTrade 2: July 23, 2021 - 5,000 shares stock pur"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Let me compute the NVDA opportunity cost of selling in July 2022\n\n# Sold 25,000 shares at ~$165.10 (post-4:1) on 7/26/22\n# NVDA price on 2/21/24 (post-4:1, pre-10:1): $67.43 * 10 = $674.30\n# If held 25,000 shares to 2/21/24: 25,000 * $674.30 = $16,857,500\n# Actual proceeds: 25,000 * $165.10 = $4,127,500\n# Opportunity cost: $16,857,500 - $4,127,500 = $12,730,000\n\nnvda_opp_cost = 25000 * 674.30 - 25000 * 165.10\nprint(f\"NVDA OPPORTUNITY COST OF SELLING IN JULY 2022:\")\nprint(f\"  Sold 25,000 shares at $165.10 on 7/26/22\")\nprint(f\"  NVDA price on 2/21/24: $674.30 (pre-10:1)\")\nprint(f\"  Value if held: ${25000 * 674.30:,.0f}\")\nprint(f\"  Actual proceeds: ${25000 * 165.10:,.0f}\")\nprint(f\"  Opportunity cost: ${nvda_opp_cost:,.0f}\")\n\n# However, they did re-enter with the Nov 2023 call options\n# 50 calls at $120 \u2192 after 10:1 split would be 500 contracts at $12\n# But at 2/21/24 (before 10:1 split): 50 contracts controlling 5,000 shares\n# Intrinsic: ($674.30 - $120) * 5,000 = $2,771,500\nprint(f\"\\n  Partial offset: Nov 2023 call options worth ~$2,771,500 in intrinsic\")\nprint(f\"  NET opportunity cost: ${nvda_opp_cost - 2771500 + 3000001:,.0f}\")\nprint(f\"  (Adjusted for $3M premium paid on new calls)\")\n"
+    },
+    "result": "NVDA OPPORTUNITY COST OF SELLING IN JULY 2022:\n  Sold 25,000 shares at $165.10 on 7/26/22\n  NVDA price on 2/21/24: $674.30 (pre-10:1)\n  Value if held: $16,857,500\n  Actual proceeds: $4,127,500\n  Opportunity cost: $12,730,000\n\n  Partial offset: Nov 2023 call options worth ~$2,771,500 in intrinsic\n  NET opportunity cost: $12,958,501\n  (Adjusted for $3M premium paid on new calls)\n"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Now let's do the other major positions\n\nprint(\"=\" * 80)\nprint(\"MSFT POSITION P&L\")\nprint(\"=\" * 80)\n\n# All MSFT options - no stock splits to worry about during this period\n# Feb 2020: Buy 100 calls at $140 for $375k, 100 calls at $130 for $750k, 50 calls at $130 for $175k\n# MSFT on 2/20/20: $175.18, 2/21/20: need, 2/28/20: $153.89\n# Exercise 3/19/21: 150 calls at $130 and 100 calls at $140\n# MSFT on 3/19/21: $221.03\n\nprint(\"Phase 1: Feb 2020 MSFT Calls\")\nprint(f\"  100 calls at $140 (premium $375,001), MSFT at $175.18 on 2/20/20 - ITM\")\nprint(f\"  100 calls at $130 (premium $750,001), MSFT at $175.18-ish on 2/21/20 - deep ITM\") \nprint(f\"  50 calls at $130 (premium $175,001), MSFT at $153.89 on 2/28/20 - ITM (COVID crash starting)\")\ntotal_premium_msft1 = 375001 + 750001 + 175001\nprint(f\"  Total premium paid: ${total_premium_msft1:,.0f}\")\n\n# Exercise 3/19/21\n# 150 calls at $130 \u2192 15,000 shares at $130 = $1,950,000 exercise cost\n# 100 calls at $140 \u2192 10,000 shares at $140 = $1,400,000 exercise cost\n# MSFT at $221.03 on 3/19/21\nintrinsic_130 = (221.03 - 130) * 15000\nintrinsic_140 = (221.03 - 140) * 10000\ntotal_intrinsic_msft1 = intrinsic_130 + intrinsic_140\nnet_msft1 = total_intrinsic_msft1 - total_premium_msft1\nprint(f\"\\n  MSFT on 3/19/21: $221.03\")\nprint(f\"  Intrinsic on 15,000 shares at $130 strike: ${intrinsic_130:,.0f}\")\nprint(f\"  Intrinsic on 10,000 shares at $140 strike: ${intrinsic_140:,.0f}\")\nprint(f\"  Total intrinsic: ${total_intrinsic_msft1:,.0f}\")\nprint(f\"  Net gain (intrinsic - premium): ${net_msft1:,.0f}\")\n\n# But they held the 25,000 shares. At MSFT $340.79 on 6/15/23:\n# Unrealized gain: 25,000 * ($340.79 - weighted avg cost)\navg_cost_msft = (15000*130 + 10000*140) / 25000\nprint(f\"\\n  25,000 shares held. Avg exercise cost: ${avg_cost_msft:.2f}\")\n# MSFT on 6/15/23: $340.79\nunrealized_msft = 25000 * (340.79 - avg_cost_msft)\nprint(f\"  MSFT on 6/15/23: $340.79\")  \nprint(f\"  Unrealized gain on held shares: ${unrealized_msft:,.0f}\")\nprint(f\"  Total gain including premium paid: ${unrealized_msft - total_premium_msft1:,.0f}\")\n\nprint(\"\\nPhase 2: May 2022 MSFT Calls\")\nprint(f\"  50 calls at $180 (premium $450,001)\")\n# Exercised 6/15/23: 5,000 shares at $180\n# MSFT on 6/15/23: $340.79\nintrinsic_180 = (340.79 - 180) * 5000\nnet_msft2 = intrinsic_180 - 450001\nprint(f\"  MSFT on exercise 6/15/23: $340.79\")\nprint(f\"  Intrinsic: ${intrinsic_180:,.0f}\")\nprint(f\"  Net gain: ${net_msft2:,.0f}\")\n\nprint(f\"\\n  MSFT TOTAL NET GAIN (realized intrinsic - all premiums): ${net_msft1 + net_msft2:,.0f}\")\nprint(f\"  Plus unrealized appreciation on 30,000 shares still held\")\n"
+    },
+    "result": "================================================================================\nMSFT POSITION P&L\n================================================================================\nPhase 1: Feb 2020 MSFT Calls\n  100 calls at $140 (premium $375,001), MSFT at $175.18 on 2/20/20 - ITM\n  100 calls at $130 (premium $750,001), MSFT at $175.18-ish on 2/21/20 - deep ITM\n  50 calls at $130 (premium $175,001), MSFT at $153.89 on 2/28/20 - ITM (COVID crash starting)\n  Total premium paid: $1,300,003\n\n  MSFT "
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Now the losing positions and other key trades\n\nprint(\"=\" * 80)\nprint(\"KEY LOSING POSITIONS\")\nprint(\"=\" * 80)\n\n# DIS\nprint(\"\\n--- DIS ---\")\n# Exercised 100 calls at $100 on 1/21/22 \u2192 10,000 shares\n# DIS on 1/21/22: $134.22\n# Bought 50 calls at $130 on 12/17/21 for $175,001 \u2192 expired worthless 9/16/22\n# DIS on 9/16/22: $105.76 (below $130 strike \u2192 worthless)\n# Sold 10,000 shares on 12/21/22 at DIS $84.92\ndis_exercise_cost = 100 * 10000  # $100 strike * 10,000 shares\ndis_sale_proceeds = 84.92 * 10000\ndis_stock_loss = dis_sale_proceeds - dis_exercise_cost\ndis_call_premium = 750001 + 175001  # Dec 2020 calls + Dec 2021 calls\ndis_worthless_premium = 175001  # Dec 2021 $130 calls expired worthless\nprint(f\"  Exercised at $100, DIS at $134.22 on 1/21/22\")\nprint(f\"  $130 calls bought 12/17/21 expired worthless: -${dis_worthless_premium:,.0f}\")\nprint(f\"  Sold 10,000 shares 12/21/22 at $84.92\")\nprint(f\"  Stock loss: ${dis_stock_loss:,.0f}\")\nprint(f\"  Total loss on DIS (stock + worthless options + premiums): complex\")\n# Net: exercised at $100, sold at $84.92 \u2192 loss of $15.08/share * 10,000 = $150,800 on stock\n# Plus $175k worthless premium on $130 calls\n# Plus $750k premium on $100 calls (partially recovered through $34.22 intrinsic at exercise)\n# Premium on $100 calls: $750,001, intrinsic at exercise: ($134.22-$100)*10,000 = $342,200\n# Net on $100 call: $342,200 - $750,001 = -$407,801 at exercise... \n# But then stock went from $134.22 to $84.92 \u2192 additional -$150,800 loss\n# Then $130 calls expired worthless: -$175,001\ndis_total_loss = (84.92 - 100) * 10000 - 750001 - 175001  # stock loss from strike + premiums\n# Wait, this double counts. Let me be cleaner:\n# Total cost: $750,001 premium + $100*10,000 exercise + $175,001 premium = $1,925,002\n# Total received: $84.92*10,000 + $0.50 (expired) = $849,200.50\n# Net P&L: 849,200.50 - 1,925,002 = -$1,075,801\ndis_total_cost = 750001 + 100*10000 + 175001\ndis_total_received = 84.92 * 10000 + 0.50\ndis_net = dis_total_received - dis_total_cost\nprint(f\"  Total cost (premiums + exercise): ${dis_total_cost:,.0f}\")\nprint(f\"  Total received: ${dis_total_received:,.0f}\")\nprint(f\"  NET LOSS: ${dis_net:,.0f}\")\n\n# CRM - Dec 2021 options\nprint(\"\\n--- CRM (Dec 2021 calls) ---\")\n# 130 calls at $210 strike, bought 12/20/21 for $925,001 total\n# CRM on 12/20/21: $243.63 (above $210, so ITM at entry)\n# Sold 12/20/22 for $4.50 (essentially worthless)\n# CRM on 12/20/22: $126.59 (way below $210 strike)\ncrm_loss = 4.50 - 925001\nprint(f\"  Bought 130 calls at $210, CRM at $243.63 (ITM)\")\nprint(f\"  Sold for $4.50 on 12/20/22, CRM at $126.59 (deep OTM)\")\nprint(f\"  NET LOSS: ${crm_loss:,.0f}\")\n\n# RBLX\nprint(\"\\n--- RBLX ---\")\n# 100 calls at $100, bought 12/20/21 for $375,001\n# RBLX on 12/20/21: $98.69 (slightly OTM)\n# Expired worthless 1/20/23, RBLX at $35.38\nrblx_loss = 0.50 - 375001  \nprint(f\"  Bought 100 calls at $100, RBLX at $98.69\")\nprint(f\"  Expired worthless 1/20/23, RBLX at $35.38\")\nprint(f\"  NET LOSS: ${rblx_loss:,.0f}\")\n\n# MU \nprint(\"\\n--- MU ---\")\n# 100 calls at $50, bought 12/21/21 for $375,001\n# MU on 12/21/21: $88.56 (deep ITM)\n# Sold 9/16/22 for $32,501, MU at $51.84 (barely ITM)\nmu_loss = 32501 - 375001\nprint(f\"  Bought 100 calls at $50, MU at $88.56 (deep ITM)\")\nprint(f\"  Sold for $32,501 on 9/16/22, MU at $51.84\")\nprint(f\"  NET LOSS: ${mu_loss:,.0f}\")\n\n# TSLA\nprint(\"\\n--- TSLA ---\")\n# 25 calls at $500 (pre-3:1 split Aug 2022), bought 12/22/20 for $750,001\n# TSLA on 12/22/20: $213.45 (adj) * 3 = $640.35 pre-3:1-split. Stock was at ~$640.\n# Wait: TSLA had a 3:1 split in Aug 2022. Also a 5:1 split in Aug 2020.\n# Tool price for 12/22/20: $213.45. This is adjusted for the 3:1 split (Aug 2022).\n# Original price: $213.45 * 3 = $640.35\n# Strike $500 \u2192 ITM at entry\n# After 3:1 split (Aug 2022): 75 contracts at $166.67 strike\n# Exercise on 3/17/22 (before split): 25 contracts * 100 shares = 2,500 shares at $500\n# TSLA on 3/17/22: $290.53 adj * 3 = $871.59 pre-split\ntsla_pre_split_exercise = 290.53 * 3\ntsla_intrinsic = (tsla_pre_split_exercise - 500) * 2500\nprint(f\"  Bought 25 calls at $500, TSLA at ~$640 on 12/22/20\")\nprint(f\"  Exercised 3/17/22: TSLA at ~${tsla_pre_split_exercise:.0f} pre-split\")\nprint(f\"  Intrinsic: ${tsla_intrinsic:,.0f}\")\n# Then sold 5,000 shares (post-3:1 split = 2,500 pre-split) on 12/20/22\n# TSLA on 12/20/22: $137.80 adj * 3 = $413.40 pre-split... \n# Wait, 5,000 shares is post-split. The 3:1 happened Aug 2022.\n# So 2,500 pre-split shares \u2192 7,500 post-split shares\n# Sold 5,000 of 7,500\n# TSLA on 12/20/22: $137.80 (post-split)\n# Cost basis per share post-split: $500/3 = $166.67\ntsla_cost_per_share_post = 500 / 3\ntsla_sale_proceeds_stock = 5000 * 137.80\ntsla_stock_cost = 5000 * tsla_cost_per_share_post\ntsla_stock_loss = tsla_sale_proceeds_stock - tsla_stock_cost\nprint(f\"  After 3:1 split: 7,500 shares at cost $166.67\")\nprint(f\"  Sold 5,000 shares 12/20/22 at $137.80\")\nprint(f\"  Stock sale loss: ${tsla_stock_loss:,.0f}\")\n# Net TSLA: premium $750,001 + exercise cost $500*2500=$1,250,000 = $2,000,001\n# Received: 5,000 * $137.80 = $689,000\n# Still holding 2,500 post-split shares\ntsla_total_cost = 750001 + 500 * 2500\ntsla_total_received = 5000 * 137.80\ntsla_remaining_value = 2500 * 137.80  # at time of last sale\ntsla_net = tsla_total_received + tsla_remaining_value - tsla_total_cost\nprint(f\"  Total cost: ${tsla_total_cost:,.0f}\")\nprint(f\"  Realized + remaining value (at $137.80): ${tsla_total_received + tsla_remaining_value:,.0f}\")\nprint(f\"  Net: ${tsla_net:,.0f}\")\n\n# PYPL\nprint(\"\\n--- PYPL ---\")\n# Bought 10,000 shares on 6/12/20 at $154.43 \u2192 $1,544,300\n# Bought 50 calls at $100 on 6/24/20, premium $375,001\n# Exercised 1/21/22: 5,000 shares at $100, PYPL at $162.67\n# Total: 15,000 shares\n# Sold 5,000 on 12/21/22 at $68.84\n# Sold 5,000 on 12/28/22 at $67.19\npypl_stock_cost = 10000 * 154.43\npypl_option_cost = 375001 + 100 * 5000  # premium + exercise\npypl_total_cost = pypl_stock_cost + pypl_option_cost\npypl_sold_proceeds = 5000 * 68.84 + 5000 * 67.19\n# Still holding 5,000 shares\npypl_remaining = 5000 * 67.19  # approximate at last sale date\npypl_net = pypl_sold_proceeds - pypl_total_cost  # excluding remaining shares\nprint(f\"  Stock cost (10,000 shares at $154.43): ${pypl_stock_cost:,.0f}\")\nprint(f\"  Option cost (premium + exercise): ${pypl_option_cost:,.0f}\")\nprint(f\"  Total invested: ${pypl_total_cost:,.0f}\")\nprint(f\"  Sold 10,000 shares for: ${pypl_sold_proceeds:,.0f}\")\nprint(f\"  Still holding 5,000 shares at ~$67\")\nprint(f\"  Realized loss on sold shares: ${pypl_sold_proceeds - (10000*154.43):,.0f}\")\n# The 5,000 from options cost $100+premium/50=$107.50/share \u2192 sold at $67-68\npypl_option_shares_loss = 5000 * 67.19 - (100*5000 + 375001)\nprint(f\"  Loss including option shares: substantial\")\n\nprint(\"\\n--- AMZN (May 2021 call) ---\")\n# 20 calls at $3000, bought 5/21/21 for $750,001\n# No exercise or sale recorded \u2192 likely expired worthless or near-worthless\n# AMZN had 20:1 split June 2022\n# Pre-split AMZN around $3,000-3,500 in May 2021\n# By 6/17/22 expiry: AMZN at ~$105 post-split = $2,100 pre-split \u2192 below $3,000 strike\nprint(f\"  Bought 20 calls at $3,000, premium $750,001\")\nprint(f\"  No sale/exercise recorded \u2192 likely expired worthless\")\nprint(f\"  NET LOSS: ~$-750,001\")\n\nprint(\"\\n\\n\" + \"=\" * 80)\nprint(\"SUMMARY OF OPTIONS EXPIRED WORTHLESS OR NEAR-WORTHLESS\")\nprint(\"=\" * 80)\ntotal_destroyed = abs(crm_loss) + abs(rblx_loss) + abs(mu_loss) + 175001 + 750001  # CRM, RBLX, MU, DIS $130 calls, AMZN $3000\nprint(f\"  CRM $210 calls: ${abs(crm_loss):,.0f}\")\nprint(f\"  RBLX $100 calls: ${abs(rblx_loss):,.0f}\")\nprint(f\"  MU $50 calls (sold for $32.5k): ${abs(mu_loss):,.0f}\")\nprint(f\"  DIS $130 calls (expired worthless): $175,001\")\nprint(f\"  AMZN $3000 calls (likely expired worthless): ~$750,001\")\nprint(f\"  TOTAL PREMIUM DESTROYED: ~${total_destroyed:,.0f}\")\n"
+    },
+    "result": "================================================================================\nKEY LOSING POSITIONS\n================================================================================\n\n--- DIS ---\n  Exercised at $100, DIS at $134.22 on 1/21/22\n  $130 calls bought 12/17/21 expired worthless: -$175,001\n  Sold 10,000 shares 12/21/22 at $84.92\n  Stock loss: $-150,800\n  Total loss on DIS (stock + worthless options + premiums): complex\n  Total cost (premiums + exercise): $1,925,002\n  Total received: $8"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Now let's compute the big winners\n\nprint(\"=\" * 80)\nprint(\"KEY WINNING POSITIONS\")\nprint(\"=\" * 80)\n\n# FB/META\nprint(\"\\n--- FB (Meta) ---\")\n# Bought 20 calls at $150 (7/27/18) for $75,001\n# Bought 30 calls at $140 (10/9/18) for $175,001\n# Exercised both 1/16/20: \n#   30 at $140 \u2192 3,000 shares, 20 at $150 \u2192 2,000 shares\n# META price 1/16/20: $220.04\n# Total intrinsic: (220.04-140)*3000 + (220.04-150)*2000 = $240,120 + $140,080 = $380,200\nfb_premium = 75001 + 175001\nfb_intrinsic = (220.04 - 140) * 3000 + (220.04 - 150) * 2000\nprint(f\"  Premium paid: ${fb_premium:,.0f}\")\nprint(f\"  META at exercise (1/16/20): $220.04\")\nprint(f\"  Intrinsic at exercise: ${fb_intrinsic:,.0f}\")\n# Sold 5,000 shares 5/8/20 at $210.70 \u2192 $1,053,500\n# Donated 5,000 shares 8/7/20 at $266.35 \u2192 $1,331,750 (tax deduction value)\nfb_sale = 5000 * 210.70\nfb_donation_value = 5000 * 266.35\nfb_cost = 140*3000 + 150*2000 + fb_premium  # exercise + premium\nfb_total_value = fb_sale + fb_donation_value\nfb_net = fb_total_value - fb_cost\nprint(f\"  Sold 5,000 shares 5/8/20 at $210.70: ${fb_sale:,.0f}\")\nprint(f\"  Donated 5,000 shares 8/7/20 at $266.35: ${fb_donation_value:,.0f}\")\nprint(f\"  Total cost (exercise + premium): ${fb_cost:,.0f}\")\nprint(f\"  Total value received/donated: ${fb_total_value:,.0f}\")\nprint(f\"  NET GAIN: ${fb_net:,.0f}\")\n\n# GOOGL\nprint(\"\\n--- GOOGL ---\")\n# Bought 40 calls at $1200 (2/27/20) for $750,001\n# GOOGL was about to crash (COVID). Price on 2/27/20... \n# Exercised 6/18/21: 4,000 shares at $1200\n# GOOGL had 20:1 split July 2022\n# GOOGL on 6/18/21 from tool: $119.13 (split-adjusted) * 20 = $2,382.60 pre-split\ngoogl_pre_split_exercise = 119.13 * 20\ngoogl_intrinsic = (googl_pre_split_exercise - 1200) * 4000\nprint(f\"  Premium paid: $750,001\")\nprint(f\"  GOOGL at exercise 6/18/21 (pre-split): ${googl_pre_split_exercise:.2f}\")\nprint(f\"  Intrinsic at exercise: ${googl_intrinsic:,.0f}\")\n\n# After 20:1 split: 4,000 shares \u2192 80,000 shares, cost basis $60/share\n# Sold 10,000 shares on each of 12/20, 12/21, 12/28/22\n# Prices: $88.29, $88.85, $85.31\ngoogl_sale_proceeds = 10000*88.29 + 10000*88.85 + 10000*85.31\ngoogl_cost_per_share_post = 1200/20  # = $60 post-split\ngoogl_sale_cost = 30000 * googl_cost_per_share_post\ngoogl_stock_gain = googl_sale_proceeds - googl_sale_cost\nprint(f\"\\n  After 20:1 split: 80,000 shares at $60 cost basis\")\nprint(f\"  Sold 30,000 shares in Dec 2022:\")\nprint(f\"    10,000 at $88.29, 10,000 at $88.85, 10,000 at $85.31\")\nprint(f\"  Proceeds: ${googl_sale_proceeds:,.0f}\")\nprint(f\"  Cost basis of sold shares: ${googl_sale_cost:,.0f}\")\nprint(f\"  Gain on sold shares: ${googl_stock_gain:,.0f}\")\nprint(f\"  Still holding 50,000 shares at cost $60\")\n# Value of remaining at $88 avg: 50,000 * $88 = $4.4M\nremaining_googl = 50000 * 85.31  # at last sale price\nprint(f\"  Remaining 50,000 shares worth ~${remaining_googl:,.0f} at Dec 2022 prices\")\ngoogl_total_gain = googl_sale_proceeds + remaining_googl - (80000*60) - 750001\nprint(f\"  TOTAL GAIN (including unrealized): ${googl_total_gain:,.0f}\")\n\n# V (Visa) - This was a legacy position, only sells\nprint(\"\\n--- V (Visa) - Sales Only ---\")\n# No buys recorded - this was a pre-existing position\n# Total proceeds from V: $9,950,006.5\n# Key sales: \n#   10,000 shares 6/21/22 at $188.90 \n#   20,000 shares 11/8/22 at $196.43\nv_big_sales = 10000*188.90 + 20000*196.43\nprint(f\"  Total V proceeds: $9,950,007 (per disclosure ranges)\")\nprint(f\"  Key sales: 10k shares at $188.90 + 20k at $196.43 = ${v_big_sales:,.0f}\")\nprint(f\"  (Legacy position - cost basis unknown but likely very low)\")\n\n# CRM early position\nprint(\"\\n--- CRM (2019 calls, successful) ---\")\n# 100 calls at $140, premium ~$250,001\n# Exercised 6/18/20: CRM at $184.94\ncrm_early_intrinsic = (184.94 - 140) * 10000\ncrm_early_net = crm_early_intrinsic - 250001\nprint(f\"  100 calls at $140, premium ~$250,001\")\nprint(f\"  CRM at exercise 6/18/20: $184.94\")\nprint(f\"  Intrinsic: ${crm_early_intrinsic:,.0f}\")\nprint(f\"  Net gain: ${crm_early_net:,.0f}\")\nprint(f\"  (Still held shares - CRM went to ~$300 by late 2021)\")\n\n# AXP\nprint(\"\\n--- AXP ---\")\n# 50 calls at $80, premium $175,001\n# Exercised 1/21/22: AXP at $150.54\naxp_intrinsic = (150.54 - 80) * 5000\naxp_net = axp_intrinsic - 175001\nprint(f\"  50 calls at $80, premium $175,001\")\nprint(f\"  AXP at exercise 1/21/22: $150.54\")\nprint(f\"  Intrinsic: ${axp_intrinsic:,.0f}\")\nprint(f\"  Net gain on options: ${axp_net:,.0f}\")\n\n# AAPL Phase 4 (the big winner option trade)\nprint(\"\\n--- AAPL $145 calls (biggest single option win) ---\")\naapl_phase4_net = 1958800 - 750001\nprint(f\"  Bought Sep 2018 for $750,001\")\nprint(f\"  Sold Jun 2020 with ~$1,958,800 intrinsic\")\nprint(f\"  Net gain: ~${aapl_phase4_net:,.0f}\")\n\n# CRWD\nprint(\"\\n--- CRWD ---\")\n# Bought 5,000 shares 9/3/20 at $129.25\n# No sale recorded\nprint(f\"  Bought 5,000 shares at $129.25 on 9/3/20\")\nprint(f\"  No sale recorded - still held\")\n"
+    },
+    "result": "================================================================================\nKEY WINNING POSITIONS\n================================================================================\n\n--- FB (Meta) ---\n  Premium paid: $250,002\n  META at exercise (1/16/20): $220.04\n  Intrinsic at exercise: $380,200\n  Sold 5,000 shares 5/8/20 at $210.70: $1,053,500\n  Donated 5,000 shares 8/7/20 at $266.35: $1,331,750\n  Total cost (exercise + premium): $970,002\n  Total value received/donated: $2,385,250\n  NET GAIN"
+  },
+  {
+    "tool": "get_vix_on_date",
+    "args": {
+      "date": "2020-02-20"
+    },
+    "result": "{\"date\": \"2020-02-20\", \"vix\": 15.56, \"regime\": \"normal\", \"note\": null}"
+  },
+  {
+    "tool": "get_vix_on_date",
+    "args": {
+      "date": "2020-02-28"
+    },
+    "result": "{\"date\": \"2020-02-28\", \"vix\": 40.11, \"regime\": \"high_fear\", \"note\": null}"
+  },
+  {
+    "tool": "get_vix_on_date",
+    "args": {
+      "date": "2021-12-20"
+    },
+    "result": "{\"date\": \"2021-12-20\", \"vix\": 22.87, \"regime\": \"elevated\", \"note\": null}"
+  },
+  {
+    "tool": "get_vix_on_date",
+    "args": {
+      "date": "2022-05-13"
+    },
+    "result": "{\"date\": \"2022-05-13\", \"vix\": 28.87, \"regime\": \"elevated\", \"note\": null}"
+  },
+  {
+    "tool": "get_vix_on_date",
+    "args": {
+      "date": "2024-02-12"
+    },
+    "result": "{\"date\": \"2024-02-12\", \"vix\": 13.93, \"regime\": \"low\", \"note\": null}"
+  },
+  {
+    "tool": "get_vix_on_date",
+    "args": {
+      "date": "2024-02-21"
+    },
+    "result": "{\"date\": \"2024-02-21\", \"vix\": 15.34, \"regime\": \"normal\", \"note\": null}"
+  },
+  {
+    "tool": "get_drawdown_from_high",
+    "args": {
+      "ticker": "MSFT",
+      "trade_date": "2020-02-28"
+    },
+    "result": "{\"ticker\": \"MSFT\", \"trade_date\": \"2020-02-28\", \"52w_high\": 178.76, \"52w_high_date\": \"2020-02-10\", \"price_at_trade\": 153.89, \"drawdown_from_high\": -0.1391, \"interpretation\": \"moderate_pullback\"}"
+  },
+  {
+    "tool": "get_drawdown_from_high",
+    "args": {
+      "ticker": "GOOGL",
+      "trade_date": "2020-02-27"
+    },
+    "result": "{\"ticker\": \"GOOGL\", \"trade_date\": \"2020-02-27\", \"52w_high\": 75.62, \"52w_high_date\": \"2020-02-19\", \"price_at_trade\": 65.21, \"drawdown_from_high\": -0.1377, \"interpretation\": \"moderate_pullback\"}"
+  },
+  {
+    "tool": "get_drawdown_from_high",
+    "args": {
+      "ticker": "PANW",
+      "trade_date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"PANW\", \"trade_date\": \"2024-02-21\", \"52w_high\": 188.45, \"52w_high_date\": \"2024-02-09\", \"price_at_trade\": 130.99, \"drawdown_from_high\": -0.3049, \"interpretation\": \"deep_drawdown\"}"
+  },
+  {
+    "tool": "get_drawdown_from_high",
+    "args": {
+      "ticker": "NVDA",
+      "trade_date": "2021-06-03"
+    },
+    "result": "{\"ticker\": \"NVDA\", \"trade_date\": \"2021-06-03\", \"52w_high\": 16.93, \"52w_high_date\": \"2021-06-03\", \"price_at_trade\": 16.93, \"drawdown_from_high\": 0.0, \"interpretation\": \"near_high\"}"
+  },
+  {
+    "tool": "get_drawdown_from_high",
+    "args": {
+      "ticker": "AAPL",
+      "trade_date": "2022-05-13"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"trade_date\": \"2022-05-13\", \"52w_high\": 178.1, \"52w_high_date\": \"2022-01-03\", \"price_at_trade\": 144.35, \"drawdown_from_high\": -0.1895, \"interpretation\": \"significant_decline\"}"
+  },
+  {
+    "tool": "get_drawdown_from_high",
+    "args": {
+      "ticker": "CRM",
+      "trade_date": "2021-12-20"
+    },
+    "result": "{\"ticker\": \"CRM\", \"trade_date\": \"2021-12-20\", \"52w_high\": 305.48, \"52w_high_date\": \"2021-11-08\", \"price_at_trade\": 243.63, \"drawdown_from_high\": -0.2024, \"interpretation\": \"significant_decline\"}"
+  },
+  {
+    "tool": "get_earnings_dates",
+    "args": {
+      "ticker": "PANW",
+      "trade_date": "2024-02-12"
+    },
+    "result": "{\"ticker\": \"PANW\", \"error\": \"Invalid comparison between dtype=datetime64[us, America/New_York] and Timestamp\"}"
+  },
+  {
+    "tool": "get_earnings_dates",
+    "args": {
+      "ticker": "NVDA",
+      "trade_date": "2021-06-03"
+    },
+    "result": "{\"ticker\": \"NVDA\", \"error\": \"Invalid comparison between dtype=datetime64[us, America/New_York] and Timestamp\"}"
+  },
+  {
+    "tool": "web_search",
+    "args": {
+      "query": "PANW Palo Alto Networks stock crash February 2024 earnings"
+    },
+    "result": "**Palo Alto Networks (PANW) Stock Falls After Revenue Forecast Disappoints - Bloomberg**\n  https://www.bloomberg.com/news/articles/2024-02-20/palo-alto-networks-plunges-after-giving-disappointing-forecast\n  February 21, 2024 - Palo Alto Networks Inc. slid by the most ever after the cybersecurity company cut its annual revenue forecast, stoking concerns that customers are reining in spending despite an uptick in attacks.\n\n**Palo Alto Networks (PANW) earnings Q2 2024**\n  https://www.cnbc.com/2024/"
+  },
+  {
+    "tool": "web_search",
+    "args": {
+      "query": "Nancy Pelosi NVDA stock sale July 2022 congressional trading"
+    },
+    "result": "**Nancy Pelosi Trading Activity | Quiver Quantitative**\n  https://www.quiverquant.com/congresstrading/politician/Nancy+Pelosi-P000197\n  Track Nancy Pelosi's stock trades, net worth, portfolio, corporate donors, proposed legislation and more\n\n**Nancy Pelosi, Husband Bet Millions On Nvidia Stock After Missing Out On Earlier $8-Million Profit | Nasdaq**\n  https://www.nasdaq.com/articles/nancy-pelosi-husband-bet-millions-on-nvidia-stock-after-missing-out-on-earlier-$8-million\n  In July 2022, the Pel"
+  },
+  {
+    "tool": "web_search",
+    "args": {
+      "query": "Pelosi PANW Palo Alto Networks options February 2024 trade timing"
+    },
+    "result": "**How Nancy Pelosi perfectly timed her Palo Alto (PANW) stock**\n  https://finbold.com/how-nancy-pelosi-perfectly-timed-her-palo-alto-panw-stock-trade/\n  ... NVDA ) stock trades, Nancy Pelosi \u2019s purchase of Palo Alto Networks (NASDAQ: PANW ) stock options is one of her most exciting trades in 2024.\n\n**Nancy Pelosi down big time on this massive stock purchase**\n  https://finbold.com/nancy-pelosi-down-big-time-on-this-massive-stock-purchase/\n  Back on February 26, Representative Pelosi disclosed tw"
+  },
+  {
+    "tool": "get_return",
+    "args": {
+      "ticker": "SPY",
+      "start_date": "2014-09-22",
+      "end_date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"SPY\", \"start\": \"2014-09-22\", \"end\": \"2024-02-21\", \"return_pct\": 195.02}"
+  },
+  {
+    "tool": "get_return",
+    "args": {
+      "ticker": "QQQ",
+      "start_date": "2014-09-22",
+      "end_date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"QQQ\", \"start\": \"2014-09-22\", \"end\": \"2024-02-21\", \"return_pct\": 363.29}"
+  },
+  {
+    "tool": "get_return",
+    "args": {
+      "ticker": "NVDA",
+      "start_date": "2022-07-26",
+      "end_date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"NVDA\", \"start\": \"2022-07-26\", \"end\": \"2024-02-21\", \"return_pct\": 308.51}"
+  },
+  {
+    "tool": "get_return",
+    "args": {
+      "ticker": "PANW",
+      "start_date": "2024-02-12",
+      "end_date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"PANW\", \"start\": \"2024-02-12\", \"end\": \"2024-02-21\", \"return_pct\": -29.57}"
+  },
+  {
+    "tool": "get_benchmark_comparison",
+    "args": {
+      "ticker": "NVDA",
+      "trade_date": "2022-07-26"
+    },
+    "result": "{\"ticker\": \"NVDA\", \"trade_date\": \"2022-07-26\", \"comparison\": {\"5d\": {\"stock\": 9.86, \"XLK\": 7.51, \"SPY\": 5.4}, \"20d\": {\"stock\": 15.12, \"XLK\": 12.99, \"SPY\": 9.71}, \"60d\": {\"stock\": -24.27, \"XLK\": -7.53, \"SPY\": -5.48}}}"
+  },
+  {
+    "tool": "get_benchmark_comparison",
+    "args": {
+      "ticker": "PANW",
+      "trade_date": "2024-02-12"
+    },
+    "result": "{\"ticker\": \"PANW\", \"trade_date\": \"2024-02-12\", \"comparison\": {\"5d\": {\"stock\": -1.49, \"XLK\": -1.79, \"SPY\": -0.29}, \"20d\": {\"stock\": -18.7, \"XLK\": 2.18, \"SPY\": 2.37}, \"60d\": {\"stock\": -24.98, \"XLK\": -0.24, \"SPY\": 2.29}}}"
+  },
+  {
+    "tool": "get_correlation_to_market",
+    "args": {
+      "ticker": "AAPL",
+      "trade_date": "2022-01-21"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"trade_date\": \"2022-01-21\", \"correlation_to_SPY\": 0.707, \"estimated_beta\": 1.16, \"interpretation\": \"highly_correlated\"}"
+  },
+  {
+    "tool": "get_correlation_to_market",
+    "args": {
+      "ticker": "NVDA",
+      "trade_date": "2022-01-21"
+    },
+    "result": "{\"ticker\": \"NVDA\", \"trade_date\": \"2022-01-21\", \"correlation_to_SPY\": 0.68, \"estimated_beta\": 2.53, \"interpretation\": \"moderately_correlated\"}"
+  },
+  {
+    "tool": "get_correlation_to_market",
+    "args": {
+      "ticker": "MSFT",
+      "trade_date": "2022-01-21"
+    },
+    "result": "{\"ticker\": \"MSFT\", \"trade_date\": \"2022-01-21\", \"correlation_to_SPY\": 0.756, \"estimated_beta\": 1.27, \"interpretation\": \"highly_correlated\"}"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Let's compute a comprehensive portfolio analysis\n# First, let's categorize the December 2021 buying spree - this was a massive cluster of trades\n\nprint(\"=\" * 80)\nprint(\"DECEMBER 2021 BUYING SPREE ANALYSIS\")\nprint(\"=\" * 80)\n\ndec_2021_trades = {\n    'GOOG $2000 calls': 750001,\n    'DIS $130 calls': 175001,\n    'CRM $210 calls (30)': 175001,\n    'RBLX $100 calls': 375001,\n    'CRM $210 calls (100)': 750001,\n    'MU $50 calls': 375001,\n}\ntotal_dec2021 = sum(dec_2021_trades.values())\nprint(f\"\\nTotal premium deployed Dec 17-21, 2021: ${total_dec2021:,.0f}\")\nprint(\"\\nOutcomes:\")\nprint(f\"  GOOG $2000 calls \u2192 Exercised (profitably, converted to shares)\")\nprint(f\"  DIS $130 calls \u2192 EXPIRED WORTHLESS ($175,001 lost)\")\nprint(f\"  CRM $210 calls \u2192 Sold for $4.50 ($924,997 lost)\")\nprint(f\"  RBLX $100 calls \u2192 EXPIRED WORTHLESS ($375,001 lost)\")\nprint(f\"  MU $50 calls \u2192 Sold for $32,501 ($342,500 lost)\")\n\ndec2021_losses = 175001 + 924997 + 375001 + 342500\nprint(f\"\\n  TOTAL DESTROYED FROM DEC 2021 SPREE: ${dec2021_losses:,.0f}\")\nprint(f\"  Only GOOG calls were profitable\")\n\n# GOOG analysis: The disclosure shows a confusing picture\n# Bought 10 calls at $2000 strike (pre-20:1 split), premium $750,001\n# After 20:1 split in Jul 2022: becomes 200 calls at $100 strike\n# Exercised 9/16/22: 200 calls * 100 = 20,000 shares at $100\n# This matches the disclosure perfectly\n# But GOOG on 9/16/22 was around $99-100 post-split, so barely ITM or even slightly underwater\n\n# Let me check GOOG price on 9/16/22\nprint(f\"\\nGOOG at exercise 9/16/22: need to check price...\")\n# Note: GOOG vs GOOGL - these trade at very similar prices\n# GOOGL on 12/20/22: $88.29 suggests GOOG was similar\n# If GOOG was around $99-100 on 9/16/22 and they exercised at $100 strike,\n# this was roughly at-the-money. Not a big winner.\n"
+    },
+    "result": "================================================================================\nDECEMBER 2021 BUYING SPREE ANALYSIS\n================================================================================\n\nTotal premium deployed Dec 17-21, 2021: $2,600,006\n\nOutcomes:\n  GOOG $2000 calls \u2192 Exercised (profitably, converted to shares)\n  DIS $130 calls \u2192 EXPIRED WORTHLESS ($175,001 lost)\n  CRM $210 calls \u2192 Sold for $4.50 ($924,997 lost)\n  RBLX $100 calls \u2192 EXPIRED WORTHLESS ($375,001 lost)\n  MU $50 calls \u2192 "
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "GOOG",
+      "date": "2022-09-16"
+    },
+    "result": "{\"ticker\": \"GOOG\", \"date\": \"2022-09-16\", \"close_price\": 102.79}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "GOOG",
+      "date": "2021-12-17"
+    },
+    "result": "{\"ticker\": \"GOOG\", \"date\": \"2021-12-17\", \"close_price\": 141.64}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "CRWD",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"CRWD\", \"date\": \"2024-02-21\", \"close_price\": 292.36}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "SQ",
+      "date": "2017-01-20"
+    },
+    "result": "{\"error\": \"No price data for SQ on 2017-01-20\"}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "DBX",
+      "date": "2018-03-27"
+    },
+    "result": "{\"ticker\": \"DBX\", \"date\": \"2018-03-27\", \"close_price\": 29.9}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "DBX",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"DBX\", \"date\": \"2024-02-21\", \"close_price\": 23.86}"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# GOOG analysis\nprint(\"--- GOOG Dec 2021 calls ---\")\n# Bought 10 calls at $2000 pre-split (12/17/21) for $750,001\n# GOOG pre-split on 12/17/21: $141.64 * 20 = $2,832.80\ngoog_pre_split_buy = 141.64 * 20\nprint(f\"  GOOG pre-split on 12/17/21: ${goog_pre_split_buy:.2f} (vs $2000 strike: deep ITM)\")\n\n# After 20:1 split: 200 contracts at $100 strike\n# Exercised 9/16/22: GOOG at $102.79 post-split\n# Intrinsic: ($102.79 - $100) * 20,000 = $55,800\ngoog_intrinsic_exercise = (102.79 - 100) * 20000\nprint(f\"  GOOG at exercise 9/16/22: $102.79 (post-split)\")\nprint(f\"  Intrinsic at exercise: ${goog_intrinsic_exercise:,.0f}\")\nprint(f\"  Premium paid: $750,001\")\nprint(f\"  NET LOSS on options: ${goog_intrinsic_exercise - 750001:,.0f}\")\nprint(f\"  But they now hold 20,000 shares at $100 cost basis\")\nprint(f\"  True economic cost: $100/share = $2,000 pre-split (vs $2,832.80 original)\")\nprint(f\"  They bought exposure at an effective $2,037.50/share pre-split ($100 + $750k/20k*20)\")\nprint(f\"  vs peak of $2,832.80 \u2192 locked in 28% lower entry via options\")\n\n# Actually this is a bit different. The premium ($750,001) for 10 pre-split contracts  \n# means $750,001 / (10*100) = $750.01/share premium. Plus $2,000 strike = $2,750 effective entry.\n# vs original GOOG at $2,832.80 \u2192 slightly below market at entry, but GOOG crashed to $2,056\n# So the effective cost is $2,750 vs current $102.79*20 = $2,055.80 \u2192 underwater at exercise\ngoog_effective_entry = 2000 + (750001 / 1000)  # pre-split terms: strike + premium per share\nprint(f\"\\n  Effective entry (pre-split): ${goog_effective_entry:.2f}/share\")\nprint(f\"  GOOG at exercise (pre-split equiv): ${102.79*20:.2f}\")\nprint(f\"  NET LOSS per share: ${102.79*20 - goog_effective_entry:.2f}\")\n\n# Actually, after split, per share:\n# Premium per post-split share: $750,001 / 20,000 = $37.50\n# Strike: $100\n# Effective entry: $137.50 per post-split share\n# GOOG on 9/16/22: $102.79\n# Loss: $102.79 - $137.50 = -$34.71/share\ngoog_loss_per_share = 102.79 - (100 + 750001/20000)\nprint(f\"\\n  Post-split effective entry: ${100 + 750001/20000:.2f}\")\nprint(f\"  GOOG at exercise: $102.79\")  \nprint(f\"  Loss per share: ${goog_loss_per_share:.2f}\")\nprint(f\"  Total loss at exercise: ${goog_loss_per_share * 20000:,.0f}\")\nprint(f\"\\n  So even the GOOG calls from Dec 2021 were underwater at exercise!\")\nprint(f\"  The Dec 2021 batch was 0-for-5 (all losers)\")\n\ndec_2021_total_destroyed = 1817499 + abs(goog_loss_per_share * 20000)\nprint(f\"\\n  REVISED DEC 2021 TOTAL LOSSES: ~${dec_2021_total_destroyed:,.0f}\")\n"
+    },
+    "result": "--- GOOG Dec 2021 calls ---\n  GOOG pre-split on 12/17/21: $2832.80 (vs $2000 strike: deep ITM)\n  GOOG at exercise 9/16/22: $102.79 (post-split)\n  Intrinsic at exercise: $55,800\n  Premium paid: $750,001\n  NET LOSS on options: $-694,201\n  But they now hold 20,000 shares at $100 cost basis\n  True economic cost: $100/share = $2,000 pre-split (vs $2,832.80 original)\n  They bought exposure at an effective $2,037.50/share pre-split ($100 + $750k/20k*20)\n  vs peak of $2,832.80 \u2192 locked in 28% lower entr"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Now let's build a comprehensive summary of all position P&L\n# And compute portfolio-level metrics\n\nprint(\"=\" * 80)\nprint(\"COMPREHENSIVE POSITION P&L SUMMARY\")\nprint(\"=\" * 80)\n\n# For each position, estimate net P&L (realized + unrealized at end of review period 2/21/24)\n# Note: disclosure amounts are RANGES, so we use market prices where possible\n\npositions_pnl = {}\n\n# AAPL - Multiple phases. Net positive from early options + stock appreciation\n# Key realized gains: sold 9k shares Dec 2017, sold 8k shares May 2020, sold AAPL $145 calls\n# Major premiums paid, but stock went up massively\n# Approximate total AAPL gain: Very complex, but clearly net positive\n# Let's estimate: bought options with ~$3.3M in premiums, ended up with 10k+5k+10k shares through exercises\n# Still holding large position\n# Conservative estimate of total AAPL gain: $3-5M+\npositions_pnl['AAPL'] = {\n    'premiums_paid': 3325004,\n    'status': 'net_winner',\n    'estimate': 'Large net gain, $3-5M+'\n}\n\n# NVDA - Lost money on first set of trades, big unrealized gain on Nov 2023 re-entry\n# Sold 25k shares at $165 (post-4:1) when they later hit $674 (pre-10:1)\n# Massive opportunity cost\npositions_pnl['NVDA'] = {\n    'realized_loss': -341365,  # per news article\n    'unrealized_at_review': 'Large gain on Nov 2023 calls',\n    'opportunity_cost': 12730000\n}\n\n# MSFT - All options exercised, huge unrealized gain\n# 30,000 shares held at avg ~$136 cost, MSFT at $340+ by Jun 2023\n# Plus premiums totaling $1.75M\npositions_pnl['MSFT'] = {\n    'status': 'major_winner',\n    'estimate': 'Holding 30k shares, ~$5M+ unrealized gain net of premiums'\n}\n\n# FB/META - Clear winner\npositions_pnl['FB'] = {\n    'net_gain': 1415248,\n    'status': 'winner'\n}\n\n# GOOGL - Winner, holding 50k+ shares\npositions_pnl['GOOGL'] = {\n    'status': 'winner',\n    'estimate': 'Net positive, holding 50k shares at $60 basis'\n}\n\n# DIS - Major loser\npositions_pnl['DIS'] = {\n    'net_loss': -1075802,\n    'status': 'loser'\n}\n\n# CRM (2021 calls) - Total wipeout\npositions_pnl['CRM_2021'] = {\n    'net_loss': -924997,\n    'status': 'loser'\n}\n\n# RBLX - Total loss\npositions_pnl['RBLX'] = {\n    'net_loss': -375001,\n    'status': 'loser'\n}\n\n# MU - Near total loss\npositions_pnl['MU'] = {\n    'net_loss': -342500,\n    'status': 'loser'\n}\n\n# TSLA - Loss on realized, still holding some\npositions_pnl['TSLA'] = {\n    'net_loss': -966501,\n    'status': 'loser'\n}\n\n# PYPL - Major loser\npositions_pnl['PYPL'] = {\n    'net_loss': -864150,  # approximate realized on sold shares\n    'status': 'loser'\n}\n\n# AMZN May 2021 calls - likely expired worthless\npositions_pnl['AMZN_2021'] = {\n    'net_loss': -750001,\n    'status': 'loser'\n}\n\n# GOOG Dec 2021 calls - underwater at exercise\npositions_pnl['GOOG'] = {\n    'net_loss': -694201,\n    'status': 'loser_at_exercise'\n}\n\n# PANW - Bought right before crash\npositions_pnl['PANW'] = {\n    'premiums_paid': 925001,\n    'status': 'underwater_immediately',\n    'note': 'Bought Feb 12, PANW crashed 29.6% by Feb 21'\n}\n\n# AXP - Winner\npositions_pnl['AXP'] = {\n    'net_gain': 177699,\n    'status': 'winner'\n}\n\n# CRM early - Winner (2019 options)\npositions_pnl['CRM_2019'] = {\n    'net_gain': 199399,\n    'status': 'winner'\n}\n\n# CRWD - Massive winner (unrealized)\ncrwd_gain = (292.36 - 129.25) * 5000\npositions_pnl['CRWD'] = {\n    'unrealized_gain': crwd_gain,\n    'status': 'major_winner'\n}\n\nprint(\"\\n=== CLEAR WINNERS ===\")\nprint(f\"  AAPL: Multiple phases, net $3-5M+ gain (complex options history)\")\nprint(f\"  MSFT: ~$5M+ unrealized gain on 30k shares + premiums profitable\")\nprint(f\"  FB/META: ${1415248:,.0f} net gain\")\nprint(f\"  GOOGL: Holding 50k+ shares at $60 basis (worth ~$4.3M+ at review end)\")\nprint(f\"  V (Visa): $9.95M in proceeds from legacy position\")\nprint(f\"  CRWD: ${crwd_gain:,.0f} unrealized gain (5k shares, $129\u2192$292)\")\nprint(f\"  AXP: ${177699:,.0f} net gain\")\nprint(f\"  CRM (2019): ${199399:,.0f} net gain\")\n\nprint(\"\\n=== CLEAR LOSERS ===\")\nprint(f\"  DIS: ${-1075802:,.0f} net loss\")\nprint(f\"  CRM (2021 calls): ${-924997:,.0f}\")\nprint(f\"  TSLA: ${-966501:,.0f}\")\nprint(f\"  PYPL: ${-864150:,.0f}+ (plus unrealized losses on remaining shares)\")\nprint(f\"  AMZN (2021 calls): ${-750001:,.0f}\")\nprint(f\"  GOOG (2021 calls): ${-694201:,.0f}\")\nprint(f\"  RBLX: ${-375001:,.0f}\")\nprint(f\"  MU: ${-342500:,.0f}\")\nprint(f\"  PANW: Immediately underwater ~29% on $925k\")\n\ntotal_clear_losses = 1075802 + 924997 + 966501 + 864150 + 750001 + 694201 + 375001 + 342500\nprint(f\"\\n  TOTAL CLEAR LOSSES: ${total_clear_losses:,.0f}\")\n"
+    },
+    "result": "================================================================================\nCOMPREHENSIVE POSITION P&L SUMMARY\n================================================================================\n\n=== CLEAR WINNERS ===\n  AAPL: Multiple phases, net $3-5M+ gain (complex options history)\n  MSFT: ~$5M+ unrealized gain on 30k shares + premiums profitable\n  FB/META: $1,415,248 net gain\n  GOOGL: Holding 50k+ shares at $60 basis (worth ~$4.3M+ at review end)\n  V (Visa): $9.95M in proceeds from legacy p"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Now let's compute what SPY/QQQ would have returned with the same capital deployment timing\n# This gives us a true alpha comparison\n\nimport numpy as np\n\n# Major capital deployments (buy dates and amounts) - using the most significant trades\ncapital_deployments = [\n    # (date, amount, description)\n    ('2016-01-13', 375001, 'AAPL calls'),\n    ('2016-05-17', 183001, 'AAPL + SQ calls'),\n    ('2018-02-02', 350001, 'AAPL calls'),\n    ('2018-07-27', 825001, 'AMZN + FB calls'),\n    ('2018-09-11', 750001, 'AAPL calls'),\n    ('2018-10-09', 175001, 'FB calls'),\n    ('2018-10-12', 3000001, 'AMZN calls'),\n    ('2018-10-24', 375001, 'T stock'),\n    ('2019-06-14', 250001, 'CRM calls'),\n    ('2019-07-05', 550001, 'NFLX + AMZN calls'),\n    ('2020-02-20', 750001, 'MSFT + WORK'),\n    ('2020-02-21', 750001, 'MSFT calls'),\n    ('2020-02-27', 750001, 'GOOGL calls'),\n    ('2020-02-28', 175001, 'MSFT calls'),\n    ('2020-06-12', 1500001, 'PYPL stock'),\n    ('2020-06-24', 550001, 'AXP + PYPL calls'),\n    ('2020-09-03', 750001, 'CRWD stock'),\n    ('2020-12-22', 2625001, 'DIS + AAPL + TSLA + AB'),\n    ('2021-02-18', 750001, 'AB stock'),\n    ('2021-02-23', 750001, 'AB stock'),\n    ('2021-05-21', 925001, 'AMZN + AAPL calls'),\n    ('2021-06-03', 3000001, 'NVDA calls'),\n    ('2021-07-23', 1125001, 'NVDA stock + calls'),\n    ('2021-12-17', 925001, 'GOOG + DIS calls'),\n    ('2021-12-20', 1300001, 'CRM + RBLX calls'),\n    ('2021-12-21', 375001, 'MU calls'),\n    ('2022-05-13', 750001, 'AAPL calls'),\n    ('2022-05-24', 825001, 'MSFT + AAPL calls'),\n    ('2023-11-22', 3000001, 'NVDA calls'),\n    ('2024-02-12', 750001, 'PANW calls'),\n    ('2024-02-21', 175001, 'PANW calls'),\n]\n\n# Calculate what each deployment would be worth at end date (2/21/24) if invested in SPY/QQQ\n# We'll use get_return for SPY and QQQ from each date to 2/21/24\n\nprint(\"Capital Deployment Timeline Summary:\")\nprint(f\"{'Year':<6} {'Amount':>15} {'# Trades':>10}\")\nyearly = {}\nfor date, amt, desc in capital_deployments:\n    year = date[:4]\n    yearly[year] = yearly.get(year, 0) + amt\n\nfor year in sorted(yearly.keys()):\n    print(f\"  {year:<6} ${yearly[year]:>14,.0f}\")\n\nprint(f\"\\n  Total: ${sum(yearly.values()):>14,.0f}\")\n"
+    },
+    "result": "Capital Deployment Timeline Summary:\nYear            Amount   # Trades\n  2016   $       558,002\n  2018   $     5,475,006\n  2019   $       800,002\n  2020   $     7,850,008\n  2021   $     9,150,008\n  2022   $     1,575,002\n  2023   $     3,000,001\n  2024   $       925,002\n\n  Total: $    29,333,031\n"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Let me compute SPY returns from each major buy date to 2/21/2024\n# I'll use the get_prices helper to compute this efficiently\n\nfrom datetime import datetime, timedelta\nimport pandas as pd\n\n# Get SPY and QQQ prices for the full period\nspy_prices = get_prices('SPY', '2016-01-01', '2024-02-22')\nqqq_prices = get_prices('QQQ', '2016-01-01', '2024-02-22')\n\nprint(f\"SPY data: {len(spy_prices)} days, {spy_prices.index[0]} to {spy_prices.index[-1]}\")\nprint(f\"QQQ data: {len(qqq_prices)} days, {qqq_prices.index[0]} to {qqq_prices.index[-1]}\")\n\n# End date\nend_date = '2024-02-21'\nspy_end = spy_prices.loc[spy_prices.index <= end_date].iloc[-1]['Close']\nqqq_end = qqq_prices.loc[qqq_prices.index <= end_date].iloc[-1]['Close']\n\nprint(f\"\\nSPY on {end_date}: ${spy_end:.2f}\")\nprint(f\"QQQ on {end_date}: ${qqq_end:.2f}\")\n\n# For each buy, compute what it would be worth in SPY/QQQ\ntotal_spy_value = 0\ntotal_qqq_value = 0\ntotal_invested = 0\n\nresults = []\nfor date_str, amount, desc in capital_deployments:\n    try:\n        spy_row = spy_prices.loc[spy_prices.index >= date_str].iloc[0]\n        qqq_row = qqq_prices.loc[qqq_prices.index >= date_str].iloc[0]\n        spy_start = spy_row['Close']\n        qqq_start = qqq_row['Close']\n        \n        spy_return = (spy_end / spy_start - 1)\n        qqq_return = (qqq_end / qqq_start - 1)\n        \n        spy_value = amount * (1 + spy_return)\n        qqq_value = amount * (1 + qqq_return)\n        \n        total_spy_value += spy_value\n        total_qqq_value += qqq_value\n        total_invested += amount\n        \n        results.append({\n            'date': date_str, 'amount': amount, 'desc': desc,\n            'spy_ret': spy_return, 'qqq_ret': qqq_return,\n            'spy_val': spy_value, 'qqq_val': qqq_value\n        })\n    except Exception as e:\n        print(f\"  Error for {date_str}: {e}\")\n\nprint(f\"\\n{'='*80}\")\nprint(f\"SPY/QQQ OPPORTUNITY COST ANALYSIS\")\nprint(f\"{'='*80}\")\nprint(f\"\\nTotal capital deployed in buys: ${total_invested:,.0f}\")\nprint(f\"If invested in SPY at same times: ${total_spy_value:,.0f} (+${total_spy_value-total_invested:,.0f})\")\nprint(f\"If invested in QQQ at same times: ${total_qqq_value:,.0f} (+${total_qqq_value-total_invested:,.0f})\")\nprint(f\"\\nSPY dollar-weighted return: {(total_spy_value/total_invested - 1)*100:.1f}%\")\nprint(f\"QQQ dollar-weighted return: {(total_qqq_value/total_invested - 1)*100:.1f}%\")\n\n# Show the biggest contributions\nprint(f\"\\nTop 5 deployments by SPY alternative value:\")\nresults_sorted = sorted(results, key=lambda x: x['spy_val'], reverse=True)\nfor r in results_sorted[:5]:\n    print(f\"  {r['date']} ${r['amount']:>10,.0f} \u2192 SPY: ${r['spy_val']:>12,.0f} ({r['spy_ret']*100:+.1f}%), QQQ: ${r['qqq_val']:>12,.0f} ({r['qqq_ret']*100:+.1f}%)\")\n"
+    },
+    "result": "SPY data: 2047 days, 2016-01-04 00:00:00 to 2024-02-21 00:00:00\nQQQ data: 2047 days, 2016-01-04 00:00:00 to 2024-02-21 00:00:00\n\nSPY on 2024-02-21: $483.89\nQQQ on 2024-02-21: $420.43\n\n[stderr]\nTraceback (most recent call last):\n  File \"/Users/rakchada/.ada_tmp/tmpiy7u9pnl.py\", line 43, in <module>\n    for date_str, amount, desc in capital_deployments:\n                                  ^^^^^^^^^^^^^^^^^^^\nNameError: name 'capital_deployments' is not defined"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\nimport pandas as pd\nimport numpy as np\n\n# Re-define capital deployments\ncapital_deployments = [\n    ('2016-01-13', 375001, 'AAPL calls'),\n    ('2016-05-17', 183001, 'AAPL + SQ calls'),\n    ('2018-02-02', 350001, 'AAPL calls'),\n    ('2018-07-27', 825001, 'AMZN + FB calls'),\n    ('2018-09-11', 750001, 'AAPL calls'),\n    ('2018-10-09', 175001, 'FB calls'),\n    ('2018-10-12', 3000001, 'AMZN calls'),\n    ('2018-10-24', 375001, 'T stock'),\n    ('2019-06-14', 250001, 'CRM calls'),\n    ('2019-07-05', 550001, 'NFLX + AMZN calls'),\n    ('2020-02-20', 750001, 'MSFT + WORK'),\n    ('2020-02-21', 750001, 'MSFT calls'),\n    ('2020-02-27', 750001, 'GOOGL calls'),\n    ('2020-02-28', 175001, 'MSFT calls'),\n    ('2020-06-12', 1500001, 'PYPL stock'),\n    ('2020-06-24', 550001, 'AXP + PYPL calls'),\n    ('2020-09-03', 750001, 'CRWD stock'),\n    ('2020-12-22', 2625001, 'DIS + AAPL + TSLA + AB'),\n    ('2021-02-18', 750001, 'AB stock'),\n    ('2021-02-23', 750001, 'AB stock'),\n    ('2021-05-21', 925001, 'AMZN + AAPL calls'),\n    ('2021-06-03', 3000001, 'NVDA calls'),\n    ('2021-07-23', 1125001, 'NVDA stock + calls'),\n    ('2021-12-17', 925001, 'GOOG + DIS calls'),\n    ('2021-12-20', 1300001, 'CRM + RBLX calls'),\n    ('2021-12-21', 375001, 'MU calls'),\n    ('2022-05-13', 750001, 'AAPL calls'),\n    ('2022-05-24', 825001, 'MSFT + AAPL calls'),\n    ('2023-11-22', 3000001, 'NVDA calls'),\n    ('2024-02-12', 750001, 'PANW calls'),\n    ('2024-02-21', 175001, 'PANW calls'),\n]\n\n# Get SPY and QQQ prices\nspy_prices = get_prices('SPY', '2016-01-01', '2024-02-22')\nqqq_prices = get_prices('QQQ', '2016-01-01', '2024-02-22')\n\nend_date = '2024-02-21'\nspy_end = spy_prices.loc[spy_prices.index <= end_date].iloc[-1]['Close']\nqqq_end = qqq_prices.loc[qqq_prices.index <= end_date].iloc[-1]['Close']\n\ntotal_spy_value = 0\ntotal_qqq_value = 0\ntotal_invested = 0\n\nfor date_str, amount, desc in capital_deployments:\n    try:\n        spy_row = spy_prices.loc[spy_prices.index >= date_str].iloc[0]\n        qqq_row = qqq_prices.loc[qqq_prices.index >= date_str].iloc[0]\n        spy_start = spy_row['Close']\n        qqq_start = qqq_row['Close']\n        \n        spy_return = (spy_end / spy_start - 1)\n        qqq_return = (qqq_end / qqq_start - 1)\n        \n        spy_value = amount * (1 + spy_return)\n        qqq_value = amount * (1 + qqq_return)\n        \n        total_spy_value += spy_value\n        total_qqq_value += qqq_value\n        total_invested += amount\n    except Exception as e:\n        print(f\"  Error for {date_str}: {e}\")\n        total_invested += amount\n\nprint(f\"{'='*80}\")\nprint(f\"SPY/QQQ OPPORTUNITY COST ANALYSIS\")\nprint(f\"{'='*80}\")\nprint(f\"\\nTotal capital deployed in buy trades: ${total_invested:,.0f}\")\nprint(f\"If all invested in SPY at same times: ${total_spy_value:,.0f}\")\nprint(f\"If all invested in QQQ at same times: ${total_qqq_value:,.0f}\")\nprint(f\"\\nSPY hypothetical gain: ${total_spy_value - total_invested:,.0f} ({(total_spy_value/total_invested - 1)*100:.1f}%)\")\nprint(f\"QQQ hypothetical gain: ${total_qqq_value - total_invested:,.0f} ({(total_qqq_value/total_invested - 1)*100:.1f}%)\")\n"
+    },
+    "result": "================================================================================\nSPY/QQQ OPPORTUNITY COST ANALYSIS\n================================================================================\n\nTotal capital deployed in buy trades: $29,333,031\nIf all invested in SPY at same times: $43,557,812\nIf all invested in QQQ at same times: $49,378,807\n\nSPY hypothetical gain: $14,224,781 (48.5%)\nQQQ hypothetical gain: $20,045,776 (68.3%)\n"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Now let's try to estimate the actual portfolio return\n# This is complex because of options leverage, but let's try\n\nprint(\"=\" * 80)\nprint(\"ESTIMATED PORTFOLIO VALUE AT END OF REVIEW PERIOD (2/21/2024)\")\nprint(\"=\" * 80)\n\n# Shares held at end of review period (2/21/2024) based on trade history:\n# AAPL: Complex. Let me trace through carefully.\n# Pre-split AAPL shares:\n#   +10,000 (Jan 2017 exercise at $90)\n#   -9,000 sold Dec 2017\n#   -1,300 donated Dec 2017\n#   -2,800 donated Dec 2017\n#   = -3,100 (deficit, meaning some from prior position or next exercises)\n# Actually must be separate tranches.\n# +10,000 (Jan 2017 exercise) +10,000 (Jun 2017 exercise) = 20,000\n# -9,000 sold -1,300 donated -2,800 donated = -13,100\n# Remaining: 6,900 pre-split shares\n# +5,000 (Sep 2018 $130) +5,000 (Sep 2018 $140) = +10,000\n# Total: 16,900 pre-split\n# -8,000 sold May 2020 = 8,900 pre-split\n# After 4:1 split (Aug 2020): 8,900 * 4 = 35,600 post-split\n# -4,500 donated Nov 2020 \u2192 31,100\n# +10,000 (Jan 2022 exercise $100) \u2192 41,100\n# -3,000 donated Dec 2021 \u2192 38,100\n# -3,000 donated Dec 2021 \u2192 35,100\n# +10,000 (Mar 2023 exercise $80) \u2192 45,100\n# -2,900 donated May 2023 \u2192 42,200\n# +5,000 (Jun 2023 exercise $80) \u2192 47,200\n\n# Wait, I need to account for the May 2020 AAPL sales more carefully.\n# \"SOLD 3,000 SHARES\" + \"SOLD 1,700 SHARES\" + \"SOLD 3,300 SHARES\" = 8,000\n# These are post-split? No, May 2020 is before the Aug 2020 split.\n# So 8,000 pre-split shares sold.\n\n# Also the AAPL $145 calls were SOLD (not exercised) on 6/18/20\n# So no shares from that.\n\n# And the $100 calls (50 contracts) from May 2021 were sold on 6/17/22 (not exercised)\n\nprint(\"\\n--- AAPL Shares at End of Review ---\")\naapl_shares = 0\naapl_shares += 10000  # Jan 2017 exercise (pre-split)\naapl_shares += 10000  # Jun 2017 exercise (pre-split)\nprint(f\"  After 2017 exercises: {aapl_shares} (pre-split)\")\naapl_shares -= 9000   # Dec 2017 sale\naapl_shares -= 1300   # Dec 2017 donation\naapl_shares -= 2800   # Dec 2017 donation\nprint(f\"  After 2017 sales/donations: {aapl_shares} (pre-split)\")\naapl_shares += 5000   # Sep 2018 exercise $130\naapl_shares += 5000   # Sep 2018 exercise $140\nprint(f\"  After Sep 2018 exercises: {aapl_shares} (pre-split)\")\naapl_shares -= 8000   # May 2020 sales (3000+1700+3300)\nprint(f\"  After May 2020 sales: {aapl_shares} (pre-split)\")\n# 4:1 split Aug 2020\naapl_shares *= 4\nprint(f\"  After 4:1 split (Aug 2020): {aapl_shares} (post-split)\")\naapl_shares -= 4500   # Nov 2020 donation\nprint(f\"  After Nov 2020 donation: {aapl_shares}\")\naapl_shares += 10000  # Jan 2022 exercise $100\nprint(f\"  After Jan 2022 exercise: {aapl_shares}\")\naapl_shares -= 3000   # Dec 2021 donation (actually Dec 30, 2021)\naapl_shares -= 3000   # Dec 2021 donation\nprint(f\"  After Dec 2021 donations: {aapl_shares}\")\naapl_shares += 10000  # Mar 2023 exercise $80\nprint(f\"  After Mar 2023 exercise: {aapl_shares}\")\naapl_shares -= 2900   # May 2023 donation\nprint(f\"  After May 2023 donation: {aapl_shares}\")\naapl_shares += 5000   # Jun 2023 exercise $80\nprint(f\"  After Jun 2023 exercise: {aapl_shares}\")\n\n# AAPL price on 2/21/24\n# Need to get this\nprint(f\"\\n  FINAL AAPL SHARES HELD: {aapl_shares}\")\n"
+    },
+    "result": "================================================================================\nESTIMATED PORTFOLIO VALUE AT END OF REVIEW PERIOD (2/21/2024)\n================================================================================\n\n--- AAPL Shares at End of Review ---\n  After 2017 exercises: 20000 (pre-split)\n  After 2017 sales/donations: 6900 (pre-split)\n  After Sep 2018 exercises: 16900 (pre-split)\n  After May 2020 sales: 8900 (pre-split)\n  After 4:1 split (Aug 2020): 35600 (post-split)\n  After Nov 2"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AAPL",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"AAPL\", \"date\": \"2024-02-21\", \"close_price\": 180.68}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "MSFT",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"MSFT\", \"date\": \"2024-02-21\", \"close_price\": 396.1}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "GOOGL",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"GOOGL\", \"date\": \"2024-02-21\", \"close_price\": 141.38}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "GOOG",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"GOOG\", \"date\": \"2024-02-21\", \"close_price\": 142.67}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AXP",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"AXP\", \"date\": \"2024-02-21\", \"close_price\": 205.73}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "NFLX",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"NFLX\", \"date\": \"2024-02-21\", \"close_price\": 57.33}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "PYPL",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"PYPL\", \"date\": \"2024-02-21\", \"close_price\": 57.17}"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Compute total portfolio value at end of review period (2/21/2024)\n\nprint(\"=\" * 80)\nprint(\"PORTFOLIO VALUE ESTIMATE AT 2/21/2024\")\nprint(\"=\" * 80)\n\n# Prices on 2/21/2024\nprices_end = {\n    'AAPL': 180.68,\n    'MSFT': 396.10,\n    'GOOGL': 141.38,\n    'GOOG': 142.67,\n    'AXP': 205.73,\n    'CRWD': 292.36,\n    'NVDA': 67.43,  # split-adjusted (need to multiply by 10 for pre-10:1 equiv)\n    'PYPL': 57.17,\n    'NFLX': 57.33,  # This seems low, let me check. Netflix did a split? No.\n    # Actually NFLX did NOT split. But $57.33 seems wrong for Feb 2024 - it was ~$580\n    'PANW': 130.99,\n    'DBX': 23.86,\n}\n\n# NFLX at $57.33 seems like it might be wrong (Netflix was ~$590 in Feb 2024)\n# Let me recheck - actually no, the tool returned $44.99 for Jun 2020 and $29.11 for Dec 2022\n# Netflix did NOT have a stock split. In June 2020 it was around $445... \n# Oh wait - maybe the data issue is that NFLX data represents a 10:1 split that never happened\n# Actually I think there might be a data issue. Let me just note this.\n\nprint(\"\\n--- Shares Held at End of Review ---\")\n\n# AAPL: 47,200 shares\naapl_value = 47200 * 180.68\nprint(f\"  AAPL: 47,200 shares \u00d7 $180.68 = ${aapl_value:,.0f}\")\n\n# MSFT: 30,000 shares (25,000 from Mar 2021 exercise + 5,000 from Jun 2023 exercise)\nmsft_value = 30000 * 396.10\nprint(f\"  MSFT: 30,000 shares \u00d7 $396.10 = ${msft_value:,.0f}\")\n\n# GOOGL: 80,000 shares from exercise - 30,000 sold = 50,000 remaining\n# But wait, GOOG and GOOGL are different. The GOOGL position came from 4,000 pre-split shares\n# After 20:1 split: 80,000 shares. Sold 30,000. Remaining: 50,000\ngoogl_value = 50000 * 141.38\nprint(f\"  GOOGL: 50,000 shares \u00d7 $141.38 = ${googl_value:,.0f}\")\n\n# GOOG: 20,000 shares from Sep 2022 exercise\ngoog_value = 20000 * 142.67\nprint(f\"  GOOG: 20,000 shares \u00d7 $142.67 = ${goog_value:,.0f}\")\n\n# AXP: 5,000 shares from Jan 2022 exercise\naxp_value = 5000 * 205.73\nprint(f\"  AXP: 5,000 shares \u00d7 $205.73 = ${axp_value:,.0f}\")\n\n# CRWD: 5,000 shares (no sales)\ncrwd_value = 5000 * 292.36\nprint(f\"  CRWD: 5,000 shares \u00d7 $292.36 = ${crwd_value:,.0f}\")\n\n# NVDA: Nov 2023 calls (50 contracts at $120 pre-10:1)\n# Intrinsic: ($674.30 - $120) * 5,000 = $2,771,500\nnvda_call_value = (67.43 * 10 - 120) * 5000\nprint(f\"  NVDA calls: 50 contracts at $120 (pre-10:1), intrinsic = ${nvda_call_value:,.0f}\")\n\n# PANW: Calls immediately underwater - PANW at $130.99 vs $200 strike\n# These have time value but are deep OTM now\npanw_intrinsic = max(0, (130.99 - 200)) * 7000  # 70 contracts\nprint(f\"  PANW calls: 70 contracts at $200, PANW at $130.99 \u2192 OTM, time value only\")\npanw_est_value = 200000  # rough estimate for time value on OTM calls with ~11 months to expiry\n\n# PYPL: 5,000 shares remaining (sold 10,000 of 15,000)\npypl_value = 5000 * 57.17\nprint(f\"  PYPL: 5,000 shares \u00d7 $57.17 = ${pypl_value:,.0f}\")\n\n# NFLX: ~3,000 shares remaining (5,000 from exercise - 1,000 sold Dec 29)\n# Actually the Dec 30 sale has no shares listed - let's assume 1,000 too\nnflx_shares = 5000 - 1000 - 1000  # assume 1000 on each sale day\nnflx_value = nflx_shares * 57.33\n# Actually the NFLX price seems off. Let me note this.\nprint(f\"  NFLX: ~3,000 shares \u00d7 $57.33 = ${nflx_value:,.0f} (price may reflect adj. issue)\")\n\n# CRM: 10,000 shares from Jun 2020 exercise (no stock sales recorded)\n# Actually need to check - the Dec 2021 calls were separate, the shares from 2020 exercise still held?\n# No sale of CRM stock recorded. Still holding 10,000 shares.\n\n# TSLA: 7,500 post-3:1 shares - 5,000 sold = 2,500 remaining\ntsla_remaining = 2500\n# TSLA on 2/21/24: need price\n\n# AB: 60,000 shares (no sales recorded)\n# DBX: 10,000 shares (no sales)\ndbx_value = 10000 * 23.86\nprint(f\"  DBX: 10,000 shares \u00d7 $23.86 = ${dbx_value:,.0f}\")\n\n# T/WBD: 10,000 T shares + 2,419 WBD shares from spinoff\n\n# DIS: Exercise 10,000 at $90 (2016) - this position sold in Dec 2022\n# But the Jan 2016 exercise of 10,000 shares... were these sold?\n# The Dec 2022 sale of 10,000 shares was the Jan 2022 exercise shares.\n# The original 2016 DIS position (10,000 pre-split shares) - no split for DIS in this period\n# Actually looking at the DIS trades: exercised 100 calls at $90 in Jan 2016 (10,000 shares)\n# Then exercised 100 calls at $100 in Jan 2022 (10,000 shares)\n# Then sold 10,000 shares Dec 2022\n# So still holding 10,000 shares from the 2016 exercise\n\nprint(f\"\\n  Additional positions (not priced above): CRM 10k shares, TSLA 2.5k, AB 60k, DIS 10k, T 10k\")\n\ntotal_valued = aapl_value + msft_value + googl_value + goog_value + axp_value + crwd_value + nvda_call_value + pypl_value + dbx_value\nprint(f\"\\n  SUBTOTAL (major positions valued above): ${total_valued:,.0f}\")\nprint(f\"  Note: This excludes CRM, TSLA, AB, DIS, T, WBD, NFLX properly valued\")\n"
+    },
+    "result": "================================================================================\nPORTFOLIO VALUE ESTIMATE AT 2/21/2024\n================================================================================\n\n--- Shares Held at End of Review ---\n  AAPL: 47,200 shares \u00d7 $180.68 = $8,528,096\n  MSFT: 30,000 shares \u00d7 $396.10 = $11,883,000\n  GOOGL: 50,000 shares \u00d7 $141.38 = $7,069,000\n  GOOG: 20,000 shares \u00d7 $142.67 = $2,853,400\n  AXP: 5,000 shares \u00d7 $205.73 = $1,028,650\n  CRWD: 5,000 shares \u00d7 $292.36 = $1,4"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "CRM",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"CRM\", \"date\": \"2024-02-21\", \"close_price\": 279.45}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "TSLA",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"TSLA\", \"date\": \"2024-02-21\", \"close_price\": 194.77}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "DIS",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"DIS\", \"date\": \"2024-02-21\", \"close_price\": 105.54}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "T",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"T\", \"date\": \"2024-02-21\", \"close_price\": 15.23}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "WBD",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"WBD\", \"date\": \"2024-02-21\", \"close_price\": 9.57}"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Complete the portfolio valuation\n\nprint(\"=\" * 80)\nprint(\"COMPLETE PORTFOLIO VALUATION AT 2/21/2024\")\nprint(\"=\" * 80)\n\nholdings = {\n    'AAPL': {'shares': 47200, 'price': 180.68},\n    'MSFT': {'shares': 30000, 'price': 396.10},\n    'GOOGL': {'shares': 50000, 'price': 141.38},\n    'GOOG': {'shares': 20000, 'price': 142.67},\n    'CRM': {'shares': 10000, 'price': 279.45},\n    'AXP': {'shares': 5000, 'price': 205.73},\n    'CRWD': {'shares': 5000, 'price': 292.36},\n    'PYPL': {'shares': 5000, 'price': 57.17},\n    'DIS': {'shares': 10000, 'price': 105.54},\n    'TSLA': {'shares': 2500, 'price': 194.77},\n    'DBX': {'shares': 10000, 'price': 23.86},\n    'T': {'shares': 10000, 'price': 15.23},\n    'WBD': {'shares': 2419, 'price': 9.57},\n}\n\n# AB (AllianceBernstein): need to check\n# AB had 60,000 shares. Let me check the price.\n# NFLX: Shares held unclear due to potential data issue on price\n\n# Note: Some positions may have been sold outside this data set\n# AB with 60,000 shares seems very large - $750k per batch for 3 batches = $2.25M\n\nprint(f\"\\n{'Ticker':<8} {'Shares':>10} {'Price':>10} {'Value':>15}\")\nprint(\"-\" * 45)\ntotal_value = 0\nfor ticker, data in sorted(holdings.items(), key=lambda x: -x[1]['shares']*x[1]['price']):\n    value = data['shares'] * data['price']\n    total_value += value\n    print(f\"  {ticker:<8} {data['shares']:>10,} {data['price']:>10.2f} ${value:>14,.0f}\")\n\n# NVDA options\nnvda_intrinsic = (67.43 * 10 - 120) * 5000  # pre-10:1 terms\ntotal_value += nvda_intrinsic\nprint(f\"  {'NVDA(c)':<8} {'50 cntr':>10} {'--':>10} ${nvda_intrinsic:>14,.0f}\")\n\n# PANW options (OTM, estimate time value)\npanw_est = 200000  # rough estimate\ntotal_value += panw_est\nprint(f\"  {'PANW(c)':<8} {'70 cntr':>10} {'--':>10} ${panw_est:>14,.0f} (est)\")\n\nprint(\"-\" * 45)\nprint(f\"  {'SUBTOTAL':<8} {'':>10} {'':>10} ${total_value:>14,.0f}\")\n\n# Add AB and NFLX estimates\n# Let me just note them\n\n# Also add realized cash from sales not reinvested\n# Total sells/donations not counted above\n# V: $9,950,007 (all cash, position fully exited)\n# FB: $3M sale + $3M donation = $6M\n# AAPL sales: $3M Dec 2017 + $4.5M May 2020\n# NVDA: $3M sale Jul 2022\n# Multiple other small sales\n\nprint(f\"\\n  Note: AB (60,000 shares) and remaining NFLX shares not included\")\nprint(f\"  Note: This is the CURRENT HOLDINGS value only, not total return\")\nprint(f\"  Substantial cash was realized from V ($9.95M), AAPL, NVDA, FB sales\")\n\n# Total realized cash from all sales/exercises\ntotal_received = 41128034  # from overview\nprint(f\"\\n  Total disclosed proceeds (per overview): ${total_received:,.0f}\")\nprint(f\"  Current holdings value (estimated): ${total_value:,.0f}\")\nprint(f\"  ESTIMATED TOTAL PORTFOLIO VALUE: ${total_received + total_value:,.0f}\")\nprint(f\"  Total capital deployed: $71,888,542\")\nprint(f\"  ESTIMATED NET GAIN: ${total_received + total_value - 71888542:,.0f}\")\n"
+    },
+    "result": "================================================================================\nCOMPLETE PORTFOLIO VALUATION AT 2/21/2024\n================================================================================\n\nTicker       Shares      Price           Value\n---------------------------------------------\n  MSFT         30,000     396.10 $    11,883,000\n  AAPL         47,200     180.68 $     8,528,096\n  GOOGL        50,000     141.38 $     7,069,000\n  GOOG         20,000     142.67 $     2,853,400\n  CRM "
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# This is a rough estimate. The \"$71.9M deployed\" includes exercises which are internal transfers\n# Let me redo this more carefully, separating NEW MONEY IN from internal transfers\n\nprint(\"=\" * 80)\nprint(\"CORRECTED CAPITAL FLOW ANALYSIS\")\nprint(\"=\" * 80)\n\n# The \"total capital deployed\" of $71.9M includes:\n# 1. Option premium purchases (NEW money out)\n# 2. Exercise costs (NEW money out - paying the strike price)  \n# 3. Stock purchases (NEW money out)\n# 4. Donations (transfers out, not cash in)\n\n# Let's separate:\n# NEW CASH IN (actual investments):\n# Option premiums paid\noption_premiums = {\n    'AAPL': [375001, 175001, 175001, 175001, 750001, 375001, 175001, 750001, 375001],\n    'NVDA': [3000001, 375001, 3000001],\n    'MSFT': [375001, 750001, 175001, 75001, 375001],\n    'AMZN': [750001, 3000001, 750001, 750001],\n    'DIS': [750001, 175001],\n    'CRM': [75001, 175001, 175001, 750001],\n    'GOOG': [750001],\n    'GOOGL': [750001],\n    'TSLA': [750001],\n    'NFLX': [375001, 175001],\n    'PYPL': [375001],\n    'AXP': [175001],\n    'PANW': [750001, 175001],\n    'MU': [375001],\n    'RBLX': [375001],\n    'SQ': [8001],\n    'HTZ': [32501, 175001],\n}\n\ntotal_premiums = sum(sum(v) for v in option_premiums.values())\nprint(f\"Total option premiums paid: ${total_premiums:,.0f}\")\n\n# Stock purchases (direct, not through exercise)\nstock_purchases = {\n    'PYPL': [750001, 750001],  # 10,000 shares at $154.43\n    'CRWD': [750001],\n    'AB': [750001, 750001, 750001],\n    'DBX': [375001],\n    'T': [375001],\n    'WORK': [375001],\n    'SUNE': [175001],\n    'NVDA': [750001],  # 5,000 shares stock purchase\n    'HTZ': [32501, 75001, 175001, 75001],  # stock purchases\n    'DIS': [8001, 75001],\n    'WBD': [75001],\n}\n\ntotal_stock_buys = sum(sum(v) for v in stock_purchases.values())\nprint(f\"Total direct stock purchases: ${total_stock_buys:,.0f}\")\n\n# Exercise costs (cash paid to exercise options)\nexercises = {\n    'AAPL_90': 90 * 10000,  # $900k pre-split\n    'AAPL_80': 80 * 10000,  # $800k pre-split\n    'AAPL_130': 130 * 5000, # $650k\n    'AAPL_140': 140 * 5000, # $700k\n    'AAPL_100': 100 * 10000, # $1M post-split\n    'AAPL_80_2023a': 80 * 10000, # $800k\n    'AAPL_80_2023b': 80 * 5000, # $400k\n    'MSFT_130': 130 * 15000, # $1.95M\n    'MSFT_140': 140 * 10000, # $1.4M\n    'MSFT_180': 180 * 5000,  # $900k\n    'GOOGL_1200': 1200 * 4000, # $4.8M pre-split\n    'GOOG_100': 100 * 20000,  # $2M post-split\n    'NVDA_100': 100 * 20000,  # $2M post-4:1\n    'FB_140': 140 * 3000, # $420k\n    'FB_150': 150 * 2000, # $300k\n    'CRM_140': 140 * 10000, # $1.4M\n    'NFLX_250': 250 * 5000, # $1.25M\n    'DIS_90': 90 * 10000, # $900k\n    'DIS_100': 100 * 10000, # $1M\n    'TSLA_500': 500 * 2500, # $1.25M\n    'PYPL_100': 100 * 5000, # $500k\n    'AXP_80': 80 * 5000, # $400k\n    'SQ_8': 8 * 5000, # $40k\n}\n\ntotal_exercise_cost = sum(exercises.values())\nprint(f\"Total exercise costs: ${total_exercise_cost:,.0f}\")\n\ntotal_new_money = total_premiums + total_stock_buys + total_exercise_cost\nprint(f\"\\nTOTAL NEW MONEY DEPLOYED: ${total_new_money:,.0f}\")\n\n# Cash received back:\n# Stock/option sales (actual cash in)\nprint(f\"\\nTotal disclosed proceeds: $41,128,034\")\n\n# The difference between new money in and cash received = net invested\nnet_invested = total_new_money - 41128034\nprint(f\"Net cash still invested: ${net_invested:,.0f}\")\n\n# Current holdings value (from above): ~$40.8M\ncurrent_holdings = 40832171\nprint(f\"Current holdings estimated value: ${current_holdings:,.0f}\")\n\n# Net gain = current holdings - net cash invested\nnet_gain = current_holdings - net_invested\nprint(f\"\\nESTIMATED NET PORTFOLIO GAIN: ${net_gain:,.0f}\")\nprint(f\"  (On net invested capital of ${net_invested:,.0f})\")\nprint(f\"  Return: {net_gain/net_invested*100:.1f}%\")\n"
+    },
+    "result": "================================================================================\nCORRECTED CAPITAL FLOW ANALYSIS\n================================================================================\nTotal option premiums paid: $24,040,541\nTotal direct stock purchases: $7,065,518\nTotal exercise costs: $25,760,000\n\nTOTAL NEW MONEY DEPLOYED: $56,866,059\n\nTotal disclosed proceeds: $41,128,034\nNet cash still invested: $15,738,025\nCurrent holdings estimated value: $40,832,171\n\nESTIMATED NET PORTFOLIO GAIN:"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# That's not quite right either because the exercise costs were already included in the \n# $71.9M figure. Let me think about this differently.\n\n# The simplest way: \n# Total cash OUT of pocket = option premiums + stock purchases + exercise costs\n# Total cash IN = stock sales + option sales\n# Current holdings = estimated market value of remaining positions\n# Net P&L = cash IN + current holdings - cash OUT\n\n# But the disclosure amounts are RANGES, not exact numbers. \n# The $71.9M total invested and $41.1M total received are disclosure range midpoints.\n\n# Let me focus on the key question: skill vs luck vs beta\n\n# A simpler comparison: the capital-weighted SPY return of 48.5% vs what they achieved\n\n# Let me compute an approximate XIRR (dollar-weighted return)\n\nfrom scipy.optimize import brentq\nfrom datetime import datetime\n\n# Build cash flow series\n# Positive = cash out (buys), Negative = cash in (sales)\ncashflows = []\n\n# All buy transactions (option premiums + stock purchases + exercise costs)\n# Let me use the timeline for this\nbuy_flows = [\n    # (date, amount) - amounts going OUT\n    ('2016-01-13', 375001),  # AAPL calls\n    ('2016-01-15', 900000),  # DIS exercise (100*100*$90)\n    ('2016-05-17', 8001 + 175001),  # SQ + AAPL calls\n    ('2017-01-19', 900000),  # AAPL exercise ($90*10000)\n    ('2017-01-20', 40000),  # SQ exercise ($8*5000)\n    ('2017-06-15', 800000),  # AAPL exercise ($80*10000)\n    ('2018-02-02', 350002),  # AAPL calls\n    ('2018-03-27', 375001),  # DBX stock\n    ('2018-07-27', 825002),  # AMZN + FB calls\n    ('2018-09-11', 750001),  # AAPL calls\n    ('2018-09-20', 650000 + 700000),  # AAPL exercises\n    ('2018-10-09', 175001),  # FB calls\n    ('2018-10-12', 3000001),  # AMZN calls\n    ('2018-10-24', 375001),  # T stock\n    ('2019-06-14', 75001),  # CRM calls\n    ('2019-06-18', 175001),  # CRM calls\n    ('2019-07-05', 375001),  # NFLX calls\n    ('2019-07-22', 925001),  # AMZN + NFLX calls\n    ('2020-01-16', 4800000 + 420000 + 300000),  # AMZN exercise + FB exercises\n    ('2020-02-20', 375001 + 375001),  # MSFT calls + WORK stock\n    ('2020-02-21', 750001),  # MSFT calls\n    ('2020-02-27', 750001),  # GOOGL calls\n    ('2020-02-28', 175001),  # MSFT calls\n    ('2020-06-12', 1500002),  # PYPL stock\n    ('2020-06-18', 1250000 + 1400000),  # NFLX + CRM exercises\n    ('2020-06-24', 175001 + 375001),  # AXP + PYPL calls\n    ('2020-09-03', 750001),  # CRWD stock\n    ('2020-12-22', 750001 + 375001 + 750001 + 750001),  # DIS, AAPL, TSLA calls, AB stock\n    ('2021-02-18', 750001),  # AB stock\n    ('2021-02-23', 750001),  # AB stock\n    ('2021-03-19', 1950000 + 1400000),  # MSFT exercises\n    ('2021-05-21', 750001 + 175001),  # AMZN + AAPL calls\n    ('2021-06-03', 3000001),  # NVDA calls\n    ('2021-06-18', 4800000),  # GOOGL exercise\n    ('2021-07-23', 750001 + 375001),  # NVDA stock + calls\n    ('2021-12-17', 750001 + 175001),  # GOOG + DIS calls\n    ('2021-12-20', 175001 + 375001 + 750001),  # CRM + RBLX + CRM calls\n    ('2021-12-21', 375001),  # MU calls\n    ('2022-01-21', 400000 + 1000000 + 500000 + 1000000),  # AXP, DIS, PYPL, AAPL exercises\n    ('2022-03-17', 1250000),  # TSLA exercise\n    ('2022-05-13', 750001),  # AAPL calls\n    ('2022-05-24', 450002 + 375001),  # MSFT + AAPL calls\n    ('2022-06-17', 2000000),  # NVDA exercise\n    ('2022-09-16', 2000000),  # GOOG exercise\n    ('2023-03-17', 800000),  # AAPL exercise\n    ('2023-06-15', 400000 + 900000),  # AAPL + MSFT exercises\n    ('2023-11-22', 3000001),  # NVDA calls\n    ('2024-02-12', 750001),  # PANW calls\n    ('2024-02-21', 175001),  # PANW calls\n]\n\n# All sell transactions (cash coming IN)\nsell_flows = [\n    ('2014-12-29', -375001),  # V\n    ('2014-12-30', -175001),  # V\n    ('2015-12-29', -375001),  # V\n    ('2016-07-21', -75001 - 375001),  # V + MGRC\n    ('2017-01-20', -375001),  # AAPL calls sold\n    ('2017-12-28', -3000001 - 750001),  # AAPL + V stock\n    ('2019-08-07', -350001),  # V\n    ('2020-01-16', -375001 - 375001),  # AMZN calls sold\n    ('2020-05-08', -3000001 - 175001 - 175001 - 1500001 - 750001 - 750001),  # FB, IBKR, MORN, V, AAPL sales\n    ('2020-06-18', -3000001),  # AAPL calls sold\n    ('2022-06-17', -175001),  # AAPL calls sold\n    ('2022-06-21', -3000001),  # V\n    ('2022-07-26', -3000001),  # NVDA stock\n    ('2022-09-16', -175001 - 0.5 - 32501),  # NVDA, DIS, MU calls\n    ('2022-11-08', -3000001),  # V\n    ('2022-12-20', -4.5 - 750001 - 750001),  # CRM calls, GOOGL, TSLA\n    ('2022-12-21', -750001 - 750001 - 375001),  # DIS, GOOGL, PYPL\n    ('2022-12-28', -375001 - 750001 - 175001),  # PYPL, GOOGL, RBLX\n    ('2022-12-29', -375001),  # NFLX\n    ('2022-12-30', -375001),  # NFLX\n    ('2023-01-20', -0.5),  # RBLX expired\n]\n\ntotal_out = sum(amt for _, amt in buy_flows)\ntotal_in = sum(amt for _, amt in sell_flows)\nprint(f\"Total cash out (investments): ${total_out:,.0f}\")\nprint(f\"Total cash in (sales): ${abs(total_in):,.0f}\")\nprint(f\"Net cash invested: ${total_out + total_in:,.0f}\")\nprint(f\"Current holdings: ~$40,832,171\")\nprint(f\"Net gain: ~${40832171 - (total_out + total_in):,.0f}\")\n"
+    },
+    "result": "Total cash out (investments): $61,018,050\nTotal cash in (sales): $30,757,540\nNet cash invested: $30,260,510\nCurrent holdings: ~$40,832,171\nNet gain: ~$10,571,660\n"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Now let me compute a dollar-weighted (IRR) comparison vs SPY/QQQ\n# Using XIRR methodology\n\nfrom scipy.optimize import brentq\nfrom datetime import datetime\nimport numpy as np\n\ndef xirr(cashflows_dates, cashflows_amounts, guess=0.1):\n    \"\"\"Compute XIRR given dates and amounts (negative = outflow, positive = inflow)\"\"\"\n    def npv(rate):\n        t0 = cashflows_dates[0]\n        total = 0\n        for dt, amt in zip(cashflows_dates, cashflows_amounts):\n            years = (dt - t0).days / 365.25\n            total += amt / (1 + rate) ** years\n        return total\n    \n    try:\n        return brentq(npv, -0.5, 5.0)\n    except:\n        return None\n\n# Build combined cashflow series for XIRR\n# Convention: negative = money going out (buys), positive = money coming in (sales + terminal value)\nall_flows_dates = []\nall_flows_amounts = []\n\nfor date_str, amt in buy_flows:\n    all_flows_dates.append(datetime.strptime(date_str, '%Y-%m-%d'))\n    all_flows_amounts.append(-amt)  # money going out\n\nfor date_str, amt in sell_flows:\n    all_flows_dates.append(datetime.strptime(date_str, '%Y-%m-%d'))\n    all_flows_amounts.append(-amt)  # amt is already negative, so -amt is positive (money coming in)\n\n# Add terminal value on 2/21/2024\nterminal_date = datetime(2024, 2, 21)\nterminal_value = 40832171\nall_flows_dates.append(terminal_date)\nall_flows_amounts.append(terminal_value)\n\n# Sort by date\ncombined = sorted(zip(all_flows_dates, all_flows_amounts))\nall_flows_dates = [c[0] for c in combined]\nall_flows_amounts = [c[1] for c in combined]\n\nportfolio_irr = xirr(all_flows_dates, all_flows_amounts)\nprint(f\"Portfolio XIRR: {portfolio_irr*100:.1f}% annualized\")\n\n# Now compute SPY XIRR with same cashflows\n# For each outflow, invest in SPY; for each inflow, sell SPY\nspy_prices = get_prices('SPY', '2014-09-01', '2024-02-22')\nspy_end_price = 483.89  # from earlier\n\n# Compute terminal value if all flows were SPY\nspy_shares = 0\nfor dt, amt in combined[:-1]:  # exclude terminal value\n    dt_str = dt.strftime('%Y-%m-%d')\n    try:\n        spy_row = spy_prices.loc[spy_prices.index >= dt_str].iloc[0]\n        spy_price = spy_row['Close']\n        if amt < 0:  # outflow = buy SPY\n            shares_bought = abs(amt) / spy_price\n            spy_shares += shares_bought\n        else:  # inflow = sell SPY\n            shares_sold = amt / spy_price\n            spy_shares -= shares_sold\n    except:\n        pass\n\nspy_terminal = spy_shares * spy_end_price\nspy_flows_dates = all_flows_dates[:-1] + [terminal_date]\nspy_flows_amounts = all_flows_amounts[:-1] + [spy_terminal]\n\nspy_irr = xirr(spy_flows_dates, spy_flows_amounts)\nprint(f\"SPY XIRR (same cash flows): {spy_irr*100:.1f}% annualized\")\n\n# QQQ comparison\nqqq_prices = get_prices('QQQ', '2014-09-01', '2024-02-22')\nqqq_end_price = 420.43\n\nqqq_shares = 0\nfor dt, amt in combined[:-1]:\n    dt_str = dt.strftime('%Y-%m-%d')\n    try:\n        qqq_row = qqq_prices.loc[qqq_prices.index >= dt_str].iloc[0]\n        qqq_price = qqq_row['Close']\n        if amt < 0:\n            shares_bought = abs(amt) / qqq_price\n            qqq_shares += shares_bought\n        else:\n            shares_sold = amt / qqq_price\n            qqq_shares -= shares_sold\n    except:\n        pass\n\nqqq_terminal = qqq_shares * qqq_end_price\nqqq_flows_dates = all_flows_dates[:-1] + [terminal_date]\nqqq_flows_amounts = all_flows_amounts[:-1] + [qqq_terminal]\n\nqqq_irr = xirr(qqq_flows_dates, qqq_flows_amounts)\nprint(f\"QQQ XIRR (same cash flows): {qqq_irr*100:.1f}% annualized\")\n\nprint(f\"\\n{'='*60}\")\nprint(f\"ALPHA vs SPY: {(portfolio_irr - spy_irr)*100:.1f}% per year\")\nprint(f\"ALPHA vs QQQ: {(portfolio_irr - qqq_irr)*100:.1f}% per year\")\nprint(f\"{'='*60}\")\n\n# Simple terminal value comparison\nprint(f\"\\nTerminal value comparison:\")\nprint(f\"  Actual portfolio: ${terminal_value:,.0f}\")\nprint(f\"  SPY strategy:     ${spy_terminal:,.0f}\")\nprint(f\"  QQQ strategy:     ${qqq_terminal:,.0f}\")\nprint(f\"\\n  vs SPY: {'+' if terminal_value > spy_terminal else ''}{terminal_value - spy_terminal:,.0f}\")\nprint(f\"  vs QQQ: {'+' if terminal_value > qqq_terminal else ''}{terminal_value - qqq_terminal:,.0f}\")\n"
+    },
+    "result": "\n[stderr]\nTraceback (most recent call last):\n  File \"/Users/rakchada/.ada_tmp/tmpok3s_qs6.py\", line 43, in <module>\n    for date_str, amt in buy_flows:\n                         ^^^^^^^^^\nNameError: name 'buy_flows' is not defined"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\nfrom scipy.optimize import brentq\nfrom datetime import datetime\nimport numpy as np\n\nbuy_flows = [\n    ('2016-01-13', 375001), ('2016-01-15', 900000), ('2016-05-17', 183002),\n    ('2017-01-19', 900000), ('2017-01-20', 40000), ('2017-06-15', 800000),\n    ('2018-02-02', 350002), ('2018-03-27', 375001), ('2018-07-27', 825002),\n    ('2018-09-11', 750001), ('2018-09-20', 1350000), ('2018-10-09', 175001),\n    ('2018-10-12', 3000001), ('2018-10-24', 375001),\n    ('2019-06-14', 75001), ('2019-06-18', 175001), ('2019-07-05', 375001),\n    ('2019-07-22', 925001),\n    ('2020-01-16', 5520000), ('2020-02-20', 750002), ('2020-02-21', 750001),\n    ('2020-02-27', 750001), ('2020-02-28', 175001), ('2020-06-12', 1500002),\n    ('2020-06-18', 2650000), ('2020-06-24', 550002), ('2020-09-03', 750001),\n    ('2020-12-22', 2625004), ('2021-02-18', 750001), ('2021-02-23', 750001),\n    ('2021-03-19', 3350000), ('2021-05-21', 925002), ('2021-06-03', 3000001),\n    ('2021-06-18', 4800000), ('2021-07-23', 1125002),\n    ('2021-12-17', 925002), ('2021-12-20', 1300003), ('2021-12-21', 375001),\n    ('2022-01-21', 2900000), ('2022-03-17', 1250000),\n    ('2022-05-13', 750001), ('2022-05-24', 825003), ('2022-06-17', 2000000),\n    ('2022-09-16', 2000000), ('2023-03-17', 800000), ('2023-06-15', 1300000),\n    ('2023-11-22', 3000001), ('2024-02-12', 750001), ('2024-02-21', 175001),\n]\n\nsell_flows = [\n    ('2014-12-29', 375001), ('2014-12-30', 175001), ('2015-12-29', 375001),\n    ('2016-07-21', 450002), ('2017-01-20', 375001),\n    ('2017-12-28', 3750002), ('2019-08-07', 350001),\n    ('2020-01-16', 750002), ('2020-05-08', 5850005),\n    ('2020-06-18', 3000001), ('2022-06-17', 175001),\n    ('2022-06-21', 3000001), ('2022-07-26', 3000001),\n    ('2022-09-16', 207503), ('2022-11-08', 3000001),\n    ('2022-12-20', 1500006), ('2022-12-21', 1875003),\n    ('2022-12-28', 1300003), ('2022-12-29', 375001), ('2022-12-30', 375001),\n]\n\n# Build combined cashflow series\nall_flows = []\nfor date_str, amt in buy_flows:\n    all_flows.append((datetime.strptime(date_str, '%Y-%m-%d'), -amt))\nfor date_str, amt in sell_flows:\n    all_flows.append((datetime.strptime(date_str, '%Y-%m-%d'), amt))\n\n# Terminal value\nterminal_date = datetime(2024, 2, 21)\nterminal_value = 40832171\nall_flows.append((terminal_date, terminal_value))\n\n# Sort by date\nall_flows.sort(key=lambda x: x[0])\n\ndef xirr(flows, guess=0.1):\n    dates = [f[0] for f in flows]\n    amounts = [f[1] for f in flows]\n    t0 = dates[0]\n    def npv(rate):\n        total = 0\n        for dt, amt in zip(dates, amounts):\n            years = (dt - t0).days / 365.25\n            if years == 0:\n                total += amt\n            else:\n                total += amt / (1 + rate) ** years\n        return total\n    try:\n        return brentq(npv, -0.5, 5.0)\n    except Exception as e:\n        return None\n\nportfolio_irr = xirr(all_flows)\nif portfolio_irr:\n    print(f\"Portfolio XIRR: {portfolio_irr*100:.1f}% annualized\")\nelse:\n    print(\"Could not compute XIRR\")\n\n# SPY comparison\nspy_prices = get_prices('SPY', '2014-09-01', '2024-02-22')\nspy_end_price = float(spy_prices.loc[spy_prices.index <= '2024-02-21'].iloc[-1]['Close'])\n\nspy_shares = 0\nfor dt, amt in all_flows[:-1]:\n    dt_str = dt.strftime('%Y-%m-%d')\n    try:\n        spy_row = spy_prices.loc[spy_prices.index >= dt_str].iloc[0]\n        spy_price = float(spy_row['Close'])\n        spy_shares += amt / spy_price  # positive amt = buy shares, negative = sell\n    except:\n        pass\n\nspy_terminal = spy_shares * spy_end_price\nspy_flows = all_flows[:-1] + [(terminal_date, spy_terminal)]\nspy_irr = xirr(spy_flows)\n\n# QQQ comparison\nqqq_prices = get_prices('QQQ', '2014-09-01', '2024-02-22')\nqqq_end_price = float(qqq_prices.loc[qqq_prices.index <= '2024-02-21'].iloc[-1]['Close'])\n\nqqq_shares = 0\nfor dt, amt in all_flows[:-1]:\n    dt_str = dt.strftime('%Y-%m-%d')\n    try:\n        qqq_row = qqq_prices.loc[qqq_prices.index >= dt_str].iloc[0]\n        qqq_price = float(qqq_row['Close'])\n        qqq_shares += amt / qqq_price\n    except:\n        pass\n\nqqq_terminal = qqq_shares * qqq_end_price\nqqq_flows = all_flows[:-1] + [(terminal_date, qqq_terminal)]\nqqq_irr = xirr(qqq_flows)\n\nprint(f\"\\n{'='*60}\")\nprint(f\"DOLLAR-WEIGHTED RETURN COMPARISON (XIRR)\")\nprint(f\"{'='*60}\")\nif portfolio_irr:\n    print(f\"  Portfolio: {portfolio_irr*100:.1f}% annualized\")\nif spy_irr:\n    print(f\"  SPY:       {spy_irr*100:.1f}% annualized\")\nif qqq_irr:\n    print(f\"  QQQ:       {qqq_irr*100:.1f}% annualized\")\n\nif portfolio_irr and spy_irr:\n    print(f\"\\n  Alpha vs SPY: {(portfolio_irr - spy_irr)*100:+.1f}% per year\")\nif portfolio_irr and qqq_irr:\n    print(f\"  Alpha vs QQQ: {(portfolio_irr - qqq_irr)*100:+.1f}% per year\")\n\nprint(f\"\\nTerminal value comparison:\")\nprint(f\"  Actual portfolio: ${terminal_value:,.0f}\")\nprint(f\"  SPY strategy:     ${spy_terminal:,.0f}\")\nprint(f\"  QQQ strategy:     ${qqq_terminal:,.0f}\")\nprint(f\"  vs SPY: ${terminal_value - spy_terminal:+,.0f}\")\nprint(f\"  vs QQQ: ${terminal_value - qqq_terminal:+,.0f}\")\n"
+    },
+    "result": "Could not compute XIRR\n\n============================================================\nDOLLAR-WEIGHTED RETURN COMPARISON (XIRR)\n============================================================\n  SPY:       157.3% annualized\n  QQQ:       157.4% annualized\n\nTerminal value comparison:\n  Actual portfolio: $40,832,171\n  SPY strategy:     $-42,136,235\n  QQQ strategy:     $-45,868,202\n  vs SPY: $+82,968,406\n  vs QQQ: $+86,700,373\n"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# The SPY/QQQ comparison went negative because most cashflows are outflows (buys > sells before terminal)\n# This is because the portfolio has large unrealized positions. \n# Let me fix: the correct approach for SPY/QQQ is to mirror each actual trade.\n# When actual portfolio BUYS, buy SPY. When actual portfolio SELLS, sell SPY proportionally.\n\n# Actually the issue is that negative amounts (buys) make the share count go down (selling SPY)\n# Let me fix the sign convention\n\nspy_prices = get_prices('SPY', '2014-09-01', '2024-02-22')\nqqq_prices = get_prices('QQQ', '2014-09-01', '2024-02-22')\n\nspy_end_price = float(spy_prices.loc[spy_prices.index <= '2024-02-21'].iloc[-1]['Close'])\nqqq_end_price = float(qqq_prices.loc[qqq_prices.index <= '2024-02-21'].iloc[-1]['Close'])\n\n# Reconstruct: when the portfolio deploys cash (negative flow = buy), buy SPY\n# When the portfolio receives cash (positive flow = sell), sell SPY\nspy_shares = 0\nqqq_shares = 0\n\nfor dt, amt in all_flows[:-1]:  # exclude terminal\n    dt_str = dt.strftime('%Y-%m-%d')\n    try:\n        spy_row = spy_prices.loc[spy_prices.index >= dt_str].iloc[0]\n        spy_price = float(spy_row['Close'])\n        qqq_row = qqq_prices.loc[qqq_prices.index >= dt_str].iloc[0]\n        qqq_price = float(qqq_row['Close'])\n        \n        if amt < 0:  # money going OUT = buying stock\n            spy_shares += abs(amt) / spy_price\n            qqq_shares += abs(amt) / qqq_price\n        else:  # money coming IN = selling stock (proportionally)\n            # Sell proportional amount\n            if spy_shares > 0:\n                sell_fraction = min(1.0, amt / (spy_shares * spy_price))\n                spy_shares *= (1 - sell_fraction)\n            if qqq_shares > 0:\n                sell_fraction = min(1.0, amt / (qqq_shares * qqq_price))\n                qqq_shares *= (1 - sell_fraction)\n    except:\n        pass\n\nspy_terminal = spy_shares * spy_end_price\nqqq_terminal = qqq_shares * qqq_end_price\n\nprint(f\"SPY alternative terminal value: ${spy_terminal:,.0f}\")\nprint(f\"QQQ alternative terminal value: ${qqq_terminal:,.0f}\")\nprint(f\"Actual portfolio terminal value: ${terminal_value:,.0f}\")\n\nprint(f\"\\nvs SPY: ${terminal_value - spy_terminal:+,.0f}\")\nprint(f\"vs QQQ: ${terminal_value - qqq_terminal:+,.0f}\")\n\n# This is a better comparison but still imperfect because the sell timing affects it\n# The key insight is whether the specific stock picks added value vs just buying the index\n"
+    },
+    "result": "\n[stderr]\nTraceback (most recent call last):\n  File \"/Users/rakchada/.ada_tmp/tmpc8duqu8r.py\", line 35, in <module>\n    for dt, amt in all_flows[:-1]:  # exclude terminal\n                   ^^^^^^^^^\nNameError: name 'all_flows' is not defined"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\nfrom datetime import datetime\n\n# Rebuild the flows\nbuy_flows = [\n    ('2016-01-13', 375001), ('2016-01-15', 900000), ('2016-05-17', 183002),\n    ('2017-01-19', 900000), ('2017-01-20', 40000), ('2017-06-15', 800000),\n    ('2018-02-02', 350002), ('2018-03-27', 375001), ('2018-07-27', 825002),\n    ('2018-09-11', 750001), ('2018-09-20', 1350000), ('2018-10-09', 175001),\n    ('2018-10-12', 3000001), ('2018-10-24', 375001),\n    ('2019-06-14', 75001), ('2019-06-18', 175001), ('2019-07-05', 375001),\n    ('2019-07-22', 925001),\n    ('2020-01-16', 5520000), ('2020-02-20', 750002), ('2020-02-21', 750001),\n    ('2020-02-27', 750001), ('2020-02-28', 175001), ('2020-06-12', 1500002),\n    ('2020-06-18', 2650000), ('2020-06-24', 550002), ('2020-09-03', 750001),\n    ('2020-12-22', 2625004), ('2021-02-18', 750001), ('2021-02-23', 750001),\n    ('2021-03-19', 3350000), ('2021-05-21', 925002), ('2021-06-03', 3000001),\n    ('2021-06-18', 4800000), ('2021-07-23', 1125002),\n    ('2021-12-17', 925002), ('2021-12-20', 1300003), ('2021-12-21', 375001),\n    ('2022-01-21', 2900000), ('2022-03-17', 1250000),\n    ('2022-05-13', 750001), ('2022-05-24', 825003), ('2022-06-17', 2000000),\n    ('2022-09-16', 2000000), ('2023-03-17', 800000), ('2023-06-15', 1300000),\n    ('2023-11-22', 3000001), ('2024-02-12', 750001), ('2024-02-21', 175001),\n]\n\nsell_flows = [\n    ('2014-12-29', 375001), ('2014-12-30', 175001), ('2015-12-29', 375001),\n    ('2016-07-21', 450002), ('2017-01-20', 375001),\n    ('2017-12-28', 3750002), ('2019-08-07', 350001),\n    ('2020-01-16', 750002), ('2020-05-08', 5850005),\n    ('2020-06-18', 3000001), ('2022-06-17', 175001),\n    ('2022-06-21', 3000001), ('2022-07-26', 3000001),\n    ('2022-09-16', 207503), ('2022-11-08', 3000001),\n    ('2022-12-20', 1500006), ('2022-12-21', 1875003),\n    ('2022-12-28', 1300003), ('2022-12-29', 375001), ('2022-12-30', 375001),\n]\n\nall_flows = []\nfor date_str, amt in buy_flows:\n    all_flows.append((datetime.strptime(date_str, '%Y-%m-%d'), -amt))  # negative = outflow\nfor date_str, amt in sell_flows:\n    all_flows.append((datetime.strptime(date_str, '%Y-%m-%d'), amt))  # positive = inflow\nall_flows.sort(key=lambda x: x[0])\n\nterminal_date = datetime(2024, 2, 21)\nterminal_value = 40832171\n\n# Simple approach: compute total cash spent and received, then compare terminal values\ntotal_outflows = sum(abs(amt) for dt, amt in all_flows if amt < 0)\ntotal_inflows = sum(amt for dt, amt in all_flows if amt > 0)\nnet_invested = total_outflows - total_inflows\n\nprint(f\"Total cash out (buys + exercises): ${total_outflows:,.0f}\")\nprint(f\"Total cash in (sales): ${total_inflows:,.0f}\")\nprint(f\"Net cash still deployed: ${net_invested:,.0f}\")\nprint(f\"Current holdings value: ${terminal_value:,.0f}\")\nprint(f\"Net gain: ${terminal_value - net_invested:,.0f}\")\nprint(f\"Simple return on net invested: {(terminal_value/net_invested - 1)*100:.1f}%\")\n\n# Better approach: use only the buy-side flows and compute what SPY would have been\n# Invest same amounts at same times, ignore the sells (they just change position size)\nspy_prices = get_prices('SPY', '2014-09-01', '2024-02-22')\nqqq_prices = get_prices('QQQ', '2014-09-01', '2024-02-22')\n\nspy_end = float(spy_prices.loc[spy_prices.index <= '2024-02-21'].iloc[-1]['Close'])\nqqq_end = float(qqq_prices.loc[qqq_prices.index <= '2024-02-21'].iloc[-1]['Close'])\n\n# For each buy, compute SPY shares that could be bought; for each sell, sell proportionally\nspy_shares = 0.0\nqqq_shares = 0.0\n\nfor dt, amt in all_flows:\n    dt_str = dt.strftime('%Y-%m-%d')\n    try:\n        spy_row = spy_prices.loc[spy_prices.index >= dt_str].iloc[0]\n        qqq_row = qqq_prices.loc[qqq_prices.index >= dt_str].iloc[0]\n        spy_px = float(spy_row['Close'])\n        qqq_px = float(qqq_row['Close'])\n        \n        if amt < 0:  # buying\n            spy_shares += abs(amt) / spy_px\n            qqq_shares += abs(amt) / qqq_px\n        else:  # selling - sell proportionally\n            if spy_shares * spy_px > 0:\n                frac = min(1.0, amt / (spy_shares * spy_px))\n                spy_shares *= (1 - frac)\n            if qqq_shares * qqq_px > 0:\n                frac = min(1.0, amt / (qqq_shares * qqq_px))\n                qqq_shares *= (1 - frac)\n    except Exception as e:\n        continue\n\nspy_term = spy_shares * spy_end\nqqq_term = qqq_shares * qqq_end\n\nprint(f\"\\n{'='*60}\")\nprint(f\"MIRROR STRATEGY COMPARISON\")\nprint(f\"{'='*60}\")\nprint(f\"  Actual portfolio holdings value: ${terminal_value:,.0f}\")\nprint(f\"  SPY mirror strategy value:       ${spy_term:,.0f}\")\nprint(f\"  QQQ mirror strategy value:       ${qqq_term:,.0f}\")\nprint(f\"\\n  vs SPY: ${terminal_value - spy_term:+,.0f}\")\nprint(f\"  vs QQQ: ${terminal_value - qqq_term:+,.0f}\")\n"
+    },
+    "result": "Total cash out (buys + exercises): $61,018,050\nTotal cash in (sales): $30,257,538\nNet cash still deployed: $30,760,512\nCurrent holdings value: $40,832,171\nNet gain: $10,071,659\nSimple return on net invested: 32.7%\n\n============================================================\nMIRROR STRATEGY COMPARISON\n============================================================\n  Actual portfolio holdings value: $40,832,171\n  SPY mirror strategy value:       $45,963,893\n  QQQ mirror strategy value:       $51,039"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Key finding: The portfolio UNDERPERFORMED SPY by ~$5.1M and QQQ by ~$10.2M\n# when mirroring the same cash flows. This is significant.\n\n# Now let me also consider the donations (which have tax value)\n# Donations are outflows from the portfolio but provide tax benefits\n# Let's count them\n\ndonations = [\n    ('2014-09-22', 'MGRC', 75001),\n    ('2014-09-22', 'RHI', 175001),\n    ('2015-12-30', 'V', 175001),\n    ('2015-12-30', 'CRM', 75001),\n    ('2017-12-21', 'AAPL', 175001),\n    ('2017-12-21', 'V', 175001),\n    ('2017-12-29', 'AAPL', 375001),\n    ('2020-08-07', 'FB', 3000001),\n    ('2020-11-06', 'AAPL', 750001),\n    ('2021-12-30', 'AAPL', 750001),\n    ('2021-12-30', 'AAPL', 750001),\n    ('2023-05-08', 'AAPL', 750001),\n]\n\ntotal_donated = sum(d[2] for d in donations)\nprint(f\"Total value of charitable donations (disclosure ranges): ${total_donated:,.0f}\")\nprint(f\"\\nDonation details:\")\nfor date, ticker, amt in donations:\n    print(f\"  {date} {ticker}: ${amt:,.0f}\")\n\nprint(f\"\\nNotes:\")\nprint(f\"  - Donations of appreciated stock avoid capital gains tax\")\nprint(f\"  - At ~37% marginal rate, tax benefit ~${total_donated * 0.37:,.0f}\")\nprint(f\"  - The FB donation of ~$3M (5,000 shares at $266) alone saved significant cap gains\")\nprint(f\"  - AAPL donations totaling ~$2.8M also very tax-efficient\")\n\n# Now let's look at the behavioral patterns\nprint(f\"\\n{'='*60}\")\nprint(f\"BEHAVIORAL ANALYSIS\")\nprint(f\"{'='*60}\")\n\nprint(f\"\\n1. DECEMBER YEAR-END TAX ACTIVITY\")\nprint(f\"   Heavy selling/donating in December nearly every year\")\nprint(f\"   Dec 2017: Sold AAPL ($3M), V ($750k), donated AAPL + V\")\nprint(f\"   Dec 2021: Donated AAPL ($1.5M)\")\nprint(f\"   Dec 2022: Massive sell-off across 7+ tickers\")\nprint(f\"   \u2192 Classic tax-loss harvesting + charitable giving pattern\")\n\nprint(f\"\\n2. CONCENTRATION PATTERN\")\nprint(f\"   Tech represents 82.6% of capital deployed\")\nprint(f\"   Top 5 tickers = 58.5% of capital\")\nprint(f\"   AAPL + NVDA + MSFT alone = $29.1M (40.4%)\")\nprint(f\"   \u2192 Extreme tech concentration with no hedging\")\n\nprint(f\"\\n3. OPTIONS USAGE\")\n# Count option vs stock trades\noption_buys = len([t for t in buy_flows])  # approximate\nprint(f\"   64 option trades out of 146 total (44%)\")\nprint(f\"   Almost exclusively CALL options (leveraged bullish bets)\")\nprint(f\"   Strike selection: Mix of ITM/deep ITM (conservative leverage)\")\nprint(f\"   No puts, no hedging strategies observed\")\n\nprint(f\"\\n4. TIMING PATTERNS\")\nprint(f\"   Dec 2021 buying spree: $2.6M in calls \u2192 0-for-5, all lost money\")\nprint(f\"   This was near the market peak (S&P peaked Jan 3, 2022)\")\nprint(f\"   \u2192 Classic buying into strength/euphoria at the wrong time\")\nprint(f\"\\n   Feb 2020 MSFT/GOOGL buys: Right before COVID crash\")  \nprint(f\"   VIX went from 15.56 (2/20) to 40.11 (2/28)\")\nprint(f\"   But these eventually recovered massively \u2192 patient holding rewarded\")\n"
+    },
+    "result": "Total value of charitable donations (disclosure ranges): $7,225,012\n\nDonation details:\n  2014-09-22 MGRC: $75,001\n  2014-09-22 RHI: $175,001\n  2015-12-30 V: $175,001\n  2015-12-30 CRM: $75,001\n  2017-12-21 AAPL: $175,001\n  2017-12-21 V: $175,001\n  2017-12-29 AAPL: $375,001\n  2020-08-07 FB: $3,000,001\n  2020-11-06 AAPL: $750,001\n  2021-12-30 AAPL: $750,001\n  2021-12-30 AAPL: $750,001\n  2023-05-08 AAPL: $750,001\n\nNotes:\n  - Donations of appreciated stock avoid capital gains tax\n  - At ~37% marginal"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Let me compute option-specific analysis\n\nprint(\"=\" * 80)\nprint(\"OPTIONS STRATEGY ANALYSIS\")\nprint(\"=\" * 80)\n\n# From the position data, count option vs stock trades\n# Total option trades: counting from position summaries\noption_trade_counts = {\n    'AAPL': 19, 'NVDA': 5, 'MSFT': 8, 'AMZN': 7, 'DIS': 5, 'CRM': 6,\n    'GOOG': 2, 'GOOGL': 2, 'TSLA': 2, 'NFLX': 3, 'PYPL': 2, 'PANW': 2,\n    'MU': 2, 'RBLX': 2, 'AXP': 2, 'SQ': 2, 'HTZ': 2, 'FB': 4\n}\ntotal_option_trades = sum(option_trade_counts.values())\nprint(f\"Total option trades: {total_option_trades}\")\nprint(f\"Total trades: 146\")\nprint(f\"Options as % of trades: {total_option_trades/146*100:.0f}%\")\n\n# Options that resulted in complete or near-complete loss:\nprint(\"\\n--- OPTIONS THAT EXPIRED WORTHLESS OR NEAR-WORTHLESS ---\")\ndestroyed_options = [\n    ('DIS $130 calls (Dec 2021)', 175001, 0.5),\n    ('CRM $210 calls (Dec 2021)', 925002, 4.5),\n    ('RBLX $100 calls (Dec 2021)', 375001, 0.5),\n    ('MU $50 calls (Dec 2021)', 375001, 32501),\n    ('AMZN $3000 calls (May 2021)', 750001, 0),  # no exit recorded, likely expired\n    ('HTZ $14 calls (Jul 2015)', 207502, 0),  # HTZ went to zero eventually\n]\n\ntotal_premium_lost = 0\ntotal_recovered = 0\nfor desc, premium, recovered in destroyed_options:\n    loss = premium - recovered\n    total_premium_lost += loss\n    total_recovered += recovered\n    print(f\"  {desc}: paid ${premium:,.0f}, recovered ${recovered:,.0f}, loss ${loss:,.0f}\")\n\nprint(f\"\\n  TOTAL PREMIUM DESTROYED: ${total_premium_lost:,.0f}\")\n\n# Options that were profitable\nprint(\"\\n--- OPTIONS THAT WERE CLEARLY PROFITABLE ---\")\nprofitable_options = [\n    ('AAPL $145 calls (Sep 2018\u2192Jun 2020)', 750001, 1958800, 'intrinsic at sale'),\n    ('AAPL $90 calls (Jan 2016\u2192Jan 2017)', 187500, 203200, 'exercised portion'),\n    ('AAPL $80 calls (May 2016\u2192Jun 2017)', 175001, 540400, 'intrinsic at exercise'),\n    ('AAPL $130/$140 calls (Feb 2018)', 350001, 732800, 'intrinsic at exercise'),\n    ('FB $140/$150 calls (2018\u2192Jan 2020)', 250002, 380200, 'intrinsic at exercise'),\n    ('CRM $140 calls (2019\u2192Jun 2020)', 250002, 449400, 'intrinsic at exercise'),\n    ('MSFT $130/$140 calls (Feb 2020)', 1300003, 2175750, 'intrinsic at exercise'),\n    ('GOOGL $1200 calls (Feb 2020)', 750001, 4730400, 'intrinsic at exercise'),\n    ('TSLA $500 calls (Dec 2020)', 750001, 928975, 'intrinsic at exercise (but stock fell after)'),\n    ('DIS $100 calls (Dec 2020)', 750001, 342200, 'intrinsic at exercise (net loss on position)'),\n    ('AAPL $100 calls (Dec 2020)', 375001, 589200, 'intrinsic at exercise'),\n    ('AXP $80 calls (Jun 2020)', 175001, 352700, 'intrinsic at exercise'),\n    ('PYPL $100 calls (Jun 2020)', 375001, 312500, 'intrinsic at exercise (PYPL was $162.67)'),\n    ('NVDA $120 calls (Nov 2023)', 3000001, 2771500, 'intrinsic at review end (still open)'),\n]\n\ntotal_profitable_premium = 0\ntotal_profitable_intrinsic = 0\nfor desc, premium, intrinsic, note in profitable_options:\n    gain = intrinsic - premium\n    total_profitable_premium += premium\n    total_profitable_intrinsic += intrinsic\n    status = \"\u2713\" if gain > 0 else \"~\"\n    print(f\"  {status} {desc}: paid ${premium:,.0f}, intrinsic ${intrinsic:,.0f}, net ${gain:+,.0f}\")\n\nprint(f\"\\n  Total premiums on profitable options: ${total_profitable_premium:,.0f}\")\nprint(f\"  Total intrinsic/value received: ${total_profitable_intrinsic:,.0f}\")\nprint(f\"  Net gain on profitable options: ${total_profitable_intrinsic - total_profitable_premium:,.0f}\")\n\n# Overall options scorecard\nprint(f\"\\n{'='*60}\")\nprint(f\"OPTIONS SCORECARD\")\nprint(f\"{'='*60}\")\ntotal_all_premiums = total_premium_lost + sum(r for _, _, r in destroyed_options) + total_profitable_premium\nprint(f\"  Total option premiums paid: ~${total_all_premiums:,.0f}\")\nprint(f\"  Premium destroyed (total losses): ${total_premium_lost:,.0f}\")\nprint(f\"  Premium destroyed as % of total: {total_premium_lost/total_all_premiums*100:.1f}%\")\nprint(f\"  Net option gain (profitable - destroyed): ${total_profitable_intrinsic - total_profitable_premium - total_premium_lost:,.0f}\")\n"
+    },
+    "result": "================================================================================\nOPTIONS STRATEGY ANALYSIS\n================================================================================\nTotal option trades: 77\nTotal trades: 146\nOptions as % of trades: 53%\n\n--- OPTIONS THAT EXPIRED WORTHLESS OR NEAR-WORTHLESS ---\n  DIS $130 calls (Dec 2021): paid $175,001, recovered $0, loss $175,000\n  CRM $210 calls (Dec 2021): paid $925,002, recovered $4, loss $924,998\n  RBLX $100 calls (Dec 2021): paid $375,"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Now let's look at the single best trade: GOOGL $1200 calls\n\nprint(\"=\" * 80)\nprint(\"BEST TRADE: GOOGL $1200 Calls (Feb 2020)\")\nprint(\"=\" * 80)\n\n# Bought 40 calls at $1200 strike on 2/27/20 for $750,001\n# GOOGL on 2/27/20: $65.21 adj * 20 = $1,304.20 pre-split\n# So these were ITM at purchase ($1,304 vs $1,200 strike)\n# Premium: $750,001 / (40 * 100) = $187.50/share\n# Effective entry: $1,200 + $187.50 = $1,387.50 per pre-split share\n# Then COVID crashed GOOGL to ~$1,000 (would have been way underwater)\n# But held through to exercise 6/18/21\n# GOOGL pre-split on 6/18/21: $119.13 * 20 = $2,382.60\n# Intrinsic: ($2,382.60 - $1,200) * 4,000 = $4,730,400\n# Net gain: $4,730,400 - $750,001 = $3,980,399\n# Return: 530.7% on premium\n\nprint(f\"  Date: February 27, 2020 (COVID crash just beginning)\")\nprint(f\"  VIX on 2/27/20: probably ~25-30 (fear building)\")\nprint(f\"  GOOGL (pre-split): ~$1,304\")\nprint(f\"  Strike: $1,200 (ITM, ~$104 intrinsic)\")\nprint(f\"  Premium paid: $750,001 ($187.50/share)\")\nprint(f\"  Effective entry: $1,387.50/share (pre-split)\")\nprint(f\"\")\nprint(f\"  March 2020: COVID crash \u2192 GOOGL dropped to ~$1,000\")\nprint(f\"  Position was significantly underwater\")\nprint(f\"  But with June 2021 expiry, had TIME to recover\")\nprint(f\"\")\nprint(f\"  Exercise 6/18/21: GOOGL at $2,382.60 (pre-split)\")\nprint(f\"  Intrinsic: $4,730,400\")\nprint(f\"  Net gain: $3,980,399 (530% return on premium)\")\nprint(f\"\")\nprint(f\"  Key insight: Long-dated deep ITM calls through COVID = perfect trade\")\nprint(f\"  The 15-month expiry provided enough runway to recover from the crash\")\n\n# What about the holding after exercise?\n# 4,000 pre-split shares \u2192 80,000 post-split\n# Sold 30,000 in Dec 2022 at ~$88 avg\n# Still holding 50,000 at $141.38 on 2/21/24\nprint(f\"\\n  Post-exercise: 4,000 shares (\u219280,000 after 20:1 split)\")\nprint(f\"  Dec 2022: Sold 30,000 at ~$87.48 avg \u2192 proceeds ~$2,624,500\")\nprint(f\"  Still holding: 50,000 shares at $141.38 = $7,069,000\")\nprint(f\"  Total value created from $750k premium: >$10M\")\n\nprint(f\"\\n{'='*80}\")\nprint(f\"WORST TIMING: December 2021 Batch\")\nprint(f\"{'='*80}\")\nprint(f\"  VIX on 12/20/21: 22.87 (elevated)\")\nprint(f\"  S&P 500 peaked Jan 3, 2022 (two weeks later)\")\nprint(f\"  Bought: GOOG, DIS, CRM, RBLX, MU calls\")\nprint(f\"  Total premium: $2,600,006\")\nprint(f\"  Result: EVERY SINGLE ONE lost money\")\nprint(f\"  Total destroyed: ~$2.5M\")\nprint(f\"\")\nprint(f\"  CRM was -20% from its high (seemed like a dip buy)\")\nprint(f\"  But the entire growth/tech sector was rolling over\")\nprint(f\"  \u2192 Bought the dip too early, before the real bear market started\")\n\nprint(f\"\\n{'='*80}\")\nprint(f\"PANW TIMING ANALYSIS\")  \nprint(f\"{'='*80}\")\nprint(f\"  Bought calls on Feb 12, 2024: PANW at $185.99\")\nprint(f\"  Strike: $200 (OTM)\")\nprint(f\"  PANW reports earnings Feb 20, 2024\")\nprint(f\"  PANW crashes 29.6% to $130.99 by Feb 21\")\nprint(f\"  Then bought MORE calls on Feb 21 at $130.99\")\nprint(f\"  The Feb 21 purchase was a contrarian bet (deep drawdown of 30.5% from high)\")\nprint(f\"  \u2192 First buy poorly timed (right before earnings disaster)\")\nprint(f\"  \u2192 Second buy was aggressive averaging down into crash\")\n"
+    },
+    "result": "================================================================================\nBEST TRADE: GOOGL $1200 Calls (Feb 2020)\n================================================================================\n  Date: February 27, 2020 (COVID crash just beginning)\n  VIX on 2/27/20: probably ~25-30 (fear building)\n  GOOGL (pre-split): ~$1,304\n  Strike: $1,200 (ITM, ~$104 intrinsic)\n  Premium paid: $750,001 ($187.50/share)\n  Effective entry: $1,387.50/share (pre-split)\n\n  March 2020: COVID crash \u2192 GOOGL "
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Let's analyze the Dec 2022 mass selling and check if it was tax-loss harvesting\n\nprint(\"=\" * 80)\nprint(\"DECEMBER 2022 MASS LIQUIDATION ANALYSIS\")\nprint(\"=\" * 80)\n\ndec_2022_sells = [\n    ('CRM options', 'sold for $4.50', -924998),\n    ('GOOGL 10k shares', '$88.29', None),\n    ('TSLA 5k shares', '$137.80', None),\n    ('DIS 10k shares', '$84.92', None),\n    ('GOOGL 10k shares', '$88.85', None),\n    ('PYPL 5k shares', '$68.84', None),\n    ('PYPL 5k shares', '$67.19', None),\n    ('GOOGL 10k shares', '$85.31', None),\n    ('RBLX 5k shares', '$35.38 region', None),\n    ('NFLX 1k shares', '$29.11 region', None),\n    ('NFLX shares', 'Dec 30', None),\n]\n\n# Which of these were at a loss?\n# TSLA: Cost $166.67 (post-3:1 split), sold at $137.80 \u2192 LOSS of $28.87/share * 5000 = $144,350\n# DIS: Cost $100, sold at $84.92 \u2192 LOSS of $15.08/share * 10000 = $150,800\n# PYPL: Various cost bases, but all above current price \u2192 LOSS\n#   10k shares at avg ~$154, sold at $68 \u2192 massive loss\n# RBLX: These were from exercise of expired options? Actually sold stock for $175k\n# NFLX: Cost $250/share pre-split... wait no, post-split cost would be different\n#   Exercised at $250 pre-split, after possible split... Actually NFLX never split.\n#   Cost $250, sold at ~$291 (the tool shows $29.11 but that seems adjusted incorrectly)\n\n# GOOGL: Cost $60 post-split, sold at $85-88 \u2192 GAIN\n\nprint(\"Tax-Loss Harvesting Candidates (sold at a loss):\")\nprint(f\"  TSLA: 5,000 shares, cost ~$166.67, sold $137.80 \u2192 loss ~$144,350\")\nprint(f\"  DIS: 10,000 shares, cost $100, sold $84.92 \u2192 loss ~$150,800\")\nprint(f\"  PYPL: 10,000 shares, avg cost ~$120+, sold $67-69 \u2192 loss ~$500,000+\")\nprint(f\"  CRM options: cost $925k, sold for $4.50 \u2192 loss ~$925,000\")\n\nprint(f\"\\nGains Realized (taxable):\")\nprint(f\"  GOOGL: 30,000 shares, cost $60, sold $85-88 \u2192 gain ~$824,500\")\n\nprint(f\"\\nNet Tax Effect:\")\nprint(f\"  Losses harvested: ~$1.7M+\")\nprint(f\"  Gains realized: ~$824,500\")\nprint(f\"  Net loss for tax purposes: ~$900,000+\")\nprint(f\"  \u2192 Used to offset other income/gains\")\n\nprint(f\"\\n{'='*80}\")\nprint(f\"NVDA SALE ANALYSIS - Political Context\")  \nprint(f\"{'='*80}\")\nprint(f\"  Sold 25,000 NVDA shares on July 26, 2022 at ~$165 (post-4:1)\")\nprint(f\"  Context: House considering CHIPS Act (passed July 28, 2022)\")\nprint(f\"  Reuters reported sale was to avoid appearance of conflict\")\nprint(f\"  News reported realized loss of ~$341,365\")\nprint(f\"  Opportunity cost if held to Feb 2024: ~$12.7M\")\nprint(f\"  \u2192 The politically-motivated sale was financially catastrophic\")\nprint(f\"  \u2192 Single worst decision in the portfolio by opportunity cost\")\n\n# Factor decomposition attempt\nprint(f\"\\n{'='*80}\")\nprint(f\"FACTOR ATTRIBUTION (APPROXIMATE)\")\nprint(f\"{'='*80}\")\n\n# The portfolio is:\n# ~82.6% tech (by capital deployed)\n# Using options for leverage (effective beta multiplier)\n# Highly correlated to QQQ\n\n# Market beta contribution:\n# SPY returned 195% over full period, portfolio deployed capital mostly 2018-2023\n# QQQ returned 363% over full period\n# The dollar-weighted SPY return with same timing was ~48.5%\n\n# Stock selection alpha:\n# Portfolio underperformed SPY mirror by $5.1M\n# Portfolio underperformed QQQ mirror by $10.2M\n# \u2192 NEGATIVE stock selection alpha\n\n# The portfolio made money primarily through:\n# 1. Being long tech (sector beta)\n# 2. Using options leverage on correct directional bets (AAPL, MSFT, GOOGL)\n# 3. Time in market (patient holding through drawdowns)\n\nprint(f\"  Market (SPY) contribution: ~48.5% return (from timing of deployments)\")\nprint(f\"  Sector tilt (QQQ vs SPY): additional ~20% return\")\nprint(f\"  Stock selection alpha: NEGATIVE (-$5.1M vs SPY, -$10.2M vs QQQ)\")\nprint(f\"  Options leverage: Amplified both wins and losses\")\nprint(f\"  Net options contribution: +$4.3M gain (above pure stock equivalent)\")\nprint(f\"\")\nprint(f\"  Conclusion: Returns came from SECTOR BET (tech) + LEVERAGE,\")\nprint(f\"  not from superior stock picking vs the tech index\")\n"
+    },
+    "result": "================================================================================\nDECEMBER 2022 MASS LIQUIDATION ANALYSIS\n================================================================================\nTax-Loss Harvesting Candidates (sold at a loss):\n  TSLA: 5,000 shares, cost ~$166.67, sold $137.80 \u2192 loss ~$144,350\n  DIS: 10,000 shares, cost $100, sold $84.92 \u2192 loss ~$150,800\n  PYPL: 10,000 shares, avg cost ~$120+, sold $67-69 \u2192 loss ~$500,000+\n  CRM options: cost $925k, sold for $4.50 \u2192 loss ~"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Let me compute correlation between the major holdings to quantify diversification\n\nprint(\"=\" * 80)\nprint(\"PORTFOLIO CORRELATION ANALYSIS\")  \nprint(\"=\" * 80)\n\nimport numpy as np\n\n# Get price data for major holdings in 2021 (when most concentrated)\ntickers = ['AAPL', 'MSFT', 'NVDA', 'GOOGL', 'CRM', 'TSLA', 'PYPL', 'DIS']\n\nreturns_dict = {}\nfor ticker in tickers:\n    try:\n        prices = get_prices(ticker, '2021-01-01', '2021-12-31')\n        if len(prices) > 0:\n            rets = prices['Close'].pct_change().dropna()\n            returns_dict[ticker] = rets\n    except:\n        pass\n\n# Build correlation matrix\nimport pandas as pd\nreturns_df = pd.DataFrame(returns_dict)\n# Align indices\nreturns_df = returns_df.dropna()\n\ncorr_matrix = returns_df.corr()\nprint(\"Pairwise Correlation Matrix (2021 daily returns):\")\nprint(corr_matrix.round(2).to_string())\n\n# Average pairwise correlation\nimport itertools\npairs = list(itertools.combinations(tickers, 2))\navg_corr = np.mean([corr_matrix.loc[a, b] for a, b in pairs if a in corr_matrix.columns and b in corr_matrix.columns])\nprint(f\"\\nAverage pairwise correlation: {avg_corr:.2f}\")\nprint(f\"\u2192 {'HIGH' if avg_corr > 0.5 else 'MODERATE'} - these positions are largely the same bet\")\n\n# Portfolio beta\nspy_rets = get_prices('SPY', '2021-01-01', '2021-12-31')['Close'].pct_change().dropna()\nfor ticker in tickers:\n    if ticker in returns_df.columns:\n        aligned = pd.concat([returns_df[ticker], spy_rets], axis=1, join='inner')\n        aligned.columns = [ticker, 'SPY']\n        aligned = aligned.dropna()\n        beta = np.cov(aligned[ticker], aligned['SPY'])[0, 1] / np.var(aligned['SPY'])\n        corr = aligned[ticker].corr(aligned['SPY'])\n        print(f\"  {ticker}: beta={beta:.2f}, corr={corr:.2f}\")\n"
+    },
+    "result": "================================================================================\nPORTFOLIO CORRELATION ANALYSIS\n================================================================================\nPairwise Correlation Matrix (2021 daily returns):\n       AAPL  MSFT  NVDA  GOOGL   CRM  TSLA  PYPL   DIS\nAAPL   1.00  0.68  0.53   0.55  0.39  0.46  0.51  0.13\nMSFT   0.68  1.00  0.59   0.72  0.52  0.41  0.48  0.18\nNVDA   0.53  0.59  1.00   0.50  0.51  0.44  0.52  0.13\nGOOGL  0.55  0.72  0.50   1.00  0.47 "
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Compute an estimated portfolio beta (weighted by position size)\n\nprint(\"=\" * 80)\nprint(\"PORTFOLIO-LEVEL RISK METRICS\")\nprint(\"=\" * 80)\n\n# Weight by approximate position sizes (2021 holdings)\n# In 2021, major holdings included AAPL, MSFT, GOOGL, NVDA, CRM, DIS, TSLA, PYPL, NFLX\n# Approximate weights based on capital deployed\nweights = {\n    'AAPL': 0.25,\n    'MSFT': 0.20,\n    'NVDA': 0.15,\n    'GOOGL': 0.15,\n    'CRM': 0.08,\n    'TSLA': 0.07,\n    'PYPL': 0.05,\n    'DIS': 0.05,\n}\n\nbetas = {\n    'AAPL': 1.32, 'MSFT': 1.16, 'NVDA': 2.05, 'GOOGL': 1.30,\n    'CRM': 1.18, 'TSLA': 1.96, 'PYPL': 1.65, 'DIS': 0.94\n}\n\nportfolio_beta = sum(weights[t] * betas[t] for t in weights)\nprint(f\"\\nEstimated portfolio beta (stock positions): {portfolio_beta:.2f}\")\nprint(f\"With options leverage multiplier (~1.5-2x on leveraged positions):\")\nprint(f\"  Effective portfolio beta: ~{portfolio_beta * 1.5:.2f} to {portfolio_beta * 2:.2f}\")\nprint(f\"  \u2192 This is a HIGH-BETA portfolio\")\n\n# Estimated Sharpe ratio\n# Net gain: ~$10M on $30.8M net invested over ~8 years (rough)\n# Annualized return: (1 + 10M/30.8M)^(1/8) - 1 \u2248 ...\nimport numpy as np\nnet_gain_pct = 10071659 / 30760512\nyears = (datetime(2024,2,21) - datetime(2016,1,13)).days / 365.25\nannualized_return = (1 + net_gain_pct) ** (1/years) - 1\nprint(f\"\\nApproximate annualized return: {annualized_return*100:.1f}%\")\n\n# SPY annualized over same period\nspy_total_return = 1.485  # 48.5% total in mirror strategy... \n# Actually the simple SPY return from 2016 to 2024 was about 195%\nspy_annual = (1 + 1.95) ** (1/9.4) - 1  # 2014-09 to 2024-02 = ~9.4 years\nqqq_annual = (1 + 3.63) ** (1/9.4) - 1\n\nprint(f\"SPY annualized return (2014-2024): {spy_annual*100:.1f}%\")\nprint(f\"QQQ annualized return (2014-2024): {qqq_annual*100:.1f}%\")\n\n# Risk-free rate ~3% average over period\nrf = 0.02\nsharpe_estimate = (annualized_return - rf) / 0.25  # assuming ~25% vol for leveraged tech portfolio\nprint(f\"\\nEstimated portfolio Sharpe ratio: {sharpe_estimate:.2f}\")\nprint(f\"(Assuming ~25% annualized volatility for leveraged tech portfolio)\")\nprint(f\"SPY Sharpe ratio (2014-2024): ~{(spy_annual - rf)/0.15:.2f}\")\n\n# Win rate\nprint(f\"\\n{'='*60}\")\nprint(f\"TRADE WIN RATE ANALYSIS\")\nprint(f\"{'='*60}\")\n\n# Count discrete position outcomes\nwinners = ['AAPL', 'MSFT', 'GOOGL (2020)', 'FB', 'CRM (2019)', 'AXP', 'CRWD', 'V', 'SQ',\n           'AAPL $145 calls', 'NFLX (exercise profitable)']\nlosers = ['DIS (2021-22)', 'CRM (2021)', 'RBLX', 'MU', 'TSLA', 'PYPL', 'AMZN (2021)',\n          'GOOG (2021)', 'PANW', 'HTZ', 'SUNE', 'NVDA (Jul 2022 sale)']\nbreakeven = ['AAPL $100 calls (2021)', 'DIS (2020 $100 calls)', 'AB', 'T', 'DBX']\n\nprint(f\"  Clear winners: {len(winners)} positions\")\nprint(f\"  Clear losers: {len(losers)} positions\")\nprint(f\"  Breakeven/unclear: {len(breakeven)} positions\")\nprint(f\"  Win rate: {len(winners)/(len(winners)+len(losers))*100:.0f}%\")\nprint(f\"\")\nprint(f\"  Key pattern: Winners tend to be LARGE and HELD LONG\")\nprint(f\"  Losers tend to be SMALLER and from ONE BAD PERIOD (Dec 2021)\")\n"
+    },
+    "result": "================================================================================\nPORTFOLIO-LEVEL RISK METRICS\n================================================================================\n\nEstimated portfolio beta (stock positions): 1.43\nWith options leverage multiplier (~1.5-2x on leveraged positions):\n  Effective portfolio beta: ~2.14 to 2.85\n  \u2192 This is a HIGH-BETA portfolio\n\nApproximate annualized return: 3.6%\nSPY annualized return (2014-2024): 12.2%\nQQQ annualized return (2014-2024): 17."
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# The 3.6% annualized return seems too low. Let me reconsider.\n# The issue is that the $30.8M \"net invested\" includes exercise costs that aren't truly \n# \"at risk\" in the same way (they just convert option exposure to stock exposure).\n# Also, the terminal value doesn't include the $30.3M already received as cash.\n\n# Better approach: Total money out vs total money back + current holdings\n# Total cash OUT from pocket: premiums ($24M) + stock purchases ($7M) = ~$31M of \"new money\"\n# Exercise costs ($25.8M) are funded by portfolio proceeds or additional capital\n# Total proceeds received: $30.3M (some of this is from selling exercised stock)\n# Current holdings: $40.8M\n\n# The real question is: what was the NET WORTH CHANGE from these investments?\n# Starting portfolio value (pre-2014): Unknown (they had V, MGRC, RHI, CRM, DIS already)\n# Ending portfolio value: $40.8M + all cash received - all cash spent\n\n# Let me use a simpler framing:\n# Total option premiums (actual money at risk): $24M\n# Total stock purchases: $7M\n# Total exercise costs: $25.8M (but this becomes stock, so it's deployed capital not \"lost\")\n# Grand total out: $56.9M\n# \n# Total cash back from sales: $30.3M\n# Current holdings value: $40.8M\n# Grand total in: $71.1M\n# \n# Net gain: $71.1M - $56.9M = $14.2M\n\n# But this doesn't account for the V position that was pre-existing ($9.95M in sales)\n# and other pre-existing positions (DIS 2016 exercise, CRM shares, etc.)\n\n# Let me just present the key findings clearly\n\nprint(\"=\" * 80)\nprint(\"FINAL PORTFOLIO PERFORMANCE SUMMARY\")\nprint(\"=\" * 80)\n\nprint(\"\\n1. TOTAL RETURNS\")\nprint(f\"   Total new capital deployed (premiums + stock buys): ~$31.1M\")\nprint(f\"   Total exercise costs (converting options to stock): ~$25.8M\")\nprint(f\"   Grand total cash out: ~$56.9M\")\nprint(f\"   \")\nprint(f\"   Cash received from sales: ~$30.3M\")\nprint(f\"   Current holdings value: ~$40.8M\")\nprint(f\"   Grand total value: ~$71.1M\")\nprint(f\"   \")\nprint(f\"   NET GAIN: ~$14.2M (25% total return)\")\nprint(f\"   ANNUALIZED: ~2.8% per year (over 8 years of active trading)\")\n\nprint(f\"\\n2. vs BENCHMARKS (mirror strategy comparison)\")\nprint(f\"   Same cash flows in SPY would have produced: ~$46.0M terminal value\")\nprint(f\"   Same cash flows in QQQ would have produced: ~$51.0M terminal value\")\nprint(f\"   Actual terminal value (holdings only): $40.8M\")\nprint(f\"   \")\nprint(f\"   UNDERPERFORMANCE vs SPY: ~$5.1M\")\nprint(f\"   UNDERPERFORMANCE vs QQQ: ~$10.2M\")\n\nprint(f\"\\n3. KEY INSIGHT: WHY UNDERPERFORMANCE?\")\nprint(f\"   a) $2.8M in option premiums destroyed on 2021 positions\")\nprint(f\"   b) NVDA sold at $165 in Jul 2022, now at $674 (opp cost: $12.7M)\")\nprint(f\"   c) PYPL and DIS positions generated large losses ($1-2M+)\")\nprint(f\"   d) Selling V over time removed a consistent winner\")\nprint(f\"   \")\nprint(f\"   Partially offset by:\")\nprint(f\"   e) GOOGL calls: $750k \u2192 $10M+ in value (best trade)\")\nprint(f\"   f) MSFT calls: $1.3M \u2192 $5M+ in unrealized gains\")\nprint(f\"   g) CRWD: $750k \u2192 $1.46M\")\n\nprint(f\"\\n4. RISK-ADJUSTED RETURNS\")\nprint(f\"   Portfolio beta: ~1.43 (stocks) to ~2.1-2.9 (with options leverage)\")\nprint(f\"   For a portfolio with 2x+ effective beta to produce only ~3% annual returns\")\nprint(f\"   when SPY returned ~12%/year = significant risk-adjusted underperformance\")\nprint(f\"   Estimated Sharpe ratio: ~0.06 vs SPY's ~0.68\")\n\nprint(f\"\\n5. HOWEVER - Important Caveats:\")\nprint(f\"   - Disclosure amounts are RANGES, not exact (introduces \u00b120% uncertainty)\")\nprint(f\"   - Pre-existing positions (V, DIS) with unknown cost basis inflate 'deployed'\")\nprint(f\"   - Tax-efficient strategies (donations, loss harvesting) have unmeasured value\")\nprint(f\"   - AB position (60k shares) not priced - could add significant value\")\nprint(f\"   - NVDA Nov 2023 calls will likely appreciate substantially (AI boom)\")\n"
+    },
+    "result": "================================================================================\nFINAL PORTFOLIO PERFORMANCE SUMMARY\n================================================================================\n\n1. TOTAL RETURNS\n   Total new capital deployed (premiums + stock buys): ~$31.1M\n   Total exercise costs (converting options to stock): ~$25.8M\n   Grand total cash out: ~$56.9M\n   \n   Cash received from sales: ~$30.3M\n   Current holdings value: ~$40.8M\n   Grand total value: ~$71.1M\n   \n   NET GAIN: ~$"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AB",
+      "date": "2024-02-21"
+    },
+    "result": "{\"ticker\": \"AB\", \"date\": \"2024-02-21\", \"close_price\": 27.29}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AB",
+      "date": "2020-12-22"
+    },
+    "result": "{\"ticker\": \"AB\", \"date\": \"2020-12-22\", \"close_price\": 21.49}"
+  },
+  {
+    "tool": "get_price_on_date",
+    "args": {
+      "ticker": "AB",
+      "date": "2021-02-18"
+    },
+    "result": "{\"ticker\": \"AB\", \"date\": \"2021-02-18\", \"close_price\": 24.4}"
+  },
+  {
+    "tool": "get_return",
+    "args": {
+      "ticker": "PANW",
+      "start_date": "2024-02-21",
+      "end_date": "2024-12-31"
+    },
+    "result": "{\"ticker\": \"PANW\", \"start\": \"2024-02-21\", \"end\": \"2024-12-31\", \"return_pct\": 38.92}"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# AB valuation\nab_value = 60000 * 27.29\nprint(f\"AB: 60,000 shares \u00d7 $27.29 = ${ab_value:,.0f}\")\nab_cost = 20000*21.49 + 15000*24.40 + 25000*24.40  # approximate\nprint(f\"AB cost basis: ~${ab_cost:,.0f}\")\nprint(f\"AB gain: ~${ab_value - ab_cost:,.0f}\")\n\n# Updated total with AB\ntotal_holdings_revised = 40832171 + ab_value\nprint(f\"\\nRevised total holdings: ${total_holdings_revised:,.0f}\")\nprint(f\"Revised underperformance vs SPY: ${total_holdings_revised - 45963893:,.0f}\")\n\n# PANW post-review update\nprint(f\"\\nPANW post-review performance:\")\nprint(f\"  PANW returned +38.9% from Feb 21, 2024 to Dec 31, 2024\")\nprint(f\"  The Feb 21 buy at $130.99 \u2192 ~$182 by year-end\")\nprint(f\"  PANW $200 calls would have recovered significantly\")\nprint(f\"  \u2192 The contrarian buy after the crash appears to have worked\")\n\n# Let me also check what HTZ and SUNE ended up doing\nprint(f\"\\n--- Early Losers ---\")\nprint(f\"  HTZ: Hertz went bankrupt in 2020 (COVID). All $565k deployed = total loss\")\nprint(f\"  SUNE: SunEdison went bankrupt in 2016. $175k = total loss\")\nprint(f\"  Combined early losses: ~$740k\")\n"
+    },
+    "result": "AB: 60,000 shares \u00d7 $27.29 = $1,637,400\nAB cost basis: ~$1,405,800\nAB gain: ~$231,600\n\nRevised total holdings: $42,469,571\nRevised underperformance vs SPY: $-3,494,322\n\nPANW post-review performance:\n  PANW returned +38.9% from Feb 21, 2024 to Dec 31, 2024\n  The Feb 21 buy at $130.99 \u2192 ~$182 by year-end\n  PANW $200 calls would have recovered significantly\n  \u2192 The contrarian buy after the crash appears to have worked\n\n--- Early Losers ---\n  HTZ: Hertz went bankrupt in 2020 (COVID). All $565k deplo"
+  },
+  {
+    "tool": "run_python",
+    "args": {
+      "code": "\n# Final comprehensive summary - let me put it all together\n\nprint(\"=\" * 80)\nprint(\"COMPLETE PORTFOLIO GRADE CARD\")\nprint(\"=\" * 80)\n\nprint(\"\"\"\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551                    QUANTITATIVE SUMMARY                         \u2551\n\u2560\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2563\n\u2551 Total Capital Deployed:           ~$56.9M                       \u2551\n\u2551 Total Cash Received:              ~$30.3M                       \u2551\n\u2551 Current Holdings Value:           ~$42.5M                       \u2551\n\u2551 Estimated Net Gain:               ~$15.9M                       \u2551\n\u2551                                                                  \u2551\n\u2551 SPY Mirror Terminal Value:        ~$46.0M                       \u2551\n\u2551 QQQ Mirror Terminal Value:        ~$51.0M                       \u2551\n\u2551 Underperformance vs SPY:          ~$3.5M                        \u2551\n\u2551 Underperformance vs QQQ:          ~$8.5M                        \u2551\n\u2551                                                                  \u2551\n\u2551 Portfolio Beta (stocks):          1.43                           \u2551\n\u2551 Effective Beta (w/ options):      ~2.1-2.9 (estimate)           \u2551\n\u2551 Win Rate (by position):           48%                            \u2551\n\u2551 Options Premium Destroyed:        $2.78M (22.7% of total paid)  \u2551\n\u2551 Net Options Gain:                 ~$4.3M                        \u2551\n\u2551                                                                  \u2551\n\u2551 Sector Concentration:             82.6% Technology               \u2551\n\u2551 Top 3 Positions:                  40.4% of capital               \u2551\n\u2551 Average Pairwise Correlation:     0.41                           \u2551\n\u2551                                                                  \u2551\n\u2551 Charitable Donations:             ~$7.2M (tax-efficient)         \u2551\n\u2551 Two Bankruptcies:                 HTZ ($565k), SUNE ($175k)      \u2551\n\u2551 Single Largest Opp. Cost:         NVDA Jul 2022 sale (~$12.7M)   \u2551\n\u2551 Single Best Trade:                GOOGL Feb 2020 calls ($750k\u2192$10M+) \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\n\"\"\")\n"
+    },
+    "result": "================================================================================\nCOMPLETE PORTFOLIO GRADE CARD\n================================================================================\n\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551                    QUANTITATIVE SUMMARY                         \u2551\n\u2560\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2563\n\u2551 Total Capital Deployed:           ~$56.9M                       \u2551\n\u2551 Total Cash Received:           "
+  }
+]

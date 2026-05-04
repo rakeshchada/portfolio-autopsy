@@ -233,10 +233,18 @@ def main():
               f"{s['claim_tags']:>4} | {s['claim_accuracy']:>7} | "
               f"{s['grounding_rate']:>7} | {s['tool_calls']:>5} | {status:>8}")
 
-    delta = score_history[-1]["trust_score"] - score_history[0]["trust_score"]
+    baseline = score_history[0]["trust_score"]
+    accepted_runs = [s for s in score_history if s.get("accepted", True)]
+    last_accepted = accepted_runs[-1]
+    delta = last_accepted["trust_score"] - baseline
     direction = "improved" if delta > 0 else "declined" if delta < 0 else "unchanged"
-    print(f"\n  Trust score {direction}: {score_history[0]['trust_score']} → {score_history[-1]['trust_score']} "
+    accepted_count = len(accepted_runs)
+    rejected_count = len(score_history) - accepted_count
+    print(f"\n  Last accepted: iteration {last_accepted['iteration']} — "
+          f"{last_accepted['trust_score']}/100 ({last_accepted['grade']})")
+    print(f"  Baseline → Last accepted: {baseline} → {last_accepted['trust_score']} "
           f"({delta:+d} points)")
+    print(f"  Accepted: {accepted_count} | Rejected: {rejected_count}")
 
     # Save summary
     summary_data = {
@@ -244,7 +252,12 @@ def main():
         "iterations": args.iterations,
         "model": args.model,
         "score_history": score_history,
+        "last_accepted_iteration": last_accepted["iteration"],
+        "last_accepted_score": last_accepted["trust_score"],
+        "baseline_score": baseline,
         "delta": delta,
+        "accepted": accepted_count,
+        "rejected": rejected_count,
         "timestamp": datetime.now().isoformat(),
     }
     (out / "summary.json").write_text(json.dumps(summary_data, indent=2))
@@ -260,7 +273,11 @@ def main():
             f"| {s['iteration']} | {s['trust_score']}/100 | {s['grade']} | "
             f"{s['claim_tags']} | {s['claim_accuracy']} | {s['grounding_rate']} | {s['tool_calls']} | {status} |"
         )
-    progression.append(f"\n**Delta: {score_history[0]['trust_score']} → {score_history[-1]['trust_score']} ({delta:+d} points)**\n")
+    progression.append(f"\n**Last accepted: iteration {last_accepted['iteration']} — "
+                       f"{last_accepted['trust_score']}/100 ({last_accepted['grade']})**")
+    progression.append(f"\n**Baseline → Last accepted: {baseline} → {last_accepted['trust_score']} "
+                       f"({delta:+d} points)**")
+    progression.append(f"\n**Accepted: {accepted_count} | Rejected: {rejected_count}**\n")
 
     for i, s in enumerate(score_history):
         progression.append(f"\n## Iteration {s['iteration']} — Score Components")
