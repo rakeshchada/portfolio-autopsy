@@ -3,6 +3,7 @@
 import re
 import json
 from src.agent.tools import TOOL_DEFINITIONS, execute_tool
+from src.agent.strategist import execute_tool_gated
 from src.eval.grounding import ToolCallRecord
 
 SYSTEM_PROMPT = """You are a senior portfolio advisor conducting a comprehensive review of a client's
@@ -119,12 +120,33 @@ build trust in the analysis and allow automated verification. Not every number n
 have one."""
 
 
-def analyze_portfolio(portfolio_summary: dict, client, model: str, guidelines: str | None = None) -> dict:
+TIME_GATE_ADVISOR_NOTICE = """
+## IMPORTANT: Time constraint
+
+Today's date is {as_of_date}. You can ONLY access market data up to this date.
+You do NOT know what happens after {as_of_date}. All analysis, recommendations,
+and tool calls must use dates on or before {as_of_date}.
+
+This means:
+- You CAN compute returns, Sharpe ratios, factor decomposition, etc. on historical data up to {as_of_date}
+- You CAN analyze behavioral patterns, round-trip P&L on closed positions, concentration risk
+- You CANNOT look up future prices to evaluate open positions
+- Your "What They Should Have Done" recommendations must be based on what was knowable at each decision point
+
+For open positions as of {as_of_date}, state the invested amount and last known price — do not
+evaluate their outcome.
+"""
+
+
+def analyze_portfolio(portfolio_summary: dict, client, model: str, guidelines: str | None = None, as_of_date: str | None = None) -> dict:
     """Run portfolio analysis. Returns dict with 'report', 'call_log', and 'metadata'.
 
     If guidelines are provided (from reflection), they are appended to the system prompt.
+    If as_of_date is provided, tools are time-gated to prevent future data access.
     """
     system_prompt = SYSTEM_PROMPT
+    if as_of_date:
+        system_prompt += TIME_GATE_ADVISOR_NOTICE.format(as_of_date=as_of_date)
     if guidelines:
         system_prompt += f"\n\n## Learned guidelines from previous iterations\n\nThese are specific " \
                          f"improvements identified by reviewing your previous reports. Follow them carefully.\n\n{guidelines}"
@@ -177,7 +199,10 @@ I want to understand: was this trader skilled, lucky, or just riding beta?"""
             if block.type == "text":
                 full_text += block.text
             if block.type == "tool_use":
-                result = execute_tool(block.name, block.input)
+                if as_of_date:
+                    result = execute_tool_gated(block.name, block.input, as_of_date)
+                else:
+                    result = execute_tool(block.name, block.input)
                 call_log.append(ToolCallRecord(
                     tool_name=block.name,
                     args=block.input,
