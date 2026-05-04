@@ -1,0 +1,68 @@
+{
+  "trader": "Ms. Nancy Pelosi",
+  "iterations": 3,
+  "model": "opus",
+  "score_history": [
+    {
+      "iteration": 1,
+      "trust_score": 92,
+      "grade": "A",
+      "components": {
+        "Tool Data Accuracy": 100,
+        "Claim Tag Accuracy": 100,
+        "Claim Grounding Rate": 67,
+        "Python Execution Clean": 90,
+        "Data Coverage": 100
+      },
+      "tool_calls": 133,
+      "report_length": 10410,
+      "claim_tags": 26,
+      "claim_accuracy": "100%",
+      "grounding_rate": "33%",
+      "accepted": true
+    },
+    {
+      "iteration": 2,
+      "trust_score": 90,
+      "grade": "B",
+      "components": {
+        "Tool Data Accuracy": 100,
+        "Claim Tag Accuracy": 100,
+        "Claim Grounding Rate": 49,
+        "Python Execution Clean": 100,
+        "Data Coverage": 100
+      },
+      "tool_calls": 134,
+      "report_length": 20636,
+      "claim_tags": 54,
+      "claim_accuracy": "100%",
+      "grounding_rate": "24%",
+      "accepted": false
+    },
+    {
+      "iteration": 3,
+      "trust_score": 85,
+      "grade": "B",
+      "components": {
+        "Tool Data Accuracy": 100,
+        "Claim Tag Accuracy": 100,
+        "Claim Grounding Rate": 29,
+        "Python Execution Clean": 96,
+        "Data Coverage": 100
+      },
+      "tool_calls": 121,
+      "report_length": 20727,
+      "claim_tags": 96,
+      "claim_accuracy": "100%",
+      "grounding_rate": "14%",
+      "accepted": false
+    }
+  ],
+  "last_accepted_iteration": 1,
+  "last_accepted_score": 92,
+  "baseline_score": 92,
+  "delta": 0,
+  "accepted": 1,
+  "rejected": 2,
+  "timestamp": "2026-05-04T00:37:05.702494"
+}
