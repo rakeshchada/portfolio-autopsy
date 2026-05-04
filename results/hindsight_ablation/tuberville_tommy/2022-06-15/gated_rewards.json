@@ -1,0 +1,203 @@
+{
+  "as_of_date": "2022-06-15",
+  "horizon_days": 90,
+  "time_gated": true,
+  "num_recommendations": 13,
+  "trajectory_reward": 0.3246,
+  "per_recommendation": [
+    {
+      "ticker": "CLF",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "return_pct": -7.04,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -11.15,
+      "reward": 1.0907,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.5575,
+        "calibration": 0.4691,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.1
+      }
+    },
+    {
+      "ticker": "SCCO",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "return_pct": -15.04,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -19.16,
+      "reward": 1.4641,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.9578,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.1
+      }
+    },
+    {
+      "ticker": "NU",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "return_pct": 50.85,
+      "spy_return_pct": 4.11,
+      "alpha_pct": 46.74,
+      "reward": -0.825,
+      "components": {
+        "direction": -1.0,
+        "alpha": -1.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.1
+      }
+    },
+    {
+      "ticker": "HUMA",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "return_pct": 10.58,
+      "spy_return_pct": 4.11,
+      "alpha_pct": 6.47,
+      "reward": -0.5873,
+      "components": {
+        "direction": -1.0,
+        "alpha": -0.3234,
+        "calibration": 0.7055,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.1
+      }
+    },
+    {
+      "ticker": "INTC",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "return_pct": -23.45,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -27.57,
+      "reward": 0.99,
+      "components": {
+        "direction": 1.0,
+        "alpha": 1.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.1
+      }
+    },
+    {
+      "ticker": "SSBK",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reward": 0.0,
+      "components": {
+        "error": "no_data"
+      }
+    },
+    {
+      "ticker": "X",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "reward": 0.0,
+      "components": {
+        "error": "no_data"
+      }
+    },
+    {
+      "ticker": "PYPL",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "return_pct": 25.29,
+      "spy_return_pct": 4.11,
+      "alpha_pct": 21.18,
+      "reward": 0.22,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.1
+      }
+    },
+    {
+      "ticker": "BABA",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "return_pct": -17.18,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -21.29,
+      "reward": 0.11,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 0.5,
+        "time_gated_bonus": 1.1
+      }
+    },
+    {
+      "ticker": "GOLD",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "return_pct": -6.97,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -11.08,
+      "reward": 0.2191,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 0.9957,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.1
+      }
+    },
+    {
+      "ticker": "SSYS",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "return_pct": -11.26,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -15.38,
+      "reward": 0.11,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 0.5,
+        "time_gated_bonus": 1.1
+      }
+    },
+    {
+      "ticker": "NVDA",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "return_pct": -20.52,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -24.64,
+      "reward": 0.22,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.1
+      }
+    },
+    {
+      "ticker": "XLP",
+      "action": "BUY",
+      "conviction": "MEDIUM",
+      "return_pct": 3.91,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -0.21,
+      "reward": 0.5593,
+      "components": {
+        "direction": 1.0,
+        "alpha": -0.0104,
+        "calibration": 0.558,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.1
+      }
+    }
+  ]
+}

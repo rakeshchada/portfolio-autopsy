@@ -1,0 +1,411 @@
+{
+  "as_of_date": "2021-06-15",
+  "total_recommendations": 14,
+  "results": [
+    {
+      "ticker": "GOOGL",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "urgency": "\u26a0\ufe0f CRITICAL \u2014 SAME-DAY ACTION REQUIRED",
+      "reasoning": "40 call options with a $1,200 strike expire on June 18, 2021 \u2014 just 3 DAYS from today. GOOGL is currently trading at ~$2,408 (pre-20:1 split adjusted), making these calls deep ITM with ~$4.83M in intrinsic value on a $750K original investment (6.4x return). These options MUST be exercised or sold to close TODAY or tomorrow at the absolute latest. Allowing them to expire worthless would be a catastrophic error. Recommended action: sell-to-close the options to capture full value including remaining time premium, or exercise to convert to 4,000 shares of GOOGL stock.",
+      "entry_price": 120.42,
+      "outcomes": {
+        "30d": {
+          "return_pct": 4.6,
+          "spy_return_pct": 2.75,
+          "alpha_pct": 1.85,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": 13.43,
+          "spy_return_pct": 5.39,
+          "alpha_pct": 8.04,
+          "correct": false
+        },
+        "90d": {
+          "return_pct": 17.22,
+          "spy_return_pct": 5.55,
+          "alpha_pct": 11.67,
+          "correct": false
+        }
+      }
+    },
+    {
+      "ticker": "NVDA",
+      "action": "HOLD",
+      "conviction": "HIGH",
+      "reasoning": "Bought 50 call options at $400 strike on June 3, already up +4.85% in just 12 days and outperforming XLK by 2x (+12.33% vs +5.37% over 20 days). At ~$710 actual price vs. $400 strike, these June 2022 calls carry ~$1.55M in intrinsic value and a full year of time runway. The Senate CHIPS Act passage on June 8th is a direct legislative catalyst for semiconductors. NVDA's beta of 2.35 means it will amplify any tech rally. Deep ITM, strong momentum, policy tailwind \u2014 hold the full position and let it run.",
+      "entry_price": 17.75,
+      "outcomes": {
+        "30d": {
+          "return_pct": 6.62,
+          "spy_return_pct": 2.75,
+          "alpha_pct": 3.87,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 13.49,
+          "spy_return_pct": 5.39,
+          "alpha_pct": 8.09,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 24.55,
+          "spy_return_pct": 5.55,
+          "alpha_pct": 19.0,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "MSFT",
+      "action": "HOLD",
+      "conviction": "HIGH",
+      "reasoning": "25,000 shares exercised at blended ~$135 cost basis, now at $248.48 \u2014 an unrealized gain of ~84% representing the largest equity position in the portfolio. Only -1.15% from 52-week highs. Up +12.42% since the March exercise and +16.69% YTD vs. SPY +13.9%. Azure cloud growth remains the dominant enterprise software story, and MSFT's moderate beta (1.1) provides ballast to offset higher-beta positions. No reason to trim \u2014 this is the anchor holding.",
+      "entry_price": 248.48,
+      "outcomes": {
+        "30d": {
+          "return_pct": 8.77,
+          "spy_return_pct": 2.75,
+          "alpha_pct": 6.02,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 13.35,
+          "spy_return_pct": 5.39,
+          "alpha_pct": 7.96,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 15.17,
+          "spy_return_pct": 5.55,
+          "alpha_pct": 9.62,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "AMZN",
+      "action": "HOLD",
+      "conviction": "HIGH",
+      "reasoning": "20 call options at $3,000 strike (exp. June 2022), purchased May 21 at a cost of $750K. Currently trading at ~$3,383 (pre-20:1 split adjusted), putting the call $383 ITM with ~12 months to expiry. Up +5.62% since purchase. At only -2.54% from its 52-week high, AMZN is near all-time highs. AWS cloud re-acceleration and Jassy's CEO transition are positive catalysts. The long time-to-expiry and ITM positioning make this a strong risk-reward hold.",
+      "entry_price": 169.16,
+      "outcomes": {
+        "30d": {
+          "return_pct": 7.33,
+          "spy_return_pct": 2.75,
+          "alpha_pct": 4.58,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": -2.64,
+          "spy_return_pct": 5.39,
+          "alpha_pct": -8.03,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 2.19,
+          "spy_return_pct": 5.55,
+          "alpha_pct": -3.36,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "AAPL",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "150 total call options at $100 strike (100 expiring Jan 2022, 50 expiring Jun 2022), currently at $126.48 \u2014 ITM by $26.48 with ~$397K intrinsic. However, AAPL is -2% YTD versus SPY +14%, and -9.15% from its 52-week January high. The Jan 2022 expiry tranche (100 contracts) has only 7 months left, so time decay is accelerating. HOLD for now \u2014 WWDC June 7 is a near-term catalyst \u2014 but monitor closely for a rollout or exercise decision on the Jan 2022 tranche within the next 60 days.",
+      "entry_price": 126.48,
+      "outcomes": {
+        "30d": {
+          "return_pct": 14.53,
+          "spy_return_pct": 2.75,
+          "alpha_pct": 11.78,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 15.18,
+          "spy_return_pct": 5.39,
+          "alpha_pct": 9.79,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 15.53,
+          "spy_return_pct": 5.55,
+          "alpha_pct": 9.98,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "NFLX",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reasoning": "5,000 shares exercised at $250 in June 2020, currently at ~$491 (pre-split) \u2014 a ~+96% gain. However, NFLX is -16.1% from its 52-week high, down -9% YTD, and multiple analyst firms (MoffettNathanson, JPMorgan) are flagging a structural subscriber growth slowdown as pandemic-era pull-forward fades. Competition from Disney+, HBO Max, Peacock, and Amazon Prime is intensifying. The stock is sitting near the bottom of its 60-day window. Take at least 50% profits \u2014 the growth story is maturing and capital can be redeployed more productively.",
+      "entry_price": 49.19,
+      "outcomes": {
+        "30d": {
+          "return_pct": 10.38,
+          "spy_return_pct": 2.75,
+          "alpha_pct": 7.62,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": 4.88,
+          "spy_return_pct": 5.39,
+          "alpha_pct": -0.51,
+          "correct": false
+        },
+        "90d": {
+          "return_pct": 19.8,
+          "spy_return_pct": 5.55,
+          "alpha_pct": 14.25,
+          "correct": false
+        }
+      }
+    },
+    {
+      "ticker": "CRM",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "10,000 shares exercised at $140, now at $239.07 \u2014 a +70.8% unrealized gain. The Slack acquisition is pending close (completed July 2021), which should act as a re-rating catalyst by expanding CRM's TAM into enterprise collaboration and directly competing with MSFT Teams. At -9.2% from 52-week high, there is moderate pullback risk, but forward PE is reasonable at 12.3x. Hold and reassess post-Slack close for signs of synergy or integration disappointment.",
+      "entry_price": 239.07,
+      "outcomes": {
+        "30d": {
+          "return_pct": -2.06,
+          "spy_return_pct": 2.75,
+          "alpha_pct": -4.82,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 3.7,
+          "spy_return_pct": 5.39,
+          "alpha_pct": -1.69,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 4.75,
+          "spy_return_pct": 5.55,
+          "alpha_pct": -0.8,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "DIS",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "10,000 shares + 100 call options at $100 strike (exp. Jan 2022). DIS is -12.9% from its March 2021 high, currently at $171.81. The stock is lagging peers (only +2.97% vs SPY +5.39% over the next 60d forward look), but there are clear re-opening catalysts ahead as theme parks scale back to full capacity in H2 2021. Disney+ subscriber growth and the $100 strike calls still have 7 months to expiry. Hold, but flag the Jan 2022 call tranche for potential roll-out before significant time decay sets in.",
+      "entry_price": 171.81,
+      "outcomes": {
+        "30d": {
+          "return_pct": 4.71,
+          "spy_return_pct": 2.75,
+          "alpha_pct": 1.96,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 2.97,
+          "spy_return_pct": 5.39,
+          "alpha_pct": -2.43,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 5.19,
+          "spy_return_pct": 5.55,
+          "alpha_pct": -0.36,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "TSLA",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "reasoning": "25 call options at $500 strike (exp. March 2022), currently at ~$599 actual price \u2014 ITM by only ~$99, with $248K intrinsic value vs. $750K invested. Down -32% from its January high, TSLA faces China regulatory scrutiny, global chip shortages, and macro rotation risk away from high-multiple names (P/E 358x). That said, recent 20-day momentum is showing recovery (+13.27% vs SPY +2.51%), and May China deliveries tripled YoY. Hold for now but set a mental stop: if TSLA retreats below $500 (making the calls OTM), exit the position immediately.",
+      "entry_price": 199.79,
+      "outcomes": {
+        "30d": {
+          "return_pct": 8.55,
+          "spy_return_pct": 2.75,
+          "alpha_pct": 5.79,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 19.66,
+          "spy_return_pct": 5.39,
+          "alpha_pct": 14.26,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 23.97,
+          "spy_return_pct": 5.55,
+          "alpha_pct": 18.42,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "AB",
+      "action": "HOLD",
+      "conviction": "HIGH",
+      "reasoning": "60,000 shares of AllianceBernstein \u2014 up +41.95% since December 2020 purchase. AB's 8.63% dividend yield, low 0.70 beta, and low SPY correlation (0.36) make it the best pure diversifier in the portfolio. In a market environment where all other positions are high-beta tech, AB serves as an income anchor and volatility dampener. The rising rate/reflation environment is net positive for asset managers. Hold the full position.",
+      "entry_price": 30.51,
+      "outcomes": {
+        "30d": {
+          "return_pct": 0.31,
+          "spy_return_pct": 2.75,
+          "alpha_pct": -2.45,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 13.75,
+          "spy_return_pct": 5.39,
+          "alpha_pct": 8.35,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 16.58,
+          "spy_return_pct": 5.55,
+          "alpha_pct": 11.03,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "PYPL",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "10,000 shares + 50 deep-ITM call options at $100 strike (exp. Jan 2022), currently at $270.44 \u2014 a +75% return since June 2020. Down -10.8% from its February 2021 high. PayPal's expansion into crypto, BNPL, and merchant services are strong secular growth drivers, and the Jan 2022 calls have 7 months remaining. Monitor the call tranche for an exercise-or-roll decision in the next 30-60 days.",
+      "entry_price": 270.44,
+      "outcomes": {
+        "30d": {
+          "return_pct": 9.06,
+          "spy_return_pct": 2.75,
+          "alpha_pct": 6.3,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 1.11,
+          "spy_return_pct": 5.39,
+          "alpha_pct": -4.28,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 3.16,
+          "spy_return_pct": 5.55,
+          "alpha_pct": -2.39,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "CRWD",
+      "action": "BUY",
+      "conviction": "MEDIUM",
+      "reasoning": "5,000 shares from September 2020 at ~$150, now at $228.34 \u2014 a +52% gain with only -5.8% from its 52-week high. CRWD is one of the best-positioned names in cybersecurity following the SolarWinds/Colonial Pipeline incidents that have made enterprise security a legislative and corporate priority in 2021. The USICA/CHIPS Act and broader bipartisan infrastructure discussions are increasing federal IT spending, a direct CRWD tailwind. Consider adding a deep-ITM LEAP call to increase convexity on this secular winner.",
+      "entry_price": 228.34,
+      "outcomes": {
+        "30d": {
+          "return_pct": 9.18,
+          "spy_return_pct": 2.75,
+          "alpha_pct": 6.42,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": 6.78,
+          "spy_return_pct": 5.39,
+          "alpha_pct": 1.38,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": 11.25,
+          "spy_return_pct": 5.55,
+          "alpha_pct": 5.7,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "T",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "10,000 shares purchased October 2018 at ~$33.75, now at $16.18 \u2014 a -52% loss on capital deployed. AT&T announced the WarnerMedia/Discovery merger on May 17, 2021, with an explicit dividend cut: T's current $2.08/share annual dividend is set to be reduced to ~$1.11 post-spinoff. The core telecom thesis has structurally deteriorated \u2014 T has massively underperformed vs. any alternative (SPY, tech peers, even bonds). The dividend-cut announcement removes the last remaining bull case. Exit immediately and redeploy capital.",
+      "entry_price": 16.18,
+      "outcomes": {
+        "30d": {
+          "return_pct": -0.54,
+          "spy_return_pct": 2.75,
+          "alpha_pct": -3.29,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": -1.38,
+          "spy_return_pct": 5.39,
+          "alpha_pct": -6.77,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": -3.72,
+          "spy_return_pct": 5.55,
+          "alpha_pct": -9.27,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "DBX",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "10,000 shares from the March 2018 IPO at ~$30, now at $29.23 \u2014 a -2.24% return over 3+ years, dramatically underperforming the market (+70%+ for SPY over the same period). Dropbox faces existential pressure from Microsoft OneDrive, Google Drive, and Box in cloud storage. The opportunity cost of holding this capital vs. any other name in the portfolio is enormous. This is dead money \u2014 exit and redeploy into higher-conviction ideas like NVDA or CRWD.",
+      "entry_price": 29.23,
+      "outcomes": {
+        "30d": {
+          "return_pct": 2.5,
+          "spy_return_pct": 2.75,
+          "alpha_pct": -0.26,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": 9.92,
+          "spy_return_pct": 5.39,
+          "alpha_pct": 4.53,
+          "correct": false
+        },
+        "90d": {
+          "return_pct": 6.88,
+          "spy_return_pct": 5.55,
+          "alpha_pct": 1.33,
+          "correct": false
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "30d": {
+      "total_evaluated": 5,
+      "correct": 2,
+      "accuracy": 40.0,
+      "avg_alpha": 3.24,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 25.0
+    },
+    "60d": {
+      "total_evaluated": 5,
+      "correct": 2,
+      "accuracy": 40.0,
+      "avg_alpha": 2.76,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 25.0
+    },
+    "90d": {
+      "total_evaluated": 5,
+      "correct": 2,
+      "accuracy": 40.0,
+      "avg_alpha": 6.06,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 25.0
+    }
+  }
+}

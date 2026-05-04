@@ -1,0 +1,21 @@
+{
+  "trader": "Ms. Nancy Pelosi",
+  "model": "sonnet",
+  "decision_dates": [
+    "2021-06-15"
+  ],
+  "results": [
+    {
+      "decision_date": "2021-06-15",
+      "gated_recs": 14,
+      "ungated_recs": 12,
+      "gated_tool_calls": 96,
+      "ungated_tool_calls": 77,
+      "accuracy_90d_gated": 40.0,
+      "accuracy_90d_ungated": 60.0,
+      "hindsight_advantage_90d": 20.0,
+      "agreement_rate": 75.0
+    }
+  ],
+  "timestamp": "2026-05-03T20:52:39.528540"
+}

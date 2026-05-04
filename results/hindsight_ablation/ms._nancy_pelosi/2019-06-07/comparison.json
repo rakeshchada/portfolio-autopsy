@@ -1,0 +1,67 @@
+{
+  "horizon_comparison": {
+    "30d": {
+      "gated_accuracy": 40.0,
+      "ungated_accuracy": 75.0,
+      "hindsight_advantage": 35.0,
+      "gated_avg_alpha": 1.73,
+      "ungated_avg_alpha": 2.04,
+      "alpha_advantage": 0.31,
+      "gated_buy_accuracy": 100.0,
+      "ungated_buy_accuracy": 100.0,
+      "gated_sell_accuracy": 0.0,
+      "ungated_sell_accuracy": 0.0
+    },
+    "60d": {
+      "gated_accuracy": 80.0,
+      "ungated_accuracy": 100.0,
+      "hindsight_advantage": 20.0,
+      "gated_avg_alpha": 1.02,
+      "ungated_avg_alpha": 2.19,
+      "alpha_advantage": 1.17,
+      "gated_buy_accuracy": 100.0,
+      "ungated_buy_accuracy": 100.0,
+      "gated_sell_accuracy": 66.7,
+      "ungated_sell_accuracy": 100.0
+    },
+    "90d": {
+      "gated_accuracy": 60.0,
+      "ungated_accuracy": 100.0,
+      "hindsight_advantage": 40.0,
+      "gated_avg_alpha": -0.31,
+      "ungated_avg_alpha": 0.36,
+      "alpha_advantage": 0.67,
+      "gated_buy_accuracy": 100.0,
+      "ungated_buy_accuracy": 100.0,
+      "gated_sell_accuracy": 33.3,
+      "ungated_sell_accuracy": 100.0
+    }
+  },
+  "agreement": {
+    "common_tickers": 8,
+    "same_action": 4,
+    "agreement_rate": 50.0
+  },
+  "disagreements": [
+    {
+      "ticker": "AAPL",
+      "gated_action": "HOLD",
+      "ungated_action": "BUY"
+    },
+    {
+      "ticker": "AMZN",
+      "gated_action": "SELL",
+      "ungated_action": "HOLD"
+    },
+    {
+      "ticker": "DIS",
+      "gated_action": "SELL",
+      "ungated_action": "HOLD"
+    },
+    {
+      "ticker": "SQ",
+      "gated_action": "HOLD",
+      "ungated_action": "SELL"
+    }
+  ]
+}

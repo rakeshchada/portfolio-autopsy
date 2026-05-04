@@ -1,0 +1,245 @@
+{
+  "as_of_date": "2019-06-07",
+  "total_recommendations": 10,
+  "results": [
+    {
+      "ticker": "AAPL",
+      "action": "HOLD",
+      "conviction": "HIGH",
+      "reasoning": "Stock is 17% off 52-week highs creating value, $145 calls have a full year to expiry (ample time), and Fed rate cuts plus potential G20 trade resolution are positive catalysts. Services revenue growth narrative is intact. Maintain both stock and options positions.",
+      "entry_price": 45.53,
+      "outcomes": {
+        "30d": {
+          "return_pct": 7.4,
+          "spy_return_pct": 4.26,
+          "alpha_pct": 3.14,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 3.6,
+          "spy_return_pct": 0.54,
+          "alpha_pct": 3.06,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 12.59,
+          "spy_return_pct": 4.04,
+          "alpha_pct": 8.55,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "AMZN",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reasoning": "Trim the $1700 strike calls (20 contracts) which have only 7 months to expiry and are less deep in-the-money ($104 ITM). Keep the $1600 strike calls which have more buffer. This locks in ~$200K+ of gains while maintaining core bullish exposure. Antitrust noise and time decay make holding the full position risky.",
+      "entry_price": 90.2,
+      "outcomes": {
+        "30d": {
+          "return_pct": 7.7,
+          "spy_return_pct": 4.26,
+          "alpha_pct": 3.44,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": -0.9,
+          "spy_return_pct": 0.54,
+          "alpha_pct": -1.44,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": 2.03,
+          "spy_return_pct": 4.04,
+          "alpha_pct": -2.01,
+          "correct": false
+        }
+      }
+    },
+    {
+      "ticker": "FB",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "Both option sets are in-the-money and the FTC fine (~$5B) is already being priced in. At ~$167, FB trades at only ~19x forward earnings \u2014 cheap relative to growth. Hold through resolution of the regulatory overhang, but monitor closely given 7-month expiry window.",
+      "entry_price": null,
+      "error": "No price data for FB on 2019-06-07"
+    },
+    {
+      "ticker": "DIS",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reasoning": "Up 26% YTD after the Disney+ announcement euphoria. Stock is within 1.3% of 52-week highs with the streaming catalyst now priced in. Trim 3,000-5,000 shares to lock in gains and reduce concentration. The actual Disney+ launch (November) may disappoint vs. elevated expectations.",
+      "entry_price": 133.24,
+      "outcomes": {
+        "30d": {
+          "return_pct": 3.83,
+          "spy_return_pct": 4.26,
+          "alpha_pct": -0.43,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": 3.41,
+          "spy_return_pct": 0.54,
+          "alpha_pct": 2.87,
+          "correct": false
+        },
+        "90d": {
+          "return_pct": 1.2,
+          "spy_return_pct": 4.04,
+          "alpha_pct": -2.84,
+          "correct": false
+        }
+      }
+    },
+    {
+      "ticker": "T",
+      "action": "HOLD",
+      "conviction": "HIGH",
+      "reasoning": "At 52-week highs with a ~6%+ dividend yield on cost basis. Fed rate cuts will drive income-seekers toward T. Low beta (0.71) provides essential portfolio ballast against the concentrated tech risk. This is the portfolio's best defensive anchor.",
+      "entry_price": 15.12,
+      "outcomes": {
+        "30d": {
+          "return_pct": 5.57,
+          "spy_return_pct": 4.26,
+          "alpha_pct": 1.31,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 6.63,
+          "spy_return_pct": 0.54,
+          "alpha_pct": 6.09,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 12.69,
+          "spy_return_pct": 4.04,
+          "alpha_pct": 8.65,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "DBX",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "Down 23% from purchase with no clear catalyst for recovery. Facing competitive pressure from Microsoft OneDrive and Google Drive. Position is small (~$230K) and capital would be better deployed elsewhere. Cut losses and redeploy.",
+      "entry_price": 23.03,
+      "outcomes": {
+        "30d": {
+          "return_pct": 9.25,
+          "spy_return_pct": 4.26,
+          "alpha_pct": 4.99,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": -5.78,
+          "spy_return_pct": 0.54,
+          "alpha_pct": -6.31,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": -18.11,
+          "spy_return_pct": 4.04,
+          "alpha_pct": -22.15,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "SQ",
+      "action": "HOLD",
+      "conviction": "HIGH",
+      "reasoning": "A 722% winner with strong secular tailwinds in payments/fintech. Square's Cash App and seller ecosystem provide durable growth. Position size (~$329K) is manageable. Let this winner continue to run.",
+      "entry_price": null,
+      "error": "No price data for SQ on 2019-06-07"
+    },
+    {
+      "ticker": "HTZ",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "Hertz is in secular decline with massive debt, falling rental car utilization, and rideshare disruption. This position has been a value trap since 2014. Exit whatever remains immediately \u2014 the company's fundamentals are deteriorating rapidly.",
+      "entry_price": null,
+      "error": "No price data for HTZ on 2019-06-07"
+    },
+    {
+      "ticker": "MSFT",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "reasoning": "Redeploy proceeds from DIS trim, DBX sale, and HTZ exit into Microsoft. MSFT has cloud growth (Azure), less China exposure than AAPL, strong enterprise positioning, and trades at a reasonable premium. Diversifies the tech bet away from hardware/China risk toward enterprise cloud/SaaS. Consider $300-500K allocation in shares or January 2021 calls.",
+      "entry_price": 123.64,
+      "outcomes": {
+        "30d": {
+          "return_pct": 4.31,
+          "spy_return_pct": 4.26,
+          "alpha_pct": 0.04,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": 2.5,
+          "spy_return_pct": 0.54,
+          "alpha_pct": 1.97,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": 6.94,
+          "spy_return_pct": 4.04,
+          "alpha_pct": 2.9,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "V",
+      "action": "BUY",
+      "conviction": "MEDIUM",
+      "reasoning": "Visa complements the SQ position with payments exposure but via a lower-beta, high-margin toll-road business model. Less trade war sensitive, consistent earnings growth, and benefits from secular shift to digital payments. Allocate $200-300K from DIS trim proceeds.",
+      "entry_price": 162.15,
+      "outcomes": {
+        "30d": {
+          "return_pct": 3.89,
+          "spy_return_pct": 4.26,
+          "alpha_pct": -0.38,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": 1.43,
+          "spy_return_pct": 0.54,
+          "alpha_pct": 0.89,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": 8.79,
+          "spy_return_pct": 4.04,
+          "alpha_pct": 4.75,
+          "correct": true
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "30d": {
+      "total_evaluated": 5,
+      "correct": 2,
+      "accuracy": 40.0,
+      "avg_alpha": 1.73,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 0.0
+    },
+    "60d": {
+      "total_evaluated": 5,
+      "correct": 4,
+      "accuracy": 80.0,
+      "avg_alpha": 1.02,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 66.7
+    },
+    "90d": {
+      "total_evaluated": 5,
+      "correct": 3,
+      "accuracy": 60.0,
+      "avg_alpha": -0.31,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 33.3
+    }
+  }
+}

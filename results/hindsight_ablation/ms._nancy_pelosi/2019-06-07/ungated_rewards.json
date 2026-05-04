@@ -1,0 +1,139 @@
+{
+  "as_of_date": "2019-06-07",
+  "horizon_days": 90,
+  "time_gated": false,
+  "num_recommendations": 9,
+  "trajectory_reward": 0.6299,
+  "per_recommendation": [
+    {
+      "ticker": "AAPL",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "return_pct": 12.59,
+      "spy_return_pct": 4.04,
+      "alpha_pct": 8.55,
+      "reward": 1.0442,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.4276,
+        "calibration": 0.8393,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "AMZN",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "return_pct": 2.03,
+      "spy_return_pct": 4.04,
+      "alpha_pct": -2.01,
+      "reward": 0.0581,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 0.2905,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "FB",
+      "action": "HOLD",
+      "conviction": "HIGH",
+      "reward": 0.0,
+      "components": {
+        "error": "no_data"
+      }
+    },
+    {
+      "ticker": "DIS",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "return_pct": 1.2,
+      "spy_return_pct": 4.04,
+      "alpha_pct": -2.84,
+      "reward": 0.0344,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 0.1718,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "T",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "return_pct": 12.69,
+      "spy_return_pct": 4.04,
+      "alpha_pct": 8.65,
+      "reward": 0.2,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "DBX",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "return_pct": -18.11,
+      "spy_return_pct": 4.04,
+      "alpha_pct": -22.15,
+      "reward": 1.35,
+      "components": {
+        "direction": 1.0,
+        "alpha": 1.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "SQ",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reward": 0.0,
+      "components": {
+        "error": "no_data"
+      }
+    },
+    {
+      "ticker": "GOOGL",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "return_pct": 13.46,
+      "spy_return_pct": 4.04,
+      "alpha_pct": 9.42,
+      "reward": 1.0812,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.4711,
+        "calibration": 0.8974,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "MSFT",
+      "action": "BUY",
+      "conviction": "MEDIUM",
+      "return_pct": 6.94,
+      "spy_return_pct": 4.04,
+      "alpha_pct": 2.9,
+      "reward": 0.6417,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.1449,
+        "calibration": 0.9911,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    }
+  ]
+}

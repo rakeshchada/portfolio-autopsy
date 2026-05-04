@@ -1,0 +1,21 @@
+{
+  "trader": "Tuberville, Tommy",
+  "model": "sonnet",
+  "decision_dates": [
+    "2022-06-15"
+  ],
+  "results": [
+    {
+      "decision_date": "2022-06-15",
+      "gated_recs": 13,
+      "ungated_recs": 15,
+      "gated_tool_calls": 82,
+      "ungated_tool_calls": 69,
+      "accuracy_90d_gated": 66.7,
+      "accuracy_90d_ungated": 77.8,
+      "hindsight_advantage_90d": 11.1,
+      "agreement_rate": 63.6
+    }
+  ],
+  "timestamp": "2026-05-03T21:00:37.571108"
+}

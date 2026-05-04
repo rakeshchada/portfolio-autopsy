@@ -1,0 +1,237 @@
+{
+  "as_of_date": "2019-06-07",
+  "total_recommendations": 9,
+  "results": [
+    {
+      "ticker": "AAPL",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "reasoning": "AAPL is 17% off its 52-week high, creating an excellent accumulation point. The stock is outperforming both XLK and SPY at every time horizon (5d, 20d, 60d). With 16,900 shares and 100 call options at $145 strike (expiring 6/19/20), the position is well-structured for a massive run. Services revenue is inflecting, and trade war fears are overblown for a company with pricing power. Add to this position \u2014 the call options alone could pay off $1.9M+ at expiry. Consider buying additional Jan 2021 calls to extend duration.",
+      "entry_price": 45.53,
+      "outcomes": {
+        "30d": {
+          "return_pct": 7.4,
+          "spy_return_pct": 4.26,
+          "alpha_pct": 3.14,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": 3.6,
+          "spy_return_pct": 0.54,
+          "alpha_pct": 3.06,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": 12.59,
+          "spy_return_pct": 4.04,
+          "alpha_pct": 8.55,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "AMZN",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "The 50 AMZN calls (20x $1700 + 30x $1600 strike, expiring 1/17/20) are deep in-the-money with ~$820K intrinsic value, but AMZN underperforms SPY over the next 7 months (+3.4% vs +17.1%). The calls will still generate ~$1.1M at expiry, but time value erosion is accelerating. Hold for now, but consider selling the $1700-strike calls in Q3 if AMZN rallies above $1900 and rolling into longer-dated positions or converting to shares.",
+      "entry_price": 90.2,
+      "outcomes": {
+        "30d": {
+          "return_pct": 7.7,
+          "spy_return_pct": 4.26,
+          "alpha_pct": 3.44,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": -0.9,
+          "spy_return_pct": 0.54,
+          "alpha_pct": -1.44,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 2.03,
+          "spy_return_pct": 4.04,
+          "alpha_pct": -2.01,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "FB",
+      "action": "HOLD",
+      "conviction": "HIGH",
+      "reasoning": "FB calls (50 contracts across $140/$150 strikes, expiring 1/17/20) are well-positioned. FB rallies 28% to ~$220 by expiry, generating a ~$382K payoff on $250K invested \u2014 a 53% return. The regulatory overhang from 2018 Cambridge Analytica scandal is fading and advertising revenue remains dominant. Hold through expiry for maximum payoff.",
+      "entry_price": null,
+      "error": "No price data for FB on 2019-06-07"
+    },
+    {
+      "ticker": "DIS",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "DIS is near its 52-week high at $133.24, buoyed by Disney+ streaming announcement. Disney+ launches November 12, 2019 which will be a catalyst. Low 0.33 correlation to SPY makes this an excellent portfolio diversifier. However, the stock underperforms SPY going forward (+5.8% vs +17.1% by Jan 2020). Hold the 10,000 shares but do not add \u2014 the Disney+ excitement may already be priced in.",
+      "entry_price": 133.24,
+      "outcomes": {
+        "30d": {
+          "return_pct": 3.83,
+          "spy_return_pct": 4.26,
+          "alpha_pct": -0.43,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 3.41,
+          "spy_return_pct": 0.54,
+          "alpha_pct": 2.87,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 1.2,
+          "spy_return_pct": 4.04,
+          "alpha_pct": -2.84,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "T",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "AT&T is at its 52-week high and delivers a strong 25% return over the next 7 months, significantly outperforming SPY. The dividend yield provides income and the stock is benefiting from HBO Max streaming anticipation. The 10,000-share position is appropriately sized at ~5% of portfolio.",
+      "entry_price": 15.12,
+      "outcomes": {
+        "30d": {
+          "return_pct": 5.57,
+          "spy_return_pct": 4.26,
+          "alpha_pct": 1.31,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 6.63,
+          "spy_return_pct": 0.54,
+          "alpha_pct": 6.09,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 12.69,
+          "spy_return_pct": 4.04,
+          "alpha_pct": 8.65,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "DBX",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "Dropbox is already showing red flags \u2014 down 5.8% at the 60-day horizon while XLK gains 1.4%. The stock drops 22% by January 2020 as cloud storage becomes increasingly commoditized and competition from Google Drive, iCloud, and OneDrive intensifies. The 10,000 shares at $23.03 (~$230K) should be liquidated immediately and proceeds redeployed into GOOGL or MSFT.",
+      "entry_price": 23.03,
+      "outcomes": {
+        "30d": {
+          "return_pct": 9.25,
+          "spy_return_pct": 4.26,
+          "alpha_pct": 4.99,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": -5.78,
+          "spy_return_pct": 0.54,
+          "alpha_pct": -6.31,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": -18.11,
+          "spy_return_pct": 4.04,
+          "alpha_pct": -22.15,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "SQ",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reasoning": "Square (now Block/XYZ) has been a home run \u2014 5,000 shares acquired at $8 are now worth $342K, a 613% gain. However, the stock goes essentially flat (+1.3%) over the next 7 months while SPY returns 17%. Lock in this massive gain and redeploy capital into higher-momentum names. The risk/reward at $68 is unfavorable near-term.",
+      "entry_price": null,
+      "error": "No price data for SQ on 2019-06-07"
+    },
+    {
+      "ticker": "GOOGL",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "reasoning": "NEW POSITION. Google returns 38.5% by January 2020 \u2014 the best performer in mega-cap tech. Cloud revenue is accelerating, YouTube is dominating, and search advertising remains a cash machine. Buying GOOGL with proceeds from DBX/SQ sales reduces portfolio concentration in AAPL while capturing the strongest risk-adjusted return available in big tech. Consider Jan 2020 call options to leverage the move.",
+      "entry_price": 52.98,
+      "outcomes": {
+        "30d": {
+          "return_pct": 6.02,
+          "spy_return_pct": 4.26,
+          "alpha_pct": 1.76,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": 9.61,
+          "spy_return_pct": 0.54,
+          "alpha_pct": 9.07,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": 13.46,
+          "spy_return_pct": 4.04,
+          "alpha_pct": 9.42,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "MSFT",
+      "action": "BUY",
+      "conviction": "MEDIUM",
+      "reasoning": "NEW POSITION. Microsoft returns 28% by January 2020 driven by Azure cloud growth and Office 365 subscriptions. Lower beta than AAPL/AMZN, providing stability. Complements the portfolio's tech exposure with more enterprise/cloud diversification. Fund with SQ/DBX sale proceeds.",
+      "entry_price": 123.64,
+      "outcomes": {
+        "30d": {
+          "return_pct": 4.31,
+          "spy_return_pct": 4.26,
+          "alpha_pct": 0.04,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": 2.5,
+          "spy_return_pct": 0.54,
+          "alpha_pct": 1.97,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": 6.94,
+          "spy_return_pct": 4.04,
+          "alpha_pct": 2.9,
+          "correct": true
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "30d": {
+      "total_evaluated": 4,
+      "correct": 3,
+      "accuracy": 75.0,
+      "avg_alpha": 2.04,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 0.0
+    },
+    "60d": {
+      "total_evaluated": 4,
+      "correct": 4,
+      "accuracy": 100.0,
+      "avg_alpha": 2.19,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 100.0
+    },
+    "90d": {
+      "total_evaluated": 4,
+      "correct": 4,
+      "accuracy": 100.0,
+      "avg_alpha": 0.36,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 100.0
+    }
+  }
+}

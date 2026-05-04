@@ -1,0 +1,62 @@
+[
+  {
+    "ticker": "AAPL",
+    "action": "HOLD",
+    "conviction": "HIGH",
+    "reasoning": "Stock is 17% off 52-week highs creating value, $145 calls have a full year to expiry (ample time), and Fed rate cuts plus potential G20 trade resolution are positive catalysts. Services revenue growth narrative is intact. Maintain both stock and options positions."
+  },
+  {
+    "ticker": "AMZN",
+    "action": "SELL",
+    "conviction": "MEDIUM",
+    "reasoning": "Trim the $1700 strike calls (20 contracts) which have only 7 months to expiry and are less deep in-the-money ($104 ITM). Keep the $1600 strike calls which have more buffer. This locks in ~$200K+ of gains while maintaining core bullish exposure. Antitrust noise and time decay make holding the full position risky."
+  },
+  {
+    "ticker": "FB",
+    "action": "HOLD",
+    "conviction": "MEDIUM",
+    "reasoning": "Both option sets are in-the-money and the FTC fine (~$5B) is already being priced in. At ~$167, FB trades at only ~19x forward earnings \u2014 cheap relative to growth. Hold through resolution of the regulatory overhang, but monitor closely given 7-month expiry window."
+  },
+  {
+    "ticker": "DIS",
+    "action": "SELL",
+    "conviction": "MEDIUM",
+    "reasoning": "Up 26% YTD after the Disney+ announcement euphoria. Stock is within 1.3% of 52-week highs with the streaming catalyst now priced in. Trim 3,000-5,000 shares to lock in gains and reduce concentration. The actual Disney+ launch (November) may disappoint vs. elevated expectations."
+  },
+  {
+    "ticker": "T",
+    "action": "HOLD",
+    "conviction": "HIGH",
+    "reasoning": "At 52-week highs with a ~6%+ dividend yield on cost basis. Fed rate cuts will drive income-seekers toward T. Low beta (0.71) provides essential portfolio ballast against the concentrated tech risk. This is the portfolio's best defensive anchor."
+  },
+  {
+    "ticker": "DBX",
+    "action": "SELL",
+    "conviction": "HIGH",
+    "reasoning": "Down 23% from purchase with no clear catalyst for recovery. Facing competitive pressure from Microsoft OneDrive and Google Drive. Position is small (~$230K) and capital would be better deployed elsewhere. Cut losses and redeploy."
+  },
+  {
+    "ticker": "SQ",
+    "action": "HOLD",
+    "conviction": "HIGH",
+    "reasoning": "A 722% winner with strong secular tailwinds in payments/fintech. Square's Cash App and seller ecosystem provide durable growth. Position size (~$329K) is manageable. Let this winner continue to run."
+  },
+  {
+    "ticker": "HTZ",
+    "action": "SELL",
+    "conviction": "HIGH",
+    "reasoning": "Hertz is in secular decline with massive debt, falling rental car utilization, and rideshare disruption. This position has been a value trap since 2014. Exit whatever remains immediately \u2014 the company's fundamentals are deteriorating rapidly."
+  },
+  {
+    "ticker": "MSFT",
+    "action": "BUY",
+    "conviction": "HIGH",
+    "reasoning": "Redeploy proceeds from DIS trim, DBX sale, and HTZ exit into Microsoft. MSFT has cloud growth (Azure), less China exposure than AAPL, strong enterprise positioning, and trades at a reasonable premium. Diversifies the tech bet away from hardware/China risk toward enterprise cloud/SaaS. Consider $300-500K allocation in shares or January 2021 calls."
+  },
+  {
+    "ticker": "V",
+    "action": "BUY",
+    "conviction": "MEDIUM",
+    "reasoning": "Visa complements the SQ position with payments exposure but via a lower-beta, high-margin toll-road business model. Less trade war sensitive, consistent earnings growth, and benefits from secular shift to digital payments. Allocate $200-300K from DIS trim proceeds."
+  }
+]

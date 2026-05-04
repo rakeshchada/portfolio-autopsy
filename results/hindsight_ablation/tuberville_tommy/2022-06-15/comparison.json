@@ -1,0 +1,67 @@
+{
+  "horizon_comparison": {
+    "30d": {
+      "gated_accuracy": 83.3,
+      "ungated_accuracy": 44.4,
+      "hindsight_advantage": -38.9,
+      "gated_avg_alpha": -6.18,
+      "ungated_avg_alpha": -5.74,
+      "alpha_advantage": 0.44,
+      "gated_buy_accuracy": 100.0,
+      "ungated_buy_accuracy": 0.0,
+      "gated_sell_accuracy": 80.0,
+      "ungated_sell_accuracy": 57.1
+    },
+    "60d": {
+      "gated_accuracy": 50.0,
+      "ungated_accuracy": 55.6,
+      "hindsight_advantage": 5.6,
+      "gated_avg_alpha": -4.35,
+      "ungated_avg_alpha": -5.57,
+      "alpha_advantage": -1.22,
+      "gated_buy_accuracy": 100.0,
+      "ungated_buy_accuracy": 100.0,
+      "gated_sell_accuracy": 40.0,
+      "ungated_sell_accuracy": 42.9
+    },
+    "90d": {
+      "gated_accuracy": 66.7,
+      "ungated_accuracy": 77.8,
+      "hindsight_advantage": 11.1,
+      "gated_avg_alpha": -5.1,
+      "ungated_avg_alpha": -4.93,
+      "alpha_advantage": 0.17,
+      "gated_buy_accuracy": 100.0,
+      "ungated_buy_accuracy": 100.0,
+      "gated_sell_accuracy": 60.0,
+      "ungated_sell_accuracy": 71.4
+    }
+  },
+  "agreement": {
+    "common_tickers": 11,
+    "same_action": 7,
+    "agreement_rate": 63.6
+  },
+  "disagreements": [
+    {
+      "ticker": "BABA",
+      "gated_action": "HOLD",
+      "ungated_action": "SELL"
+    },
+    {
+      "ticker": "NU",
+      "gated_action": "SELL",
+      "ungated_action": "HOLD"
+    },
+    {
+      "ticker": "PYPL",
+      "gated_action": "HOLD",
+      "ungated_action": "BUY"
+    },
+    {
+      "ticker": "SSYS",
+      "gated_action": "HOLD",
+      "ungated_action": "SELL"
+    }
+  ]
+}

@@ -1,0 +1,201 @@
+{
+  "as_of_date": "2021-06-15",
+  "horizon_days": 90,
+  "time_gated": false,
+  "num_recommendations": 12,
+  "trajectory_reward": 0.331,
+  "per_recommendation": [
+    {
+      "ticker": "GOOGL",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "return_pct": 17.22,
+      "spy_return_pct": 5.55,
+      "alpha_pct": 11.67,
+      "reward": 1.1626,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.5837,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "NVDA",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "return_pct": 24.55,
+      "spy_return_pct": 5.55,
+      "alpha_pct": 19.0,
+      "reward": 1.3275,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.9501,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "MSFT",
+      "action": "HOLD",
+      "conviction": "HIGH",
+      "return_pct": 15.17,
+      "spy_return_pct": 5.55,
+      "alpha_pct": 9.62,
+      "reward": 0.3,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "AAPL",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "return_pct": 15.53,
+      "spy_return_pct": 5.55,
+      "alpha_pct": 9.98,
+      "reward": 0.2,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "CRWD",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "return_pct": 11.25,
+      "spy_return_pct": 5.55,
+      "alpha_pct": 5.7,
+      "reward": 0.9533,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.285,
+        "calibration": 0.7501,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "PYPL",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "return_pct": 3.16,
+      "spy_return_pct": 5.55,
+      "alpha_pct": -2.39,
+      "reward": 0.0904,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 0.4519,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "AB",
+      "action": "HOLD",
+      "conviction": "HIGH",
+      "return_pct": 16.58,
+      "spy_return_pct": 5.55,
+      "alpha_pct": 11.03,
+      "reward": 0.3,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "AMZN",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "return_pct": 2.19,
+      "spy_return_pct": 5.55,
+      "alpha_pct": -3.36,
+      "reward": 0.0625,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 0.3126,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "CRM",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "return_pct": 4.75,
+      "spy_return_pct": 5.55,
+      "alpha_pct": -0.8,
+      "reward": 0.1358,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 0.679,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "NFLX",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "return_pct": 19.8,
+      "spy_return_pct": 5.55,
+      "alpha_pct": 14.25,
+      "reward": -0.4137,
+      "components": {
+        "direction": -1.0,
+        "alpha": -0.7124,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "DIS",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "return_pct": 5.19,
+      "spy_return_pct": 5.55,
+      "alpha_pct": -0.36,
+      "reward": -0.2464,
+      "components": {
+        "direction": -1.0,
+        "alpha": 0.0182,
+        "calibration": 0.7408,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "TSLA",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "return_pct": 23.97,
+      "spy_return_pct": 5.55,
+      "alpha_pct": 18.42,
+      "reward": 0.1,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 0.5,
+        "time_gated_bonus": 1.0
+      }
+    }
+  ]
+}

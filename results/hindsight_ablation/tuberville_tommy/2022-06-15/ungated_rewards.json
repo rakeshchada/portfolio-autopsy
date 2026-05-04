@@ -1,0 +1,228 @@
+{
+  "as_of_date": "2022-06-15",
+  "horizon_days": 90,
+  "time_gated": false,
+  "num_recommendations": 15,
+  "trajectory_reward": 0.5823,
+  "per_recommendation": [
+    {
+      "ticker": "PYPL",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "return_pct": 25.29,
+      "spy_return_pct": 4.11,
+      "alpha_pct": 21.18,
+      "reward": 1.35,
+      "components": {
+        "direction": 1.0,
+        "alpha": 1.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "SCCO",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "return_pct": -15.04,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -19.16,
+      "reward": 1.331,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.9578,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "INTC",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "return_pct": -23.45,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -27.57,
+      "reward": 1.35,
+      "components": {
+        "direction": 1.0,
+        "alpha": 1.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "BABA",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "return_pct": -17.18,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -21.29,
+      "reward": 0.9,
+      "components": {
+        "direction": 1.0,
+        "alpha": 1.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "X",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reward": 0.0,
+      "components": {
+        "error": "no_data"
+      }
+    },
+    {
+      "ticker": "CLF",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "return_pct": -7.04,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -11.15,
+      "reward": 0.7672,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.5575,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "GOLD",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "return_pct": -6.97,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -11.08,
+      "reward": 0.1991,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 0.9957,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "SSYS",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "return_pct": -11.26,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -15.38,
+      "reward": 0.8306,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.7688,
+        "calibration": 1.0,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "NU",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "return_pct": 50.85,
+      "spy_return_pct": 4.11,
+      "alpha_pct": 46.74,
+      "reward": 0.1,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 0.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "NVDA",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "return_pct": -20.52,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -24.64,
+      "reward": 0.1,
+      "components": {
+        "direction": 0.0,
+        "alpha": 0.0,
+        "calibration": 1.0,
+        "conviction_multiplier": 0.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "ECOM",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "reward": 0.0,
+      "components": {
+        "error": "no_data"
+      }
+    },
+    {
+      "ticker": "SSBK",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reward": 0.0,
+      "components": {
+        "error": "no_data"
+      }
+    },
+    {
+      "ticker": "DTD",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "return_pct": 3.08,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -1.04,
+      "reward": -0.2966,
+      "components": {
+        "direction": -1.0,
+        "alpha": 0.0519,
+        "calibration": 0.4394,
+        "conviction_multiplier": 1.0,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "MTUM",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "return_pct": 3.81,
+      "spy_return_pct": 4.11,
+      "alpha_pct": -0.3,
+      "reward": -0.517,
+      "components": {
+        "direction": -1.0,
+        "alpha": 0.0149,
+        "calibration": 0.2543,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    },
+    {
+      "ticker": "OXY",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "return_pct": 8.61,
+      "spy_return_pct": 4.11,
+      "alpha_pct": 4.5,
+      "reward": 0.8735,
+      "components": {
+        "direction": 1.0,
+        "alpha": 0.225,
+        "calibration": 0.5742,
+        "conviction_multiplier": 1.5,
+        "time_gated_bonus": 1.0
+      }
+    }
+  ]
+}

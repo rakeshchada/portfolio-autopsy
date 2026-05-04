@@ -1,0 +1,345 @@
+{
+  "as_of_date": "2022-06-15",
+  "total_recommendations": 13,
+  "results": [
+    {
+      "ticker": "CLF",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "Cleveland-Cliffs is down 45.4% from its 52-week high and has catastrophically underperformed, losing -15.9% in the last 20 days versus SPY's +1.16%. Steel demand collapses in recessions, and the volatility model shows another -27.5% max drawdown potential from current levels. The short-sale options at $22 (Jul/Jan) provide some credit but not enough to offset further equity deterioration. Exit the stock equity leg now; reassess options structure separately.",
+      "entry_price": 18.05,
+      "outcomes": {
+        "30d": {
+          "return_pct": -16.95,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -18.96,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": 8.98,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -4.14,
+          "correct": false
+        },
+        "90d": {
+          "return_pct": -7.04,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -11.15,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "SCCO",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "Southern Copper is the most recession-sensitive name in the book \u2014 copper demand is a leading indicator of global slowdown. The stock is -16.98% in the last 20 days (vs SPY +1.16%), off 24.5% from highs, and the volatility forward analysis shows ZERO max runup after today's entry with -24.6% max further drawdown. The June 17 collar (put $55 / call $65) is expiring worthless this week, removing all protection. Exit the $175K equity position before the collar fully unwinds.",
+      "entry_price": 48.17,
+      "outcomes": {
+        "30d": {
+          "return_pct": -18.54,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -20.55,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": -13.33,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -26.45,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": -15.04,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -19.16,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "NU",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "Nu Holdings has lost 53.4% since the March entry with a staggering 112.5% annualized volatility. Brazilian EM fintech in a strengthening-dollar, risk-off bear market is a toxic combination. The existing short sale at $9 (Dec 2022) is now deeply underwater. Exit the equity leg immediately \u2014 this name has no business being in a portfolio in the current macro environment.",
+      "entry_price": 3.52,
+      "outcomes": {
+        "30d": {
+          "return_pct": 9.37,
+          "spy_return_pct": 2.0,
+          "alpha_pct": 7.37,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": 20.74,
+          "spy_return_pct": 13.12,
+          "alpha_pct": 7.62,
+          "correct": false
+        },
+        "90d": {
+          "return_pct": 50.85,
+          "spy_return_pct": 4.11,
+          "alpha_pct": 46.74,
+          "correct": false
+        }
+      }
+    },
+    {
+      "ticker": "HUMA",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "Pre-revenue biotech down 48% since the March entry with 89% annualized vol and a market cap under $200M. No options hedges in place. In a high-VIX, risk-off environment, speculative micro-cap biotech is among the worst places to be. The $32.5K position has a high probability of further decay to near-zero. Cut losses now.",
+      "entry_price": 3.78,
+      "outcomes": {
+        "30d": {
+          "return_pct": -7.41,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -9.41,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": 22.22,
+          "spy_return_pct": 13.12,
+          "alpha_pct": 9.1,
+          "correct": false
+        },
+        "90d": {
+          "return_pct": 10.58,
+          "spy_return_pct": 4.11,
+          "alpha_pct": 6.47,
+          "correct": false
+        }
+      }
+    },
+    {
+      "ticker": "INTC",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reasoning": "Intel is down 29.8% from its 52-week high, underperforming XLK on every time horizon (5d: -4.35% vs -3.19%; 20d: -5.07% vs +0.48%), and carries a nearly uninvestible 67x forward P/E. PC and data center demand headwinds are accelerating into a likely Q2 earnings miss (late July). The June 9 buy averaged down into persistent weakness. Trim the equity component; the short-sale options at $52.50 can remain as premium generators if the stock stays depressed.",
+      "entry_price": 36.41,
+      "outcomes": {
+        "30d": {
+          "return_pct": -0.08,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -2.08,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": -5.63,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -18.75,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": -23.45,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -27.57,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "SSBK",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reasoning": "South State Bank has no retrievable market data, no hedges, no sells since August 2021, and represents $75K in effectively illiquid dead capital. Rising rates compress small bank margins despite NIM narrative. Without price visibility or options protection, this is unmanageable risk. Evaluate any available market exit.",
+      "entry_price": null,
+      "error": "No price data for SSBK on 2022-06-15"
+    },
+    {
+      "ticker": "X",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "reasoning": "U.S. Steel just pre-announced exceptional Q2 EBITDA guidance of ~$1.6 billion, significantly above Wall Street estimates. The existing put $23 / call $30 collar (Jan 2023) provides meaningful downside protection while capping upside. Do not add capital \u2014 steel is cyclically exposed to a potential recession \u2014 but the collar structure justifies holding the $457K position through the Q2 earnings catalyst.",
+      "entry_price": null,
+      "error": "No price data for X on 2022-06-15"
+    },
+    {
+      "ticker": "PYPL",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "Today's aggressive accumulation (adding $75K to a $450K+ position) reflects a deep-value thesis at 9x P/E and 72% off all-time highs. The 60-day benchmark forward shows PYPL outperforming SPY by +20 percentage points historically from this level. However, beta is 1.82 and the stock is still -6.7% since the large May buy. The short sale at $150 (Sep 2023) partially hedges the position. Hold current size \u2014 do not add further in a VIX-29 environment until the stock stabilizes above $80.",
+      "entry_price": 75.43,
+      "outcomes": {
+        "30d": {
+          "return_pct": -2.53,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -4.53,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 33.32,
+          "spy_return_pct": 13.12,
+          "alpha_pct": 20.21,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 25.29,
+          "spy_return_pct": 4.11,
+          "alpha_pct": 21.18,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "BABA",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "reasoning": "The position has shown 20-day outperformance (+11.2% vs XLY +1.35%) suggesting a potential regulatory stabilization trade, but China risk remains acute (Ant IPO renewal denied June 9). The Jan 2022 put purchases suggest the trader already recognized downside risk. Do not add equity; maintain the existing put hedges and reassess after China's next regulatory signal.",
+      "entry_price": 102.6,
+      "outcomes": {
+        "30d": {
+          "return_pct": -5.17,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -7.18,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": -12.27,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -25.39,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": -17.18,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -21.29,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "GOLD",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "Barrick Gold is up 6.27% from its January entry, providing rare positive P&L in this portfolio. It's the portfolio's only inflation hedge and has low correlation to SPY (beta 0.57). The $27/$23 short-sale collar (Jan 2023) limits further loss. Despite recent 20-day weakness (-12.35%) driven by rising real rates, gold miners provide valuable portfolio diversification in a stagflationary scenario. Hold.",
+      "entry_price": 27.18,
+      "outcomes": {
+        "30d": {
+          "return_pct": -9.18,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -11.18,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 12.99,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -0.12,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": -6.97,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -11.08,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "SSYS",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "reasoning": "Fresh entries June 9 and 14 show active conviction. The stock is showing mild relative strength (+3.99% vs XLK +0.48% over 20 days) at 50% off highs. Hold the position but do not add further size \u2014 66.5% annualized vol and no near-term catalyst make this speculative in the current environment.",
+      "entry_price": 18.29,
+      "outcomes": {
+        "30d": {
+          "return_pct": 3.61,
+          "spy_return_pct": 2.0,
+          "alpha_pct": 1.61,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 6.94,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -6.17,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": -11.26,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -15.38,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "NVDA",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "This is effectively a net credit position \u2014 more premium received than capital deployed. The new short sale at $150 (March 2023) monetizes continued weakness, while the $180 June 17 put expires worthless this week. At 50% off highs and a forward P/E of 17.7x, NVDA is approaching long-term value for a data center/AI leader. The current bearish options book is correctly positioned \u2014 maintain and let time decay work in the portfolio's favor.",
+      "entry_price": 16.5,
+      "outcomes": {
+        "30d": {
+          "return_pct": -4.63,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -6.63,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 13.2,
+          "spy_return_pct": 13.12,
+          "alpha_pct": 0.08,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": -20.52,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -24.64,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "XLP",
+      "action": "BUY",
+      "conviction": "MEDIUM",
+      "reasoning": "Redeploy a portion of the capital freed from CLF/SCCO/NU/HUMA/INTC/SSBK into the Consumer Staples ETF as a defensive anchor. XLP has massively outperformed in 2022 bear market, offers low beta, inflation pass-through pricing power, and dividends. This directly addresses the portfolio's 0% defensive sector allocation and over 40% basic materials concentration risk in a pre-recessionary environment.",
+      "entry_price": 62.51,
+      "outcomes": {
+        "30d": {
+          "return_pct": 5.57,
+          "spy_return_pct": 2.0,
+          "alpha_pct": 3.57,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": 9.29,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -3.83,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": 3.91,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -0.21,
+          "correct": true
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "30d": {
+      "total_evaluated": 6,
+      "correct": 5,
+      "accuracy": 83.3,
+      "avg_alpha": -6.18,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 80.0
+    },
+    "60d": {
+      "total_evaluated": 6,
+      "correct": 3,
+      "accuracy": 50.0,
+      "avg_alpha": -4.35,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 40.0
+    },
+    "90d": {
+      "total_evaluated": 6,
+      "correct": 4,
+      "accuracy": 66.7,
+      "avg_alpha": -5.1,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 60.0
+    }
+  }
+}

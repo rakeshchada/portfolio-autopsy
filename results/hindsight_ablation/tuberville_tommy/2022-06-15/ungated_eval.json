@@ -1,0 +1,380 @@
+{
+  "as_of_date": "2022-06-15",
+  "total_recommendations": 15,
+  "results": [
+    {
+      "ticker": "PYPL",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "reasoning": "PYPL is at -72% from its 52-week high and sitting just 4.5% above the window low \u2014 this is the portfolio's best risk/reward setup. Forward data confirms +25.3% return over 90 days, outperforming SPY by +21pp. The massive $375K add on May 19th and today's $75K top-up at $75.43 are near the multi-year low (~$69 floor); position is approaching a meaningful recovery inflection. Maintain and consider adding on any further dip toward $69-72.",
+      "entry_price": 75.43,
+      "outcomes": {
+        "30d": {
+          "return_pct": -2.53,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -4.53,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": 33.32,
+          "spy_return_pct": 13.12,
+          "alpha_pct": 20.21,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": 25.29,
+          "spy_return_pct": 4.11,
+          "alpha_pct": 21.18,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "SCCO",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "Forward returns are deeply negative at -15% over 90 days, -19pp below SPY, with zero max runup after today's entry \u2014 meaning there is no good entry point in the forward window. Copper demand is deteriorating under China slowdown + global recession fears. The position was entered at $175K net cost and is already -24.5% from its 52-week high with momentum accelerating to the downside. Exit now before the metal cycle fully turns.",
+      "entry_price": 48.17,
+      "outcomes": {
+        "30d": {
+          "return_pct": -18.54,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -20.55,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": -13.33,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -26.45,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": -15.04,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -19.16,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "INTC",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "Intel underperforms its own sector ETF (XLK) by a staggering -26pp over 60 days forward and -27.6pp over 90 days, returning -23.5% from today. The structural story is broken \u2014 AMD is taking share, margins are compressing, and a June 9 add of $32.5K is already underwater. Even in a tech sector bounce, INTC lags badly. Exit the position to redeploy into better tech names.",
+      "entry_price": 36.41,
+      "outcomes": {
+        "30d": {
+          "return_pct": -0.08,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -2.08,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": -5.63,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -18.75,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": -23.45,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -27.57,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "BABA",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reasoning": "Forward 90-day return is -17.2%, lagging SPY by -21pp. Despite China regulatory hopes (which briefly lifted shares in early June), the headwinds persist: regulatory fines re-emerge in July, COVID lockdown risks remain, and the geopolitical overhang on US-listed Chinese ADRs is structural. Net cost basis is ~$217K with no clear near-term catalyst to recover. Trim to reduce China concentration (currently 25% of net portfolio).",
+      "entry_price": 102.6,
+      "outcomes": {
+        "30d": {
+          "return_pct": -5.17,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -7.18,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": -12.27,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -25.39,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": -17.18,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -21.29,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "X",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "Despite no live price data available today (possible settlement lag on complex options overlay), US Steel issued a strong Q2 guidance on June 16 with an active $800M buyback ($210M remaining). The May 31 add of $175K with a collar structure (put $23 Jan'23 / call $30 Jan'23) provides downside protection. The buyback news is a short-term catalyst; hold through the options structure but monitor steel demand closely given recession risk.",
+      "entry_price": null,
+      "error": "No price data for X on 2022-06-15"
+    },
+    {
+      "ticker": "CLF",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reasoning": "CLF is down -45.4% from its March 2022 peak of $33. The last trade was a short sale in February, suggesting this is essentially a residual position being hedged rather than actively managed. With ~$148K net cost basis and steel/iron ore demand rolling over under China construction weakness and rising US rates, the risk/reward on the remaining equity exposure is poor. Close out residual exposure.",
+      "entry_price": 18.05,
+      "outcomes": {
+        "30d": {
+          "return_pct": -16.95,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -18.96,
+          "correct": true
+        },
+        "60d": {
+          "return_pct": 8.98,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -4.14,
+          "correct": false
+        },
+        "90d": {
+          "return_pct": -7.04,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -11.15,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "GOLD",
+      "action": "HOLD",
+      "conviction": "MEDIUM",
+      "reasoning": "Barrick Gold is up +6.3% since the January entry and forward 60-day return shows +13% \u2014 it's the portfolio's best-performing recent position. In a high-inflation/elevated-VIX environment, GOLD serves as a portfolio hedge. The short call/put overlay at $23/$27 (Jan'23) caps but also cushions the position. Hold as a macro hedge; gold benefits if Fed overtightens into recession.",
+      "entry_price": 27.18,
+      "outcomes": {
+        "30d": {
+          "return_pct": -9.18,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -11.18,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 12.99,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -0.12,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": -6.97,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -11.08,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "SSYS",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reasoning": "Down -51% from its 52-week high; forward max drawdown after today's entry is an additional -27.7% with only a +14.8% max runup. The trader just added $32.5K on June 9 and $8K on June 14 \u2014 averaging into a structural bear trend in 3D printing with no catalyst. This speculative position should be cut to free capital for higher-conviction ideas like PYPL.",
+      "entry_price": 18.29,
+      "outcomes": {
+        "30d": {
+          "return_pct": 3.61,
+          "spy_return_pct": 2.0,
+          "alpha_pct": 1.61,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": 6.94,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -6.17,
+          "correct": false
+        },
+        "90d": {
+          "return_pct": -11.26,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -15.38,
+          "correct": true
+        }
+      }
+    },
+    {
+      "ticker": "NU",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "reasoning": "NU (Nubank) is down -53% from its March entry at ~$7.54, now at $3.52, and -70% from its 52-week high. Annualized vol is 113% \u2014 this is a speculative binary. However, the forward 90-day max runup is +56.8%, the best in the portfolio, as it sits near all-time lows with a tight stop. Given the small position size (~$40K net), hold rather than realize the loss at the absolute bottom \u2014 but set a hard floor of $3.00.",
+      "entry_price": 3.52,
+      "outcomes": {
+        "30d": {
+          "return_pct": 9.37,
+          "spy_return_pct": 2.0,
+          "alpha_pct": 7.37,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 20.74,
+          "spy_return_pct": 13.12,
+          "alpha_pct": 7.62,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": 50.85,
+          "spy_return_pct": 4.11,
+          "alpha_pct": 46.74,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "NVDA",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "reasoning": "NVDA is -50% from its high at $16.50 (pre-split adjusted) and the put/call structure just established today is complex \u2014 long Jun'22 put $180 and short Mar'23 call $150. The 90-day forward max drawdown is -30.4%, so near-term there is more pain; but NVDA is the highest-quality semiconductor franchise in the portfolio and the long-term thesis remains intact. Hold the options overlay but don't add more equity yet.",
+      "entry_price": 16.5,
+      "outcomes": {
+        "30d": {
+          "return_pct": -4.63,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -6.63,
+          "correct": null
+        },
+        "60d": {
+          "return_pct": 13.2,
+          "spy_return_pct": 13.12,
+          "alpha_pct": 0.08,
+          "correct": null
+        },
+        "90d": {
+          "return_pct": -20.52,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -24.64,
+          "correct": null
+        }
+      }
+    },
+    {
+      "ticker": "ECOM",
+      "action": "HOLD",
+      "conviction": "LOW",
+      "reasoning": "The April 21 add of $175K into ChannelAdvisor (ECOM) brought total net cost to ~$219K. With multiple short sales reducing carry cost and the most recent buy on June 1, this is being actively managed. E-commerce infrastructure names are under pressure but ECOM is not a pure momentum name. Hold, let the short sales work, and reassess after next earnings.",
+      "entry_price": null,
+      "error": "No price data for ECOM on 2022-06-15"
+    },
+    {
+      "ticker": "SSBK",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "Southern States Bancshares was bought in August 2021 and has never been touched since \u2014 a completely stale $75K position in an illiquid small-cap community bank. Rising interest rates are pressuring regional bank NIM expectations; there is no options overlay or active management here. Exit to free capital and reduce dead weight.",
+      "entry_price": null,
+      "error": "No price data for SSBK on 2022-06-15"
+    },
+    {
+      "ticker": "DTD",
+      "action": "SELL",
+      "conviction": "MEDIUM",
+      "reasoning": "WisdomTree Total Dividend ETF bought July 2021 and never managed \u2014 a $32.5K idle position. In a rising-rate environment, dividend ETFs face duration headwinds. No options overlay, no active management. Liquidate to redeploy capital.",
+      "entry_price": 52.95,
+      "outcomes": {
+        "30d": {
+          "return_pct": 0.89,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -1.11,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": 9.12,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -4.0,
+          "correct": false
+        },
+        "90d": {
+          "return_pct": 3.08,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -1.04,
+          "correct": false
+        }
+      }
+    },
+    {
+      "ticker": "MTUM",
+      "action": "SELL",
+      "conviction": "HIGH",
+      "reasoning": "iShares MSCI Momentum ETF is structurally wrong for this market environment \u2014 momentum strategies have been crushed in 2022 as rate-sensitive growth stocks that dominated MTUM's composition sold off hardest. Another stale July 2021 buy with zero subsequent activity. Exit immediately.",
+      "entry_price": 129.36,
+      "outcomes": {
+        "30d": {
+          "return_pct": 1.02,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -0.98,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": 7.45,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -5.67,
+          "correct": false
+        },
+        "90d": {
+          "return_pct": 3.81,
+          "spy_return_pct": 4.11,
+          "alpha_pct": -0.3,
+          "correct": false
+        }
+      }
+    },
+    {
+      "ticker": "OXY",
+      "action": "BUY",
+      "conviction": "HIGH",
+      "reasoning": "This position was fully exited in February 2022 for a large profit \u2014 but it should be re-entered now. Energy is the only winning sector in 2022 (XLE +50% YTD) and OXY specifically has Buffett accumulating aggressively. With oil prices elevated and the Fed not yet breaking energy demand, OXY offers a high-quality re-entry into the best macro trend of the year at a portfolio that currently has ZERO energy exposure after the February exit.",
+      "entry_price": 56.86,
+      "outcomes": {
+        "30d": {
+          "return_pct": -2.6,
+          "spy_return_pct": 2.0,
+          "alpha_pct": -4.61,
+          "correct": false
+        },
+        "60d": {
+          "return_pct": 9.04,
+          "spy_return_pct": 13.12,
+          "alpha_pct": -4.08,
+          "correct": true
+        },
+        "90d": {
+          "return_pct": 8.61,
+          "spy_return_pct": 4.11,
+          "alpha_pct": 4.5,
+          "correct": true
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "30d": {
+      "total_evaluated": 9,
+      "correct": 4,
+      "accuracy": 44.4,
+      "avg_alpha": -5.74,
+      "buy_accuracy": 0.0,
+      "sell_accuracy": 57.1
+    },
+    "60d": {
+      "total_evaluated": 9,
+      "correct": 5,
+      "accuracy": 55.6,
+      "avg_alpha": -5.57,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 42.9
+    },
+    "90d": {
+      "total_evaluated": 9,
+      "correct": 7,
+      "accuracy": 77.8,
+      "avg_alpha": -4.93,
+      "buy_accuracy": 100.0,
+      "sell_accuracy": 71.4
+    }
+  }
+}

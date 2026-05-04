@@ -1,0 +1,62 @@
+{
+  "horizon_comparison": {
+    "30d": {
+      "gated_accuracy": 40.0,
+      "ungated_accuracy": 60.0,
+      "hindsight_advantage": 20.0,
+      "gated_avg_alpha": 3.24,
+      "ungated_avg_alpha": 4.08,
+      "alpha_advantage": 0.84,
+      "gated_buy_accuracy": 100.0,
+      "ungated_buy_accuracy": 100.0,
+      "gated_sell_accuracy": 25.0,
+      "ungated_sell_accuracy": 0.0
+    },
+    "60d": {
+      "gated_accuracy": 40.0,
+      "ungated_accuracy": 60.0,
+      "hindsight_advantage": 20.0,
+      "gated_avg_alpha": 2.76,
+      "ungated_avg_alpha": 3.41,
+      "alpha_advantage": 0.65,
+      "gated_buy_accuracy": 100.0,
+      "ungated_buy_accuracy": 100.0,
+      "gated_sell_accuracy": 25.0,
+      "ungated_sell_accuracy": 0.0
+    },
+    "90d": {
+      "gated_accuracy": 40.0,
+      "ungated_accuracy": 60.0,
+      "hindsight_advantage": 20.0,
+      "gated_avg_alpha": 6.06,
+      "ungated_avg_alpha": 7.73,
+      "alpha_advantage": 1.67,
+      "gated_buy_accuracy": 100.0,
+      "ungated_buy_accuracy": 100.0,
+      "gated_sell_accuracy": 25.0,
+      "ungated_sell_accuracy": 0.0
+    }
+  },
+  "agreement": {
+    "common_tickers": 12,
+    "same_action": 9,
+    "agreement_rate": 75.0
+  },
+  "disagreements": [
+    {
+      "ticker": "DIS",
+      "gated_action": "HOLD",
+      "ungated_action": "SELL"
+    },
+    {
+      "ticker": "GOOGL",
+      "gated_action": "SELL",
+      "ungated_action": "BUY"
+    },
+    {
+      "ticker": "NVDA",
+      "gated_action": "HOLD",
+      "ungated_action": "BUY"
+    }
+  ]
+}
