@@ -26,7 +26,7 @@ from src.eval.grounding import evaluate_report, format_eval_report
 
 BEDROCK_MODELS = {
     "opus": "global.anthropic.claude-opus-4-6-v1",
-    "sonnet": "global.anthropic.claude-sonnet-4-6-v1",
+    "sonnet": "global.anthropic.claude-sonnet-4-6",
     "haiku": "global.anthropic.claude-haiku-4-5-v1",
 }
 
@@ -56,6 +56,7 @@ def run_iteration(
     model: str,
     guidelines: str | None,
     out_dir: Path,
+    as_of_date: str | None = None,
 ) -> dict:
     """Run one analyze → evaluate cycle. Returns eval results."""
     print(f"\n{'='*60}")
@@ -69,7 +70,7 @@ def run_iteration(
 
     # Analyze
     print(f"\n  [1/2] Running portfolio analysis...")
-    result = analyze_portfolio(summary, client, model, guidelines=guidelines)
+    result = analyze_portfolio(summary, client, model, guidelines=guidelines, as_of_date=as_of_date)
     report = result["report"]
     call_log = result["call_log"]
     meta = result["metadata"]
@@ -146,6 +147,8 @@ def main():
     parser.add_argument("--model", default="opus", choices=["opus", "sonnet", "haiku"])
     parser.add_argument("--iterations", type=int, default=3, help="Number of iterations (default: 3)")
     parser.add_argument("--output", default="outputs_reflect", help="Output directory")
+    parser.add_argument("--as-of-date", default=None,
+                        help="Time-gate: restrict analysis to data available as of this date (YYYY-MM-DD)")
     args = parser.parse_args()
 
     if not args.kaggle:
@@ -182,7 +185,7 @@ def main():
 
     for i in range(1, args.iterations + 1):
         # Analyze + evaluate
-        result = run_iteration(i, summary, client, model_id, guidelines, out)
+        result = run_iteration(i, summary, client, model_id, guidelines, out, as_of_date=args.as_of_date)
         eval_results = result["eval_results"]
         trust = eval_results["overall_trust_score"]
 

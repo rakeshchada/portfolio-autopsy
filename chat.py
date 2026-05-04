@@ -23,7 +23,7 @@ from src.data.portfolio import load_kaggle_trades, build_portfolio_summary
 
 BEDROCK_MODELS = {
     "opus": "global.anthropic.claude-opus-4-6-v1",
-    "sonnet": "global.anthropic.claude-sonnet-4-6-v1",
+    "sonnet": "global.anthropic.claude-sonnet-4-6",
     "haiku": "global.anthropic.claude-haiku-4-5-v1",
 }
 

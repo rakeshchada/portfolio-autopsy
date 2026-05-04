@@ -19,7 +19,7 @@ from src.eval.grounding import evaluate_report, format_eval_report
 
 BEDROCK_MODELS = {
     "opus": "global.anthropic.claude-opus-4-6-v1",
-    "sonnet": "global.anthropic.claude-sonnet-4-6-v1",
+    "sonnet": "global.anthropic.claude-sonnet-4-6",
     "haiku": "global.anthropic.claude-haiku-4-5-v1",
 }
 
@@ -52,6 +52,9 @@ def main():
     parser.add_argument("--model", default="opus", choices=["opus", "sonnet", "haiku"])
     parser.add_argument("--output", default="outputs", help="Output directory")
     parser.add_argument("--skip-eval", action="store_true", help="Skip grounding evaluation")
+    parser.add_argument("--as-of-date", default=None,
+                        help="Time-gate: restrict analysis to data available as of this date (YYYY-MM-DD). "
+                             "Prevents hindsight bias in recommendations.")
     args = parser.parse_args()
 
     if not args.kaggle:
@@ -78,8 +81,11 @@ def main():
           f"${summary['total_capital_deployed']:,.0f} deployed")
 
     # --- Analysis ---
-    print(f"\n=== Portfolio Analysis ===\n")
-    result = analyze_portfolio(summary, client, model=model_id)
+    if args.as_of_date:
+        print(f"\n=== Portfolio Analysis (time-gated to {args.as_of_date}) ===\n")
+    else:
+        print(f"\n=== Portfolio Analysis ===\n")
+    result = analyze_portfolio(summary, client, model=model_id, as_of_date=args.as_of_date)
 
     report = result["report"]
     call_log = result["call_log"]
