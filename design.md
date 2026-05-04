@@ -15,186 +15,247 @@ covering strategy, execution, risk management, and behavioral patterns.
 ## Design Evolution
 
 ### v1: Per-trade grading (discarded)
-The initial design analyzed trades individually, grading each A–F. This was shallow:
+The initial design analyzed trades individually, grading each A-F. This was shallow:
 it missed portfolio-level patterns (concentration, correlation, position sizing) and
-couldn't evaluate round-trips (buy-exercise-sell cycles). It also produced ethics-committee
-editorializing rather than financial analysis.
+couldn't evaluate round-trips (buy-exercise-sell cycles).
 
 ### v2: Portfolio-level advisor with fixed tools
 Restructured to feed the agent the complete trade timeline. Added 12 pre-built market data
-tools (prices, returns, benchmarks, VIX, etc.). Better output, but the agent was still
-constrained to only the analyses we pre-defined. Every tool call was essentially a database
-lookup — no custom computation.
+tools. Better output, but constrained to pre-defined analyses.
 
 ### v3: Agent with Python sandbox + web search (current)
 The key insight: **don't limit the agent to pre-built tools — give it a programming
-environment.** The agent now has:
-
-1. **12 convenience tools** — pre-built functions for common queries (prices, returns,
-   benchmarks, volatility, earnings, VIX, drawdowns, correlations)
-2. **Python sandbox** — arbitrary code execution with numpy, pandas, scipy, yfinance.
-   The agent can compute Sharpe ratios, run Monte Carlo simulations, build factor models,
-   price options, or any analysis it decides is relevant.
-3. **Web search** — look up market news, analyst opinions, and events around trade dates
-   to understand *why* stocks moved, not just *that* they moved.
-
-This architecture lets the agent **discover what analysis matters** rather than following
-a checklist. Different portfolios surface different issues: a concentrated tech portfolio
-needs factor decomposition; an options-heavy portfolio needs premium efficiency analysis;
-a frequent trader needs transaction cost modeling.
+environment.** The agent now has 12 convenience tools, a Python sandbox (numpy, pandas,
+scipy, yfinance), and web search. This lets the agent **discover what analysis matters**
+rather than following a checklist.
 
 ## Architecture
 
 ```
 Trade Data (CSV / Kaggle dataset)
-        │
-        ▼
-  Portfolio Builder
-  (parse options details, build timeline, group by ticker)
-        │
-        ▼
+        |
+  Portfolio Builder (parse options, build timeline, group by ticker)
+        |
   Portfolio Advisor Agent (Claude + tools)
-  ├── Market data tools (12 pre-built, yfinance)
-  ├── Python sandbox (numpy, pandas, scipy, yfinance)
-  ├── Web search (DuckDuckGo)
-  │
-  │   Agent reasons about portfolio → calls tools → computes metrics
-  │   → searches for context → synthesizes into report
-  │
-  ├── Structured <claim> tags for verifiable assertions
-  │
-        ▼
+  |-- Market data tools (12 pre-built, yfinance)
+  |-- Python sandbox (numpy, pandas, scipy, yfinance)
+  |-- Web search (DuckDuckGo)
+  |
+  |   Agent reasons -> calls tools -> computes metrics
+  |   -> searches for context -> synthesizes report with <claim> tags
+  |
   Grounding Evaluator
-  ├── Tool call audit (re-run sample of tool calls, verify data)
-  ├── Claim tag verification (independently compute claimed values)
-  ├── Python execution review (check for errors)
-  └── Trust score (composite 0-100)
-        │
-        ▼
-  Report + Evaluation Scorecard
+  |-- Tool call audit (re-run sample, verify data)
+  |-- Claim tag verification (independently compute claimed values)
+  |-- Python execution review (check for errors)
+  |-- Trust score (composite 0-100)
+        |
+  Report + Scorecard + Reflection Agent -> Guidelines -> Improved Report
 ```
 
 ## Key Design Decisions
 
-### 1. Why agent + sandbox, not hardcoded pipeline?
+### 1. Agent + sandbox > hardcoded pipeline
 
-A fixed pipeline produces uniform output regardless of the portfolio. But the interesting
-questions differ: a single-stock portfolio needs deep dive analysis; a 200-position portfolio
-needs clustering and factor decomposition. The agent decides what matters.
+A fixed pipeline produces uniform output. The interesting questions differ per portfolio:
+a single-stock portfolio needs deep dive analysis; a 200-position portfolio needs clustering
+and factor decomposition. The sandbox transforms the agent from a tool-caller into an analyst.
 
-The sandbox is the critical piece. The 12 pre-built tools are convenience — the sandbox is
-capability. It transforms the agent from a tool-caller into an analyst.
+**Tradeoff:** Less deterministic output. For production, you'd want both: the agent for
+discovery, a fixed pipeline for consistent baseline metrics.
 
-**Tradeoff:** Less deterministic output. Two runs on the same data may emphasize different
-aspects. For a production system, you'd want both: the agent for discovery, plus a fixed
-pipeline for consistent baseline metrics.
-
-### 2. Why structured claim tags?
+### 2. Structured claim tags for trust
 
 LLMs hallucinate numbers. In financial analysis, a fabricated return or price can be
-catastrophic. The `<claim>` tag system forces the agent to cite its sources, and the
-evaluator independently re-computes each claim.
+catastrophic. The `<claim>` tag system forces source citation, and the evaluator
+independently re-computes each claim. This is the observability layer for safely increasing
+model autonomy.
 
-This maps to a real production concern: how do you deploy LLM-generated analysis in a
-trading firm where wrong numbers lose money? The answer is automated grounding verification.
+### 3. Reflection loop (GEPA-inspired)
 
-### 3. Why not fine-tune?
+The eval framework produces structured feedback — which claims failed, which computations
+errored. A reflection agent converts this into specific guidelines. This is evolutionary
+prompt optimization with selection pressure: reject mutations that make scores worse.
 
-For a take-home project, prompt engineering + tool design is the right call. But the
-architecture is designed for it:
-- The claim tags create natural training signal (verified claims = positive examples)
-- Tool call logs are structured data suitable for SFT on tool selection
-- The Python sandbox outputs create (prompt, code, result) triples for code generation tuning
+## Experiment 1: Reflection Loop (Scaffold Optimization)
 
-A fine-tuned model would improve: analysis consistency, tool selection efficiency (fewer
-wasted calls), and output quality (less preamble, better structure).
+**Question:** Can scaffold-level optimization (prompt amendment via reflection) substitute
+for model improvement?
 
-### 4. Why evaluate the agent's own output?
+**Method:** Iterative analyze -> evaluate -> reflect -> re-analyze cycles with strict
+improvement gating. The reflection agent receives structured eval results and produces
+numbered guidelines injected into the advisor's system prompt.
 
-Inspired by the JD question: "How do we safely increase model autonomy without losing
-observability, steerability, or control?" The eval framework is the observability layer.
-Every tool call is logged and auditable. Every numerical claim traces back to its source.
-The trust score quantifies how much you should trust this specific report.
+**Results (5-iteration run, Pelosi portfolio, Opus):**
 
-## Data
+| Iter | Score | Grade | Claim Tags | Tag Accuracy | Grounding | Tools | Status |
+|------|-------|-------|------------|--------------|-----------|-------|--------|
+| 1 | 89 | B | 40 | 100% | 27% | 99 | baseline |
+| 2 | 82 | B | 45 | 100% | 10% | 143 | rejected |
+| 3 | 88 | B | 55 | 100% | 25% | 126 | rejected |
+| 4 | 95 | A | 89 | 100% | 37% | 143 | accepted |
+| 5 | 92 | A | 105 | 100% | 31% | 165 | rejected |
 
-- **Primary dataset:** 46K Congressional trades from Kaggle (inception through March 2024),
-  sourced from STOCK Act public disclosures via QuiverQuant.
-- **Market data:** Live via yfinance (free, no API key). Covers prices, fundamentals,
-  earnings, options chains.
-- **News context:** DuckDuckGo search for market events around trade dates.
-- **The system is trader-agnostic** — Congressional trades are used as a public dataset for
-  demonstration. The same engine works on any trade log with dates, tickers, and amounts.
+Best: iteration 4 (95/A). +6 points over baseline. Claim tags doubled. 3 regressions
+auto-rolled-back.
 
-## Success Criteria
+**Qualitative improvements from reflection:**
+- "Tag ALL verifiable claims, not just a subset" -> 40 to 89 tags
+- "Every price must trace to a tool call" -> grounding improved 27% to 37%
+- "Avoid ~ as a substitute for computing" -> fewer approximations
+- New analyses emerged: Monte Carlo skill tests, VIX regime analysis at every trade date
 
-1. **Quantitative accuracy:** Claims in the report are independently verifiable. The
-   grounding evaluator spot-checks prices and returns against market data. Target: >90%
-   accuracy on verifiable claims.
-2. **Analytical depth:** The report surfaces insights beyond what a simple P&L statement
-   shows — behavioral patterns, options strategy evaluation, factor attribution,
-   opportunity cost analysis.
-3. **Source grounding:** Every specific number traces to a tool call, Python computation,
-   or web search result. No hand-waved estimates.
-4. **Extensibility:** New analysis dimensions emerge from the agent's reasoning +
-   sandbox, not from adding hardcoded tools.
+**Cross-portfolio validation (single-run, different traders):**
 
-## Reflection Loop (GEPA-inspired evolutionary optimization)
+| Trader | Tool Calls | Trust Score | Grade | Key Findings |
+|--------|-----------|-------------|-------|--------------|
+| Pelosi | 77 | 88-98 | A | LEAPS strategy, disposition effect |
+| Tuberville | 85 | ~88 | D+ | Systematic value destruction |
+| Phillips | 72 | ~85 | C+ | Sector concentration risk |
 
-The system implements an analyze → evaluate → reflect → re-analyze loop inspired by
-[GEPA](https://github.com/gepa-ai/gepa)'s evolutionary prompt optimization. Rather than
-gradient updates, the agent improves through structured self-reflection on its evaluation
-results.
+## Experiment 2: Reflection x Time-Gating Interaction
 
-**How it works:**
-1. The advisor agent generates a portfolio report (iteration 1 = baseline, no guidelines)
-2. The grounding evaluator scores it (trust score, claim accuracy, grounding rate)
-3. A reflection agent analyzes the eval failures and produces specific guidelines
-4. The advisor re-runs with guidelines injected into its system prompt
-5. The evaluator scores again. If the score regressed, guidelines are rolled back
-   (strict improvement gating, borrowed from GEPA's `StrictImprovementAcceptance`)
+**Question:** Does reflection-based optimization work the same way under information
+constraints? Can it compensate for the quality loss from time-gating?
 
-**Results on Pelosi portfolio (2 iterations):**
+**Method:** Run the same 3-iteration reflection loop in two conditions:
+- **Gated** (cutoff 2022-06-01): agent cannot access data after June 2022
+- **Ungated** (full data): standard retrospective analysis
 
-| Metric | Iteration 1 (baseline) | Iteration 2 (with guidelines) |
-|--------|----------------------|------------------------------|
-| Trust Score | 90/100 | 93/100 (+3) |
-| Claim Tags | 41 | 89 (+117%) |
-| Tag Accuracy | 100% | 100% |
-| Grounding Rate | 28% | 33% (+18%) |
-| Python Clean | 94% | 96% |
-| Tildes (~) | 29 | 21 (-28%) |
+**Results:**
 
-The reflection produced 10 specific guidelines. The most impactful: "tag ALL verifiable
-claims, not just a subset" (41→89 tags), "every price must trace to a tool call" (grounding
-improved), and "avoid ~ as a substitute for computing" (fewer approximations). Iteration 2
-also introduced new analytical depth not present in iteration 1: Monte Carlo skill tests,
-VIX regime analysis at every trade date, and tax-loss harvesting quantification.
+| Iteration | Gated (2022-06-01) | Ungated (full data) |
+|-----------|-------------------|---------------------|
+| 1 (baseline) | 92/100 (A) | 80/100 (B) |
+| 2 | 90/100 (rejected) | 92/100 (A, accepted) |
+| 3 | 85/100 (rejected) | crashed (model error) |
+| Best | 92 (iter 1) | 92 (iter 2) |
 
-**What we borrowed from GEPA:**
-- Structured reflective dataset (curate what the reflection LLM sees, not raw dumps)
-- Strict improvement gating (reject mutations that make scores worse)
-- Cumulative guideline evolution (each reflection builds on previous guidelines)
+**Finding 1: The gated agent started stronger (92 vs 80).**
+Without future data, the agent was *more careful* with claims — fewer ungrounded assertions,
+tighter evidence-to-claim chains. The information constraint imposed natural discipline.
 
-**What we didn't implement (future work):**
-- Population-based search with Pareto front over multiple strategy variants
-- Ancestry-aware crossover between strategies
-- Component-level round-robin mutation (rotating which prompt section gets updated)
+**Finding 2: Reflection helped the ungated agent (+12 pts) but hurt the gated agent.**
+The ungated agent had room to improve: messy citations, ungrounded claims. Reflection
+cleaned these up (80->92). The gated agent was already disciplined; reflection's pressure
+to "cite more" created ungroundable claims (claim tags: 26->96, grounding rate: 33%->14%).
 
-## What's Next (with more time)
+**Finding 3: The optimization landscape depends on information regime.**
+The same eval signal + same reflection agent + same guidelines format produced opposite
+dynamics. In the unconstrained regime, "add more citations" improves quality. In the
+constrained regime, it degrades quality. This has implications for deploying reflection-based
+optimization in real-time / information-limited settings.
 
-- **Distillation + RL:** Generate 50-100 Opus trajectories, distill to Qwen3-32B or
-  Gemma-27B via SFT, then run GRPO with the trust score as reward. The eval framework
-  becomes the reward model. Estimated: ~2 days on A100.
-- **Real-time alerts:** Monitor portfolio positions and surface warnings (concentration
-  drift, stop-loss triggers, earnings proximity)
-- **Backtesting framework:** "What if you'd followed a systematic version of your own
-  strategy?" — codify the trader's patterns into rules and backtest them
-- **Multi-modal analysis:** Ingest earnings call transcripts, SEC filings, news articles
-  alongside price data
+**Implication for production:** A live trading advisor (inherently information-constrained)
+should NOT be optimized with the same reflection strategy as a retrospective analyzer.
+The reward signal needs to be conditioned on the information regime.
+
+## Experiment 3: Hindsight Bias Ablation
+
+**Question:** How much of a retrospective agent's analytical value comes from hindsight?
+
+**Method:** Same agent, same tools, same portfolio. One variable: can the agent access
+future data? Time-gating enforced at three layers:
+1. Tool parameter validation rejects dates > cutoff
+2. Python sandbox patches `yf.download()` to cap end dates
+3. Web search blocks queries with future year references
+
+Both agents produce BUY/SELL/HOLD recommendations, scored against actual market outcomes.
+
+**Results (3 decision points, 2 portfolios):**
+
+| Trader | Decision Date | Gated (90d) | Ungated (90d) | Advantage | Agreement |
+|--------|---------------|-------------|---------------|-----------|-----------|
+| Pelosi | 2019-06-07 | 60% | 100% | +40pp | 50% |
+| Pelosi | 2021-06-15 | 40% | 60% | +20pp | 75% |
+| Tuberville | 2022-06-15 | 67% | 78% | +11pp | 64% |
+
+**Findings:**
+- Hindsight advantage ranges +11 to +40 percentage points
+- Bias is largest in bull markets (+40pp) where future gains are unpredictable from fundamentals
+- Bias is smallest in bear markets (+11pp) where distress signals are visible in current data
+- The gated agent still achieves 40-67% accuracy — real analytical value from available info
+- Disagreements reveal which positions are most hindsight-dependent (GOOGL flipped SELL->BUY)
+
+**Knowability classification:** Each recommendation is classified as KNOWABLE (same action
+regardless of future data), HINDSIGHT (action only justified with future knowledge), MIXED,
+or UNKNOWN. This labels the training data for potential RL: reward KNOWABLE insights,
+penalize HINDSIGHT-dependent ones.
+
+## Experiment 4: Cross-Model Quality Gap
+
+**Question:** What is the smallest capability-preserving system? Where does quality degrade?
+
+**Method:** Same portfolio, same tools, 4 models. Evaluated with grounding framework.
+
+| Model | Tool Calls | Report | Trust | Tool Acc | Grounding |
+|-------|-----------|--------|-------|----------|-----------|
+| Opus | 77 | 25k | 88-98 | 100% | 85%+ |
+| Haiku | 44 | 19k | 65 | 100% | 17% |
+| Llama 4 Scout 17B | 3 | 1.8k | 31 | 100% | 0% |
+| Llama 3.1 8B | 0 | 3.4k | 22 | 50% | 0% |
+
+**Findings:**
+- **Tool mechanics are not the bottleneck**: Haiku makes correct tool calls (100% accuracy)
+  but makes fewer of them (44 vs 77) and grounds fewer claims to tool data (17% vs 85%)
+- **The gap is in reasoning about evidence**: deciding WHICH tools to call, HOW to synthesize
+  results, and WHETHER to cite vs assert
+- **Open models fail at tool use entirely**: Llama 3.1 8B outputs tool calls as plain text
+  (0 structured calls). Even Llama 4 Scout only makes 3 calls before stopping
+- **Distillation target**: Opus->Haiku gap (28 pts) is the actionable opportunity — both
+  use the same tool interface, the gap is in analytical reasoning quality
+
+## Experiment 5: Interactive Chat with Persistent Memory
+
+**Question:** How should long-horizon memory be represented for dynamic reasoning?
+How do you give a memory cell a human chat interface?
+
+**Design:**
+The agent has two additional tools beyond market data and Python:
+- `store_memory(category, content, metadata)` — persist an insight
+- `recall_memory(category, query)` — retrieve before answering
+
+Memory is organized by type (finding, alert, metric, pattern, position_summary) and
+persists as JSON on disk between sessions. The system prompt is refreshed each turn
+with the latest memories, so the agent always has its accumulated knowledge available.
+
+**Key design choice:** The agent decides what to remember, not the system. This means
+memory contains insights and conclusions ("NVDA position was sold at -50% drawdown,
+classic panic sell") rather than raw data ("NVDA closed at $16.51 on 2022-07-26").
+Raw data can be re-fetched; analytical judgments cannot.
+
+**Observed behavior:**
+- First query about 2023 returns: 14 tool calls, ~2 minutes of computation
+- Same query in next session: 1 recall_memory call, instant response
+- Agent proactively stores discoveries without being prompted
+- Memory accumulates an increasingly rich model of the portfolio over sessions
+
+**Product application:** This architecture maps to a real-time trading advisor sidebar
+embedded alongside a brokerage app. The memory system is the bridge between stateless
+LLM inference and the persistent understanding a human advisor builds over years.
+Use cases: ad-hoc portfolio Q&A, pre-trade concentration warnings, proactive alerts
+from accumulated analysis, evolving understanding of a trader's behavioral patterns.
+
+## What's Next
+
+### With more compute time
+- **Fine-tune on teacher trajectories:** Opus generates ~30 turns per portfolio. 100
+  portfolios = ~3000 turn-level SFT examples. Fine-tune Qwen3-4B or Haiku on these
+  to close the quality gap. The grounding eval is the evaluation metric.
+- **Regime-conditioned reflection:** Different reflection strategies for information-
+  constrained vs unconstrained agents (the key finding from Experiment 2).
+- **Expand hindsight ablation:** 10+ traders, 5+ decision points each, with confidence
+  intervals and statistical significance tests.
+
+### With more scope
+- **RL with trust score as reward:** The grounding evaluator produces a differentiable
+  signal. The knowability labels separate learnable from unlearnable improvements.
+  GRPO with the trust score would optimize the agent end-to-end.
 - **Population-based reflection:** Maintain a Pareto front of strategy variants, each
-  specialized for different portfolio types (growth vs value vs options-heavy)
+  specialized for different portfolio types.
+- **Real-time deployment:** The time-gated agent IS a live trading advisor. Add streaming
+  market data, position monitoring, and alert triggers.
 
 ---
 
-*v4 — reflects the full system including reflection loop and tool analysis*
+*v5 — includes reflection x time-gating interaction experiment and cross-model comparison*
