@@ -273,7 +273,10 @@ def execute_tool(name: str, args: dict) -> str:
         return _to_json(summary)
 
     elif name == "run_python":
-        return execute_python(args["code"])
+        code = args.get("code") or args.get("script") or args.get("python_code") or ""
+        if not code:
+            return _to_json({"error": "No code provided. Use the 'code' parameter."})
+        return execute_python(code)
 
     elif name == "web_search":
         return web_search(args["query"])

@@ -24,11 +24,12 @@ def _flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _get_price(ticker: str, date: str) -> float | None:
+    from src.data.market import _cached_download
     dt = pd.to_datetime(date)
     start = (dt - timedelta(days=5)).strftime("%Y-%m-%d")
     end = (dt + timedelta(days=2)).strftime("%Y-%m-%d")
     try:
-        df = yf.download(ticker, start=start, end=end, progress=False)
+        df = _cached_download(ticker, start, end)
         if df.empty:
             return None
         df = _flatten_columns(df)

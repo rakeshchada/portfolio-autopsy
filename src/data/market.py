@@ -1,9 +1,90 @@
-"""Market data fetching via yfinance."""
+"""Market data fetching via yfinance with disk cache."""
+
+import hashlib
+import json
+import os
+from pathlib import Path
 
 import yfinance as yf
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+
+
+_CACHE_DIR = Path(os.environ.get("YF_CACHE_DIR", "/tmp/yf_cache"))
+_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+_FAILED_TICKERS: set[str] = set()
+
+
+def _cached_download(ticker: str, start: str, end: str) -> pd.DataFrame:
+    """yf.download with per-ticker full-history cache.
+
+    Stores one CSV per ticker covering all data ever fetched. If the requested
+    range is within what's cached, slices from cache. Otherwise fetches the
+    full range (extending the cache) and returns the slice.
+    """
+    if ticker in _FAILED_TICKERS:
+        return pd.DataFrame()
+
+    cache_path = _CACHE_DIR / f"{ticker}.csv"
+
+    if cache_path.exists():
+        df = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+        if not df.empty:
+            df = _flatten_columns(df)
+            df.index = pd.to_datetime(df.index)
+            # Check if requested range is within cached range
+            cached_start = df.index.min()
+            cached_end = df.index.max()
+            req_start = pd.to_datetime(start)
+            req_end = pd.to_datetime(end)
+
+            if req_start >= cached_start and req_end <= cached_end + pd.Timedelta(days=1):
+                return df.loc[start:end]
+
+            # Extend range to cover both cached and requested
+            new_start = min(cached_start, req_start).strftime("%Y-%m-%d")
+            new_end = max(cached_end, req_end).strftime("%Y-%m-%d")
+            fresh = yf.download(ticker, start=new_start, end=new_end, progress=False)
+            if not fresh.empty:
+                fresh = _flatten_columns(fresh)
+                fresh.to_csv(cache_path)
+                return fresh.loc[start:end]
+            return df.loc[start:end]
+        else:
+            _FAILED_TICKERS.add(ticker)
+            return pd.DataFrame()
+
+    # First fetch for this ticker
+    df = yf.download(ticker, start=start, end=end, progress=False)
+    if not df.empty:
+        df = _flatten_columns(df)
+        df.to_csv(cache_path)
+    else:
+        pd.DataFrame().to_csv(cache_path)
+        _FAILED_TICKERS.add(ticker)
+
+    return df
+
+
+def prewarm_cache(tickers: list[str], start: str = "2010-01-01", end: str = "2025-12-31"):
+    """Download full history for a list of tickers in one batch. Call before experiments."""
+    to_fetch = [t for t in tickers if not (_CACHE_DIR / f"{t}.csv").exists()]
+    if not to_fetch:
+        return
+    print(f"  Pre-warming cache for {len(to_fetch)} tickers...", end="", flush=True)
+    for i, ticker in enumerate(to_fetch):
+        df = yf.download(ticker, start=start, end=end, progress=False)
+        cache_path = _CACHE_DIR / f"{ticker}.csv"
+        if not df.empty:
+            df = _flatten_columns(df)
+            df.to_csv(cache_path)
+        else:
+            pd.DataFrame().to_csv(cache_path)
+            _FAILED_TICKERS.add(ticker)
+        if (i + 1) % 10 == 0:
+            print(f" {i+1}", end="", flush=True)
+    print(" done")
 
 
 def _flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -16,7 +97,7 @@ def _flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
 def get_price_history(ticker: str, trade_date: str, window_days: int = 90) -> pd.DataFrame:
     start = pd.to_datetime(trade_date) - timedelta(days=window_days)
     end = pd.to_datetime(trade_date) + timedelta(days=window_days)
-    df = yf.download(ticker, start=start.strftime("%Y-%m-%d"), end=end.strftime("%Y-%m-%d"), progress=False)
+    df = _cached_download(ticker, start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
     if df.empty:
         return df
     df = _flatten_columns(df)
@@ -26,8 +107,8 @@ def get_price_history(ticker: str, trade_date: str, window_days: int = 90) -> pd
 
 def get_price_on_date(ticker: str, date: str) -> float | None:
     dt = pd.to_datetime(date)
-    df = yf.download(ticker, start=(dt - timedelta(days=5)).strftime("%Y-%m-%d"),
-                     end=(dt + timedelta(days=1)).strftime("%Y-%m-%d"), progress=False)
+    df = _cached_download(ticker, (dt - timedelta(days=5)).strftime("%Y-%m-%d"),
+                          (dt + timedelta(days=1)).strftime("%Y-%m-%d"))
     if df.empty:
         return None
     df = _flatten_columns(df)
@@ -173,7 +254,7 @@ def get_vix_on_date(date: str) -> dict:
     start = (dt - timedelta(days=5)).strftime("%Y-%m-%d")
     end = (dt + timedelta(days=1)).strftime("%Y-%m-%d")
     for ticker in ["^VIX", "VIXY"]:
-        df = yf.download(ticker, start=start, end=end, progress=False)
+        df = _cached_download(ticker, start, end)
         if not df.empty:
             break
     if df.empty:
@@ -193,7 +274,7 @@ def get_drawdown_from_high(ticker: str, trade_date: str, lookback_days: int = 25
     dt = pd.to_datetime(trade_date)
     start = (dt - timedelta(days=lookback_days)).strftime("%Y-%m-%d")
     end = (dt + timedelta(days=1)).strftime("%Y-%m-%d")
-    df = yf.download(ticker, start=start, end=end, progress=False)
+    df = _cached_download(ticker, start, end)
     if df.empty:
         return {"error": "No data"}
     df = _flatten_columns(df)
@@ -219,7 +300,7 @@ def get_counterfactual_entries(ticker: str, trade_date: str, window_days: int = 
     end_fetch = (td + timedelta(days=window_days)).strftime("%Y-%m-%d")
     eval_end = (td + timedelta(days=90)).strftime("%Y-%m-%d")
 
-    df = yf.download(ticker, start=start, end=end_fetch, progress=False)
+    df = _cached_download(ticker, start, end_fetch)
     if df.empty:
         return {"error": "No data"}
     df = _flatten_columns(df)
@@ -299,8 +380,8 @@ def get_correlation_to_market(ticker: str, trade_date: str, lookback_days: int =
     start = (td - timedelta(days=lookback_days)).strftime("%Y-%m-%d")
     end = (td + timedelta(days=1)).strftime("%Y-%m-%d")
 
-    stock_df = yf.download(ticker, start=start, end=end, progress=False)
-    spy_df = yf.download("SPY", start=start, end=end, progress=False)
+    stock_df = _cached_download(ticker, start, end)
+    spy_df = _cached_download("SPY", start, end)
 
     if stock_df.empty or spy_df.empty:
         return {"error": "Insufficient data"}
