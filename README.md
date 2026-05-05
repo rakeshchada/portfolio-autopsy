@@ -82,6 +82,8 @@ Given a measurement framework, can the system improve itself? A reflection agent
 
 Over 5 iterations on the Pelosi portfolio, reflection improved the trust score by 6 points (89 to 95), doubled grounded citations (40 to 89), and introduced new analytical depth (Monte Carlo skill tests, VIX regime analysis) — without changing the model or code. The rollback mechanism prevented 3 regressions.
 
+**At scale (n=19 traders):** trust score improves +3.4 points on average (71.5 → 74.8), claim grounding rate improves +31% relative (19.7% → 25.8%), and reflection **never regresses** — 9/19 traders improved, 10/19 unchanged, 0 worse. The mechanism: reflection doesn't make claims more accurate (already ~72%), it makes them better *grounded* — more claims traceable to actual tool data. The rollback gate (79% acceptance rate) prevents the 21% of iterations that would have hurt.
+
 The most interesting finding: the same reflection loop produces opposite dynamics depending on information availability. We ran the loop on a time-gated agent (restricted to pre-2022 data) and an ungated agent (full data access):
 
 ```
@@ -372,7 +374,7 @@ python experiments/refinement/run_confidence_calibration.py
 
 ## Current Limitations
 
-**Phase 1 (analysis):** The reflection improvement trajectory (89 to 95) and the reflection × time-gating interaction are measured on a single portfolio (Pelosi). The grounding evaluator has not been meta-evaluated against human judgment — it scores the agent's output, but no one has scored the scorer.
+**Phase 1 (analysis):** The reflection improvement is validated across 19 traders (+3.4 mean, 0 regressions), but the reflection × time-gating interaction is measured on a single portfolio (Pelosi). The grounding evaluator itself lacks human validation — it measures the agent's factual accuracy, but its own precision/recall against human labels is unknown.
 
 **Phase 2 (refinement):** The strongest finding (learning curve 26% → 66%) is measured on 12 traders — statistically significant but would benefit from larger n. Instrument swap performance (59-71%) rests on only 17-19 episodes at the category level. The transfer result (41% → 80%) is n=10 test traders — directionally strong but needs replication. Model contamination in the "any-stock" condition means we cannot cleanly separate structural insight from memorization for instrument swaps — the risk-reduction metric (drawdown) is our decontamination proxy but is not a perfect substitute.
 
